@@ -16,13 +16,10 @@ reticulate::use_condaenv("titiler", required = TRUE)
 import pathlib
 import pystac
 import rio_stac
-# import shutil
-# import os
-
 ```
 
 
-```{python path}
+```{python prototype}
 # path_collection = "/Volumes/backup_2022/backups/new_graph/uav_imagery/imagery_uav_bc/imagery_uav_bc.json"
 path_collection = "/Users/airvine/Projects/gis/imagery_uav_bc/imagery_uav_bc.json"
 path_s3_json = "https://dev-imagery-uav-bc.s3.amazonaws.com/imagery_uav_bc.json"
@@ -91,6 +88,76 @@ collection.save_object(include_self_link=True, dest_href=path_collection)
 
 ```
 
+
+```{python dev}
+# Define the path to the STAC collection JSON file
+path_collection = "/Users/airvine/Projects/gis/imagery_uav_bc/imagery_uav_bc.json"
+path_s3_json = "https://dev-imagery-uav-bc.s3.amazonaws.com/imagery_uav_bc.json"
+
+# Load the existing STAC collection from the file
+collection = pystac.Collection.from_file(path_collection)
+
+# Manually set the self HREF for the collection to the cloud location
+collection.set_self_href(path_s3_json)
+
+# Define the base local path where imagery is stored
+path_base = pathlib.Path("/Users/airvine/Projects/gis/imagery_uav_bc/")
+
+# Define the base S3 URL where assets are hosted
+path_s3 = "https://dev-imagery-uav-bc.s3.amazonaws.com/"
+
+# Define a list of paths to process
+
+path_items = list(path_base.rglob("*.tif"))
+# path_items = [
+#     pathlib.Path("/Users/airvine/Projects/gis/imagery_uav_bc/fraser/nechacko/2024/199171_burnt_cabin_gala/odm_orthophoto/odm_orthophoto.tif"),
+#     pathlib.Path("/Users/airvine/Projects/gis/imagery_uav_bc/fraser/nechacko/2024/199171_burnt_cabin_gala/odm_dem/dtm.tif"),
+#     pathlib.Path("/Users/airvine/Projects/gis/imagery_uav_bc/fraser/nechacko/2024/199171_burnt_cabin_gala/odm_dem/dsm.tif")
+# ]
+
+# Iterate over each image file in the list
+for path_item in path_items:
+    # Compute the relative path of the item within the base directory
+    href_item = path_item.relative_to(path_base)
+    
+    # Extract components from the relative path to construct an item ID
+    parts_href = href_item.parts[-len(href_item.parts):-1]
+    image_type = path_item.stem  # Get the filename without extension
+    item_id = "-".join(parts_href + (image_type,))
+
+    # Create a STAC Item for the given image file
+    item = rio_stac.stac.create_stac_item(
+        path_item, 
+        id=item_id,
+        asset_media_type='image/tiff; application=geotiff; profile=cloud-optimized',
+        asset_name='image',
+        asset_href=f"{path_s3}{href_item}",
+        with_proj=True,  # Extract and include projection properties
+        collection=collection.id,  # Assign the item to the collection
+        collection_url=collection.get_self_href(),  # Use collection's self href
+        asset_roles=["data"]
+    )
+
+    # Add the newly created item to the collection
+    collection.add_item(item)
+    
+    # Define the correct self_href for the item JSON file
+    item_self_href = f"{path_s3}{href_item}".replace(".tif", ".json")
+    item.set_self_href(item_self_href)
+    
+    # Print the asset HREF for debugging purposes
+    print(f"Asset HREF after editing: {item.assets['image'].href}")
+    
+    # Save the STAC item JSON in the same directory as the TIFF file
+    path_item_json = pathlib.Path(str(path_item.parent / f"{item_id}.json"))
+    item.save_object(dest_href=path_item_json)
+
+# Save the updated STAC collection with the new items included
+collection.save_object(include_self_link=True, dest_href=path_collection)
+
+```
+
+
 ```{python validate}
 
 
@@ -119,7 +186,7 @@ tile = mercantile.tile((west + east) / 2, (south + north) / 2, zoom)
 print(f"Tile coordinates: Z={tile.z}, X={tile.x}, Y={tile.y}")
 ```
 
-```{python, query-bc}
+```{python query-bc}
 import pystac
 
 # Load the Collection JSON directly
