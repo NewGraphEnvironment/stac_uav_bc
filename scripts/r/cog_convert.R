@@ -3,7 +3,25 @@
 #--------------------------------------------------convert to COG---------------------------------------------------
 ################################################################################################################
 # find all the images with fs that are named ortho.tif, dtm.tif or dem.tif
-paths_in <- grep(
+path <- "/Volumes/backup_2022/backups/new_graph/uav_imagery/skeena/bulkley"
+path <- "/Volumes/backup_2022/backups/new_graph/uav_imagery/skeena"
+## for this we added 
+grep_this <- "/2024/"
+invert_this <- TRUE
+
+# here is a subset of Fraser 
+path <- "/Volumes/backup_2022/backups/new_graph/uav_imagery/fraser/nechacko"
+# this regex pattern ($^) matches the end of a string immediately after the start, which is impossible, ensuring that nothing is filtered out
+grep_this <- "$^"
+invert_this <- TRUE
+
+# here is kyspiox, zymoetz and babine
+path <- "/Volumes/backup_2022/backups/new_graph/uav_imagery/skeena"
+# this regex pattern ($^) matches the end of a string immediately after the start, which is impossible, ensuring that nothing is filtered out
+grep_this <- "/babine/|/kispiox/|/zymoetz/"
+invert_this <- FALSE
+
+paths_in_raw <- grep(
   
   "\\.xml$",
   
@@ -13,17 +31,21 @@ paths_in <- grep(
     glob = "*orthophoto.tif|ortho.tif|dtm.tif|dsm.tif",
     recurse = TRUE
   ),
-  invert = TRUE, value = TRUE
+  invert = TRUE, 
+  value = TRUE
 )
 
+# now - we have already processes the imagery for 2024 so we will not repeat.  we will filter out those that contain /2024/
+paths_in <- grep(grep_this, paths_in_raw, invert = invert_this, value = TRUE)
 
-path_out_stub <- "/Volumes/backup_2022/backups/new_graph/archive/uav_imagery/imagery_uav_bc"
+
+path_out_stub <- "/Volumes/backup_2022/backups/new_graph/uav_imagery/imagery_uav_bc"
 # convert outpaths to be same dir structure after archive but in new directory called imagery_uav_bc
 paths_out <- fs::path(
   path_out_stub,
   fs::path_rel(
     paths_in, 
-    start = "/Volumes/backup_2022/backups/new_graph/archive/uav_imagery"
+    start = "/Volumes/backup_2022/backups/new_graph/uav_imagery"
   )
 )
 
