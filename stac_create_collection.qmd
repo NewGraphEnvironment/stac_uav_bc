@@ -1,0 +1,69 @@
+---
+title: "STAC create collection "
+format: html
+jupyter: titiler  # Use your Conda environment
+---
+
+```{r env-activate}
+library(reticulate)
+reticulate::use_condaenv("titiler", required = TRUE)
+# reticulate::py_config()
+
+```
+
+
+```{python import-modules}
+import pystac
+from pystac import Collection, Extent, SpatialExtent, TemporalExtent
+from datetime import datetime
+```
+
+Generate the catalogue
+
+```{python path}
+path_collection = "/Volumes/backup_2022/backups/new_graph/uav_imagery/imagery_uav_bc/imagery_uav_bc.json"
+path_collection_href_self = "https://dev-imagery-uav-bc.s3.amazonaws.com/imagery_uav_bc.json"
+
+```
+
+
+```{python}
+# Define spatial extent (bounding box for BC)
+spatial_extent = SpatialExtent([[-140, 48, -114, 60]])
+
+# Define temporal extent using datetime objects
+temporal_extent = TemporalExtent([[datetime(2020, 1, 1), datetime(2025, 1, 1)]])
+
+# Create the extent object
+extent = Extent(spatial=spatial_extent, temporal=temporal_extent)
+
+# Create the STAC Collection
+collection = Collection(
+    id="uav-imagery-bc",
+    description="A collection of UAV imagery from British Columbia",
+    extent=extent,
+    license="CC-BY-4.0",
+    title="UAV Imagery from British Columbia",
+    href=path_collection
+)
+
+# Save the collection JSON
+collection.save(catalog_type=pystac.CatalogType.RELATIVE_PUBLISHED)
+
+# Explicitly set the self link
+collection.set_self_href(path_collection_href_self)
+
+# Save locally
+collection.save_object(include_self_link=True, dest_href=path_collection)
+
+```
+
+Test to see if the collection is valid
+
+```{python}
+# stac validate ./bc-uav-collection.json
+
+collection = pystac.Collection.from_file(path_collection)
+collection.validate()
+```
+
