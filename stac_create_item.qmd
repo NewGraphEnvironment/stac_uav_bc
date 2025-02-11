@@ -16,16 +16,29 @@ reticulate::use_condaenv("titiler", required = TRUE)
 import pathlib
 import pystac
 import rio_stac
+# import shutil
+# import os
 
 ```
 
 
 ```{python path}
-path_collection = "/Volumes/backup_2022/backups/new_graph/uav_imagery/imagery_uav_bc/imagery_uav_bc.json"
+# path_collection = "/Volumes/backup_2022/backups/new_graph/uav_imagery/imagery_uav_bc/imagery_uav_bc.json"
+path_collection = "/Users/airvine/Projects/gis/imagery_uav_bc/imagery_uav_bc.json"
+path_s3_json = "https://dev-imagery-uav-bc.s3.amazonaws.com/imagery_uav_bc.json"
+
 collection = pystac.Collection.from_file(path_collection)
 
-path_base =  pathlib.Path("/Volumes/backup_2022/backups/new_graph/uav_imagery/imagery_uav_bc/")
-path_item = pathlib.Path("/Volumes/backup_2022/backups/new_graph/uav_imagery/imagery_uav_bc/fraser/nechacko/2024/199171_burnt_cabin_gala/odm_orthophoto/odm_orthophoto.tif")
+# Manually force PySTAC to remember the cloud HREF
+collection.set_self_href(path_s3_json)
+
+# see it with collection.get_self_href()
+
+# path_base =  pathlib.Path("/Volumes/backup_2022/backups/new_graph/uav_imagery/imagery_uav_bc/")
+path_base =  pathlib.Path("/Users/airvine/Projects/gis/imagery_uav_bc/")
+
+# path_item = pathlib.Path("/Volumes/backup_2022/backups/new_graph/uav_imagery/imagery_uav_bc/fraser/nechacko/2024/199171_burnt_cabin_gala/odm_orthophoto/odm_orthophoto.tif")
+path_item = pathlib.Path("/Users/airvine/Projects/gis/imagery_uav_bc/fraser/nechacko/2024/199171_burnt_cabin_gala/odm_orthophoto/odm_orthophoto.tif")
 # path_item = pathlib.Path("/Volumes/backup_2022/backups/new_graph/uav_imagery/imagery_uav_bc/fraser/nechacko/2024/199171_burnt_cabin_gala/odm_dem/dtm.tif")
 # path_item = pathlib.Path("/Volumes/backup_2022/backups/new_graph/uav_imagery/imagery_uav_bc/fraser/nechacko/2024/199171_burnt_cabin_gala/odm_dem/dsm.tif")
 
@@ -46,44 +59,68 @@ item_id = "-".join(parts_href + (image_type,))
 # Create the STAC Item
 item = rio_stac.stac.create_stac_item(
     path_item, 
-    # id=item_id,
+    id=item_id,
     # define the media type https://pystac.readthedocs.io/en/stable/api/media_type.html
     asset_media_type='image/tiff; application=geotiff; profile=cloud-optimized',
     asset_name = 'image',
     asset_href=f"{path_s3}{href_item}",
     with_proj=True,  # Extracts and includes projection properties
     collection=collection.id,  # Assign the item to the collection
-    collection_url=collection.get_self_href()  # Use collection's self href
+    collection_url=collection.get_self_href(),  # Use collection's self href
+    asset_roles=["data"]
     )
 
 
-# # # Add the item to an existing collection
+
+# Add item to collection without altering HREF
 collection.add_item(item)
+# collection.add_item(item, strategy=None)
+
+# Define the correct item self_href
+item_self_href = f"{path_s3}{href_item}".replace(".tif", ".json")  # Ensure it's a .json path
+
+# Set the item’s self_href
+item.set_self_href(item_self_href)
+
+print(f"Asset HREF after editing: {item.assets['image'].href}")
 
 # Save item JSON in the same directory as the TIFF with the item_id as the json name
 path_item_json = pathlib.Path(str(path_item.parent / f"{item_id}.json"))
 
-
-print(f"Asset HREF after editing: {item.assets['image'].href}")
-
 item.save_object(dest_href=path_item_json)
-# item.save_object(
-#     include_self_link=True,
-#     dest_href=path_item_json
-#     )
 
-# Add the item to an existing collection
-# collection.add_item(item)
-# collection.add_item(
-#     item,
-#     strategy=pystac.layout.BestPracticesLayoutStrategy()
-#     )
 
-# Save the updated collection
-collection.save_object()
+# Save locally
+collection.save_object(include_self_link=True, dest_href=path_collection)
+# # Save the updated collection
+# collection.save_object()
 
-# collection.normalize_hrefs(str(path_base))
-# # #
+# # Ensure correct item HREFs inside the collection JSON
+# for item in collection.get_items():
+#     item_self_href = f"{path_s3}{href_item}".replace(".tif", ".json")  # Ensure JSON path
+#     item.set_self_href(item_self_href)  # Manually override item HREF
+
+# collection.normalize_hrefs(path_s3)
+# 
+# # # Ensure the collection knows path_collection is a JSON file, not a directory
+# # collection.set_self_href(path_collection)  
+# 
+# # Save locally
+# collection.save_object(include_self_link=True, dest_href=path_collection)
+# 
+# 
+# collection.save(catalog_type=pystac.CatalogType.ABSOLUTE_PUBLISHED, dest_href=path_collection)
+# 
+# # Save the collection to the directory, NOT directly to the JSON file
+# collection.save(catalog_type=pystac.CatalogType.ABSOLUTE_PUBLISHED, dest_href=path_base)
+# 
+# # Move the generated JSON file to match the expected filename
+# shutil.move(os.path.join(path_base, "collection.json"), path_collection)
+# 
+# # Verify the final path
+# print("Collection saved at:", path_collection)
+
+
 # collection.save_object(dest_href=path_collection)
 
 ```
