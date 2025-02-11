@@ -39,7 +39,7 @@ path_base =  pathlib.Path("/Users/airvine/Projects/gis/imagery_uav_bc/")
 
 # path_item = pathlib.Path("/Volumes/backup_2022/backups/new_graph/uav_imagery/imagery_uav_bc/fraser/nechacko/2024/199171_burnt_cabin_gala/odm_orthophoto/odm_orthophoto.tif")
 path_item = pathlib.Path("/Users/airvine/Projects/gis/imagery_uav_bc/fraser/nechacko/2024/199171_burnt_cabin_gala/odm_orthophoto/odm_orthophoto.tif")
-# path_item = pathlib.Path("/Volumes/backup_2022/backups/new_graph/uav_imagery/imagery_uav_bc/fraser/nechacko/2024/199171_burnt_cabin_gala/odm_dem/dtm.tif")
+path_item = pathlib.Path("/Users/airvine/Projects/gis/imagery_uav_bc/fraser/nechacko/2024/199171_burnt_cabin_gala/odm_dem/dtm.tif")
 # path_item = pathlib.Path("/Volumes/backup_2022/backups/new_graph/uav_imagery/imagery_uav_bc/fraser/nechacko/2024/199171_burnt_cabin_gala/odm_dem/dsm.tif")
 
 path_s3 = "https://dev-imagery-uav-bc.s3.amazonaws.com/"
@@ -70,11 +70,8 @@ item = rio_stac.stac.create_stac_item(
     asset_roles=["data"]
     )
 
-
-
 # Add item to collection without altering HREF
 collection.add_item(item)
-# collection.add_item(item, strategy=None)
 
 # Define the correct item self_href
 item_self_href = f"{path_s3}{href_item}".replace(".tif", ".json")  # Ensure it's a .json path
@@ -89,39 +86,8 @@ path_item_json = pathlib.Path(str(path_item.parent / f"{item_id}.json"))
 
 item.save_object(dest_href=path_item_json)
 
-
 # Save locally
 collection.save_object(include_self_link=True, dest_href=path_collection)
-# # Save the updated collection
-# collection.save_object()
-
-# # Ensure correct item HREFs inside the collection JSON
-# for item in collection.get_items():
-#     item_self_href = f"{path_s3}{href_item}".replace(".tif", ".json")  # Ensure JSON path
-#     item.set_self_href(item_self_href)  # Manually override item HREF
-
-# collection.normalize_hrefs(path_s3)
-# 
-# # # Ensure the collection knows path_collection is a JSON file, not a directory
-# # collection.set_self_href(path_collection)  
-# 
-# # Save locally
-# collection.save_object(include_self_link=True, dest_href=path_collection)
-# 
-# 
-# collection.save(catalog_type=pystac.CatalogType.ABSOLUTE_PUBLISHED, dest_href=path_collection)
-# 
-# # Save the collection to the directory, NOT directly to the JSON file
-# collection.save(catalog_type=pystac.CatalogType.ABSOLUTE_PUBLISHED, dest_href=path_base)
-# 
-# # Move the generated JSON file to match the expected filename
-# shutil.move(os.path.join(path_base, "collection.json"), path_collection)
-# 
-# # Verify the final path
-# print("Collection saved at:", path_collection)
-
-
-# collection.save_object(dest_href=path_collection)
 
 ```
 
@@ -134,81 +100,6 @@ for item in collection.get_all_items():
         print(f"✅ {item.id} is valid.")
     except Exception as e:
         print(f"❌ {item.id} failed validation: {e}")
-
-```
-
-
-```{python}
-collection.set_self_href(path_root)
-# Save the updated collection
-collection.save_object()
-
-```
-
-
-
-
-
-
-
-
-```{python, eval = F}
-# NOT NECESSARY
-# Ensures consistent local paths
-collection.normalize_hrefs(root_href=str(path_s3))  
-
-# Ensure the collection JSON is saved in the correct location
-collection.set_self_href(str(path_collection))
-
-# Save the collection JSON
-collection.save()
-
-# Save the updated collection
-collection.save_object()
-
-print([item.id for item in collection.get_all_items()])
-
-
-##############################################################
-# Normalize HREFs to ensure all paths remain self-contained
-collection.normalize_hrefs(str(path_base))
-
-# Explicitly set the correct filename back
-collection.set_self_href(path_collection)
-
-# Save the collection without changing filenames
-collection.save(catalog_type=pystac.CatalogType.SELF_CONTAINED)
-
-```
-
-```{python}
-# Load the existing item
-item_path = path_base / "fraser/nechacko/2024/199171_burnt_cabin_gala/odm_orthophoto/fraser-nechacko-2024-199171_burnt_cabin_gala-odm_orthophoto-odm_orthophoto.json"
-item = pystac.Item.from_file(str(item_path))
-
-# Print item self_href before normalization
-print("Before normalization: Item self_href:", item.get_self_href())
-
-# Normalize HREFs
-collection.normalize_hrefs(str(path_base))
-
-# Print item self_href after normalization
-print("After normalization: Item self_href:", item.get_self_href())
-
-```
-
-
-```{python}
-updated_links = []
-for link in collection.links:
-    href = link.href
-    if href.startswith("/Volumes/"):
-        href = href.replace("/Volumes/backup_2022/backups/new_graph/uav_imagery/imagery_uav_bc/", f"{path_self}")
-
-    updated_links.append(pystac.Link(rel=link.rel, target=href, media_type=link.media_type))
-
-# Replace collection links with updated ones
-collection.links = updated_links
 
 ```
 
