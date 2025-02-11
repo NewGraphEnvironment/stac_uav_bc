@@ -1,0 +1,227 @@
+---
+title: "STAC create item "
+format: html
+jupyter: titiler  # Use your Conda environment
+---
+
+```{r env-activate}
+library(reticulate)
+reticulate::use_condaenv("titiler", required = TRUE)
+# reticulate::py_config()
+
+```
+
+
+```{python import-modules}
+import pathlib
+import pystac
+import rio_stac
+
+```
+
+
+```{python path}
+path_collection = "/Volumes/backup_2022/backups/new_graph/uav_imagery/imagery_uav_bc/imagery_uav_bc.json"
+collection = pystac.Collection.from_file(path_collection)
+
+path_base =  pathlib.Path("/Volumes/backup_2022/backups/new_graph/uav_imagery/imagery_uav_bc/")
+path_item = pathlib.Path("/Volumes/backup_2022/backups/new_graph/uav_imagery/imagery_uav_bc/fraser/nechacko/2024/199171_burnt_cabin_gala/odm_orthophoto/odm_orthophoto.tif")
+# path_item = pathlib.Path("/Volumes/backup_2022/backups/new_graph/uav_imagery/imagery_uav_bc/fraser/nechacko/2024/199171_burnt_cabin_gala/odm_dem/dtm.tif")
+# path_item = pathlib.Path("/Volumes/backup_2022/backups/new_graph/uav_imagery/imagery_uav_bc/fraser/nechacko/2024/199171_burnt_cabin_gala/odm_dem/dsm.tif")
+
+path_s3 = "https://dev-imagery-uav-bc.s3.amazonaws.com/"
+
+# define the relative path to the item
+href_item = path_item.relative_to(path_base)
+
+# Extract components from the path
+parts_href = href_item.parts[-len(href_item.parts):-1]
+# parts_href = list(path_item.relative_to(path_base).parts[:-1])  # Extract parts of the path
+
+image_type = path_item.stem     # Get filename without extension
+
+# Construct the item ID
+item_id = "-".join(parts_href + (image_type,))
+
+# Create the STAC Item
+item = rio_stac.stac.create_stac_item(
+    path_item, 
+    # id=item_id,
+    # define the media type https://pystac.readthedocs.io/en/stable/api/media_type.html
+    asset_media_type='image/tiff; application=geotiff; profile=cloud-optimized',
+    asset_name = 'image',
+    asset_href=f"{path_s3}{href_item}",
+    with_proj=True,  # Extracts and includes projection properties
+    collection=collection.id,  # Assign the item to the collection
+    collection_url=collection.get_self_href()  # Use collection's self href
+    )
+
+
+# # # Add the item to an existing collection
+collection.add_item(item)
+
+# Save item JSON in the same directory as the TIFF with the item_id as the json name
+path_item_json = pathlib.Path(str(path_item.parent / f"{item_id}.json"))
+
+
+print(f"Asset HREF after editing: {item.assets['image'].href}")
+
+item.save_object(dest_href=path_item_json)
+# item.save_object(
+#     include_self_link=True,
+#     dest_href=path_item_json
+#     )
+
+# Add the item to an existing collection
+# collection.add_item(item)
+# collection.add_item(
+#     item,
+#     strategy=pystac.layout.BestPracticesLayoutStrategy()
+#     )
+
+# Save the updated collection
+collection.save_object()
+
+# collection.normalize_hrefs(str(path_base))
+# # #
+# collection.save_object(dest_href=path_collection)
+
+```
+
+```{python validate}
+
+
+for item in collection.get_all_items():
+    try:
+        item.validate()
+        print(f"✅ {item.id} is valid.")
+    except Exception as e:
+        print(f"❌ {item.id} failed validation: {e}")
+
+```
+
+
+```{python}
+collection.set_self_href(path_root)
+# Save the updated collection
+collection.save_object()
+
+```
+
+
+
+
+
+
+
+
+```{python, eval = F}
+# NOT NECESSARY
+# Ensures consistent local paths
+collection.normalize_hrefs(root_href=str(path_s3))  
+
+# Ensure the collection JSON is saved in the correct location
+collection.set_self_href(str(path_collection))
+
+# Save the collection JSON
+collection.save()
+
+# Save the updated collection
+collection.save_object()
+
+print([item.id for item in collection.get_all_items()])
+
+
+##############################################################
+# Normalize HREFs to ensure all paths remain self-contained
+collection.normalize_hrefs(str(path_base))
+
+# Explicitly set the correct filename back
+collection.set_self_href(path_collection)
+
+# Save the collection without changing filenames
+collection.save(catalog_type=pystac.CatalogType.SELF_CONTAINED)
+
+```
+
+```{python}
+# Load the existing item
+item_path = path_base / "fraser/nechacko/2024/199171_burnt_cabin_gala/odm_orthophoto/fraser-nechacko-2024-199171_burnt_cabin_gala-odm_orthophoto-odm_orthophoto.json"
+item = pystac.Item.from_file(str(item_path))
+
+# Print item self_href before normalization
+print("Before normalization: Item self_href:", item.get_self_href())
+
+# Normalize HREFs
+collection.normalize_hrefs(str(path_base))
+
+# Print item self_href after normalization
+print("After normalization: Item self_href:", item.get_self_href())
+
+```
+
+
+```{python}
+updated_links = []
+for link in collection.links:
+    href = link.href
+    if href.startswith("/Volumes/"):
+        href = href.replace("/Volumes/backup_2022/backups/new_graph/uav_imagery/imagery_uav_bc/", f"{path_self}")
+
+    updated_links.append(pystac.Link(rel=link.rel, target=href, media_type=link.media_type))
+
+# Replace collection links with updated ones
+collection.links = updated_links
+
+```
+
+
+```{python, xyz, eval - FALSE}
+import mercantile
+
+# Bounds from Titiler response
+west, south, east, north = -124.703866, 54.107650, -124.695957, 54.111509
+
+# Choose a zoom level
+zoom = 15
+
+# Get a tile covering the center of the bounds
+tile = mercantile.tile((west + east) / 2, (south + north) / 2, zoom)
+
+print(f"Tile coordinates: Z={tile.z}, X={tile.x}, Y={tile.y}")
+```
+
+```{python, query-bc}
+import pystac
+
+# Load the Collection JSON directly
+collection = pystac.Collection.from_file("https://dev-imagery-uav-bc.s3.amazonaws.com/imagery_uav_bc.json")
+
+# Define BC bounding box (approximate)
+bbox_bc = [-139, 48, -114, 60]  # (West, South, East, North)
+
+# Get all items linked in the collection
+items = collection.get_all_items()
+
+# Filter items that fall within BC bounds
+bc_items = []
+for item in items:
+    # Check if item's bounding box intersects with BC
+    item_bbox = item.bbox  # [west, south, east, north]
+    if (
+        item_bbox[2] >= bbox_bc[0] and  # Item east >= BC west
+        item_bbox[0] <= bbox_bc[2] and  # Item west <= BC east
+        item_bbox[3] >= bbox_bc[1] and  # Item north >= BC south
+        item_bbox[1] <= bbox_bc[3]      # Item south <= BC north
+    ):
+        bc_items.append(item)
+
+# Print matching items
+for item in bc_items:
+    print(f"Item: {item.id}")
+    for asset_key, asset in item.assets.items():
+        print(f"  - {asset_key}: {asset.href}")
+
+
+```
+
