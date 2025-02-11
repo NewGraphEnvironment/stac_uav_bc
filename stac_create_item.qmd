@@ -70,18 +70,20 @@ item = rio_stac.stac.create_stac_item(
 # Add item to collection without altering HREF
 collection.add_item(item)
 
-# Define the correct item self_href
-item_self_href = f"{path_s3}{href_item}".replace(".tif", ".json")  # Ensure it's a .json path
+# # Define the correct item self_href
+# item_self_href = f"{path_s3}{href_item}".replace(".tif", ".json")  # Ensure it's a .json path
+# 
+# # Set the item’s self_href
+# item.set_self_href(item_self_href)
+# 
+# print(f"Asset HREF after editing: {item.assets['image'].href}")
+# 
+# # Save item JSON in the same directory as the TIFF with the item_id as the json name
+# path_item_json = pathlib.Path(str(path_item.parent / f"{item_id}.json"))
+# 
+# item.save_object(dest_href=path_item_json)
 
-# Set the item’s self_href
-item.set_self_href(item_self_href)
-
-print(f"Asset HREF after editing: {item.assets['image'].href}")
-
-# Save item JSON in the same directory as the TIFF with the item_id as the json name
-path_item_json = pathlib.Path(str(path_item.parent / f"{item_id}.json"))
-
-item.save_object(dest_href=path_item_json)
+item.save_object()
 
 # Save locally
 collection.save_object(include_self_link=True, dest_href=path_collection)
@@ -142,21 +144,41 @@ for path_item in path_items:
     collection.add_item(item)
     
     # Define the correct self_href for the item JSON file
-    item_self_href = f"{path_s3}{href_item}".replace(".tif", ".json")
+    item_self_href = f"{path_s3}{href_item.parent}/{item_id}.json"
     item.set_self_href(item_self_href)
-    
+
     # Print the asset HREF for debugging purposes
     print(f"Asset HREF after editing: {item.assets['image'].href}")
-    
+
     # Save the STAC item JSON in the same directory as the TIFF file
     path_item_json = pathlib.Path(str(path_item.parent / f"{item_id}.json"))
     item.save_object(dest_href=path_item_json)
+    
+    # path_item_json = path_item.with_suffix(".json")
+    # item.save_object(dest_href=path_item_json)
+    
+    #     # Add the newly created item to the collection
+    # collection.add_item(item)
 
 # Save the updated STAC collection with the new items included
-collection.save_object(include_self_link=True, dest_href=path_collection)
+collection.save_object(
+    # include_self_link=True, 
+    dest_href=path_collection
+    )
 
 ```
 
+
+
+```{r json-clean, eval= FALSE}
+# DELETE ATTACK - USE WITH CARE
+# list all the jsonsin the directory so we can delete them
+path_base = "/Users/airvine/Projects/gis/imagery_uav_bc/"
+j <- fs::dir_ls(path_base, glob = "*.json", recurse = TRUE)
+
+fs::file_delete(j)
+
+```
 
 ```{python validate}
 
@@ -186,7 +208,7 @@ tile = mercantile.tile((west + east) / 2, (south + north) / 2, zoom)
 print(f"Tile coordinates: Z={tile.z}, X={tile.x}, Y={tile.y}")
 ```
 
-```{python query-bc}
+```{python query-s3-json}
 import pystac
 
 # Load the Collection JSON directly
@@ -216,6 +238,51 @@ for item in bc_items:
     print(f"Item: {item.id}")
     for asset_key, asset in item.assets.items():
         print(f"  - {asset_key}: {asset.href}")
+
+
+```
+
+
+```{python query-titiler}
+import requests
+import pystac
+
+# Define BC bounding box (West, South, East, North)
+bbox_bc = [-139, 48, -114, 60]
+
+# Titiler endpoint
+titiler_endpoint = "http://titiler-env.eba-s4jhubvr.us-west-2.elasticbeanstalk.com"
+
+# Load the STAC Collection
+collection_url = "https://dev-imagery-uav-bc.s3.amazonaws.com/imagery_uav_bc.json"
+collection = pystac.Collection.from_file(collection_url)
+
+# Get all items
+items = collection.get_all_items()
+
+# Filter items using /stac/bounds
+matching_items = []
+for item in items:
+    stac_url = item.get_self_href()
+    bounds_url = f"{titiler_endpoint}/stac/bounds?url={stac_url}"
+
+    response = requests.get(bounds_url)
+    if response.status_code == 200:
+        item_bbox = response.json()["bounds"]  # [west, south, east, north]
+
+        # Check intersection with BC bbox
+        if (
+            item_bbox[2] >= bbox_bc[0] and  # Item east >= BC west
+            item_bbox[0] <= bbox_bc[2] and  # Item west <= BC east
+            item_bbox[3] >= bbox_bc[1] and  # Item north >= BC south
+            item_bbox[1] <= bbox_bc[3]      # Item south <= BC north
+        ):
+            matching_items.append((item.id, stac_url))
+
+# Print matching items
+print("Matching Items in BC:")
+for item_id, stac_url in matching_items:
+    print(f"- {item_id}: {stac_url}")
 
 
 ```
