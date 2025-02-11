@@ -3,19 +3,23 @@
 # list our buckets
 
 
-s3fs::s3_dir_ls()
+# s3fs::s3_dir_ls()
 
-path_in <- "/Volumes/backup_2022/backups/new_graph/archive/uav_imagery/imagery_uav_bc"
+path_in <- "/Users/airvine/Projects/gis/imagery_uav_bc"
 path_out <- "s3://dev-imagery-uav-bc" 
   
-  
+################################################################################################################
+#--------------------------------------------------backup everything---------------------------------------------------
+################################################################################################################
+# path_in <- "/Volumes/backup_2022/backups/new_graph/uav_imagery"
+# path_out <- "s3://dev-backup-imagery-uav" 
 
 # see how big everything is
-d_info <- fs::dir_info(
-  path,
-  recurse = TRUE
-  ) |> 
-  janitor::adorn_totals(where = "row")
+# d_info_in <- fs::dir_info(
+#   path_in,
+#   recurse = TRUE
+#   ) |> 
+#   janitor::adorn_totals(where = "row")
 
 # lets just use aws to load everything into our dev-imagery-uav-bc bucket except the dotfiles
 cmd_raw <- paste0(
@@ -23,7 +27,9 @@ cmd_raw <- paste0(
   path_in, 
   " ", 
   path_out, 
-  " --delete --quiet --exclude */.* --exclude .*"
+  # we have set our multipart chunksize and concurrent requests in our ~/.aws/config file under profile airvine then 
+  # add  export AWS_PROFILE=airvine to our ~/.bashrc file. thats why we call a profile here
+  " --delete --quiet --exclude */.* --exclude .* --profile airvine"
 )
 
 cmd_vector <- unlist(strsplit(cmd_raw, " "))  # Split into vector
@@ -41,15 +47,7 @@ processx::run(
 )
 
 
-s3fs::s3_dir_ls(path_out)
+# to stop the computer from sleeping we ran the following in  the terminal
+# caffeinate -s Rscript /Users/airvine/Projects/repo/stac_uav_bc/scripts/r/s3_sync.R
+  
 
-
-# see files in the bucket
-files <- s3fs::s3_dir_ls(path_out, recurse = TRUE) 
-
-
-# see the website urls
-file_urls <- files |> 
-  purrr::map(
-    ~ ngr::ngr_s3_path_to_https(s3_path = .x, website = F)
-  )
