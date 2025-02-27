@@ -1,3 +1,7 @@
+This creates a catalog.json and a new sub-directory named the same as the collection id.  In the sub-directory
+are subsequent sub-directories for each of the stac items with a json inside. hrefs look correct for items. bit lost.
+Getting close though.
+
 ```{r env-activate}
 library(reticulate)
 reticulate::use_condaenv("titiler", required = TRUE)
@@ -30,10 +34,14 @@ def create_stac_catalog(path_collection: str, path_catalogue: str):
     catalog.add_child(collection)
     
     # Save Catalog locally
-    catalog.normalize_and_save(
-        root_href=path_catalogue,
-        catalog_type=pystac.CatalogType.SELF_CONTAINED
-    )
+    # catalog.normalize_and_save(
+    #     root_href=path_catalogue,
+    #     catalog_type=pystac.CatalogType.SELF_CONTAINED
+    # )
+    
+    # Save only the root catalog JSON without regenerating items
+    catalog.normalize_hrefs(path_catalogue)
+    catalog.save(catalog_type=pystac.CatalogType.SELF_CONTAINED)
     
     print(f"STAC Catalog created and saved locally at: {path_catalogue}")
 
@@ -42,7 +50,7 @@ def create_stac_catalog(path_collection: str, path_catalogue: str):
 
 ```{python cat-create}
 path_collection = "/Users/airvine/Projects/gis/uav_imagery/imagery_uav_bc/imagery_uav_bc.json"
-path_catalogue = "/Users/airvine/Projects/gis/uav_imagery"
+path_catalogue = "/Users/airvine/Projects/gis/uav_imagery/imagery_uav_bc"
 
 create_stac_catalog(path_collection, path_catalogue)
 ```
