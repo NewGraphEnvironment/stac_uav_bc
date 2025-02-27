@@ -50,4 +50,11 @@ processx::run(
 # to stop the computer from sleeping we ran the following in  the terminal
 # caffeinate -s Rscript /Users/airvine/Projects/repo/stac_uav_bc/scripts/r/s3_sync.R
   
-
+# when we load the catalog json we need to make it the website config file
+s3 <- paws::s3()
+s3$put_bucket_website(
+  Bucket = "dev-imagery-uav-bc",
+  WebsiteConfiguration = list(
+    IndexDocument = list(Suffix = "catalog.json")
+  )
+)
