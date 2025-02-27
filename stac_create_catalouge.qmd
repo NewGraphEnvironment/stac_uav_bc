@@ -1,0 +1,48 @@
+```{r env-activate}
+library(reticulate)
+reticulate::use_condaenv("titiler", required = TRUE)
+# reticulate::py_config()
+
+```
+
+
+```{python fun-cat-create}
+import pystac
+import os
+
+def create_stac_catalog(path_collection: str, path_catalogue: str):
+    """
+    Creates a STAC Catalog and links an existing Collection to it.
+    
+    :param path_collection: Local path to the existing STAC Collection JSON.
+    :param path_catalogue: Local directory where the catalog should be saved.
+    """
+    # Create Catalog
+    catalog = pystac.Catalog(
+        id="imagery_uav_bc_catalog",
+        description="Root catalog for UAV imagery in BC"
+    )
+    
+    # Load existing Collection
+    collection = pystac.Collection.from_file(path_collection)
+    
+    # Add Collection to Catalog
+    catalog.add_child(collection)
+    
+    # Save Catalog locally
+    catalog.normalize_and_save(
+        root_href=path_catalogue,
+        catalog_type=pystac.CatalogType.SELF_CONTAINED
+    )
+    
+    print(f"STAC Catalog created and saved locally at: {path_catalogue}")
+
+
+```
+
+```{python cat-create}
+path_collection = "/Users/airvine/Projects/gis/uav_imagery/imagery_uav_bc/imagery_uav_bc.json"
+path_catalogue = "/Users/airvine/Projects/gis/uav_imagery"
+
+create_stac_catalog(path_collection, path_catalogue)
+```
