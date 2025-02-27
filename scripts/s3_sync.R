@@ -5,7 +5,7 @@
 
 # s3fs::s3_dir_ls()
 
-path_in <- "/Users/airvine/Projects/gis/imagery_uav_bc"
+path_in <- "/Users/airvine/Projects/gis/uav_imagery/imagery_uav_bc"
 path_out <- "s3://dev-imagery-uav-bc" 
   
 ################################################################################################################
