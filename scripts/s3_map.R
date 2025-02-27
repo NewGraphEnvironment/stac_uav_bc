@@ -24,4 +24,8 @@ file_urls_tiles <- paste0(
   file_urls
 )
 
+# these are the raw json locations
 grep(".json", file_urls, value = TRUE)
+
+# search by keyword
+grep("station", file_urls, value = TRUE)
