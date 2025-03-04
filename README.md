@@ -76,11 +76,27 @@ q |>
     ## - assets: image
     ## - item's fields: assets, bbox, collection, geometry, id, links, properties, stac_extensions, stac_version, type
 
-As of QGIS 3.42 can also access stac items (orthoimagery, Digital
-Surface Models and Digital Terrain Models in our case) directly now via
-QGIS. See a blog with details about that
+Have a look at where to get things
+
+``` r
+q$features[[1]]$assets
+```
+
+    ## $image
+    ## $image$href
+    ## [1] "https://dev-imagery-uav-bc.s3.amazonaws.com/skeena/bulkley/2021/197912_roberthatch/odm_orthophoto/odm_orthophoto.tif"
+    ## 
+    ## $image$type
+    ## [1] "image/tiff; application=geotiff; profile=cloud-optimized"
+    ## 
+    ## $image$roles
+    ## [1] "data"
+
+As of QGIS 3.42 - ONE can also access stac items (orthoimagery, Digital
+Surface Models and Digital Terrain Models in our case) directly via the
+Data Source Manager. See a blog with details
 [here](https://www.lutraconsulting.co.uk/blogs/stac-in-qgis). It looks
-like this in the th `Layer / Data Source Manager` toolbar in QGIS:
+like this in the the `Layer / Data Source Manager` toolbar in QGIS:
 
 ``` r
 knitr::include_graphics("fig/a11sone01.png")
@@ -97,4 +113,6 @@ knitr::include_graphics("fig/a11sone02.png")
 ``` r
 rmarkdown::render("README.Rmd", output_format = "github_document")
 rmarkdown::render("README.Rmd", output_format = "html_document")
+
+usethis::use_git_ignore("README.html")
 ```
