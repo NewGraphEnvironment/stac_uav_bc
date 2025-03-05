@@ -1,5 +1,3 @@
-README
-================
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -19,7 +17,13 @@ functioning.
 
 <br>
 
-Table @ref(tab:tab-uav-imagery-cap) shows links to the collection:
+<div style="text-align: center; font-weight: bold; margin-bottom: 10px;">
+
+Drone imagery download and viewer links. <b>NOTE: Links to viewer
+current may need to be manually altered in browser to begin with http vs
+https! This should be resolved soon.</b>
+
+</div>
 
 As of QGIS 3.42 - ONE can also access stac items (orthoimagery, Digital
 Surface Models and Digital Terrain Models in our case) directly via the

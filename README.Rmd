@@ -1,5 +1,4 @@
 ---
-title: "README"
 output:
   html_document:
     code_folding: hide
@@ -34,7 +33,7 @@ knitr::include_graphics("fig/cover.JPG")
 
 staticimports::import()
 source('scripts/staticimports.R')
-
+source('scripts/functions.R')
 ```
 
 
@@ -61,21 +60,12 @@ r <- q |>
 
 <br>
 
-Table \@ref(tab:tab-uav-imagery-cap) shows links to the collection:
 
-
-```{r tab-uav-imagery-cap, results="asis"}
+```{r tab-uav-imagery-cap, results="asis", eval=knitr::opts_knit$get("output.format") != "gfm"}
 my_caption <- "Drone imagery download and viewer links."
 
-my_tab_caption(tip_text = " <b>NOTE: Links to viewer current may need to be manually altered in browser to begin with http vs https! This should resolved soon.</b>")
+my_tab_caption_rmd(tip_text = " <b>NOTE: Links to viewer current may need to be manually altered in browser to begin with http vs https! This should be resolved soon.</b>")
 ```
-
-
-```{r tab-uav-imagery}
-tab |> 
-  my_dt_table(cols_freeze_left = 2, escape = FALSE)
-```
-
 
 ```{r}
 tab <- tibble::tibble(url_download = purrr::map_chr(r$features, ~ purrr::pluck(.x, "assets", "image", "href"))) |> 
@@ -98,6 +88,11 @@ tab <- tibble::tibble(url_download = purrr::map_chr(r$features, ~ purrr::pluck(.
 
 ```
 
+
+```{r tab-uav-imagery, eval=knitr::opts_knit$get("output.format") != "gfm"}
+tab |> 
+  my_dt_table(cols_freeze_left = 2, escape = FALSE)
+```
 
 
 As of QGIS 3.42 - ONE can also access stac items (orthoimagery, Digital Surface Models and Digital Terrain Models in our case) directly via
