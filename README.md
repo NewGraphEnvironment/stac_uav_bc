@@ -1,3 +1,5 @@
+README
+================
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -13,106 +15,18 @@ package](https://brazil-data-cube.github.io/rstac/) and [QGIS
 (v3.42+)](https://qgis.org/). Still a work in progress but currently
 functioning.
 
-``` r
-fpr::fpr_photo_resize_convert("fig/cover.png", path = "fig")
-knitr::include_graphics("fig/cover.JPG")
-```
-
 <img src="fig/cover.JPG" width="100%" style="display: block; margin: auto;" />
 
-This a bounding box for the [Neexdzi
-Kwa](https://www.newgraphenvironment.com/restoration_wedzin_kwa_2024/)
-watershed (aka - the Upper Bulkley River near Houston BC)
+<br>
 
-``` r
-q <- rstac::stac("http://www.a11s.one:8000/") |>
-  rstac::stac_search(collections = "uav-imagery-bc",
-                     bbox = c(-126.77000, 54.08832, -125.88822, 54.68786)) |>
-  rstac::post_request()
-
-q |>
-  rstac::items_fetch()
-```
-
-    ## ###Items
-    ## - features (32 item(s)):
-    ##   - skeena-bulkley-2021-197912_roberthatch-odm_orthophoto-odm_orthophoto
-    ##   - skeena-bulkley-2021-197912_roberthatch-odm_dem-dtm
-    ##   - skeena-bulkley-2021-197912_roberthatch-odm_dem-dsm
-    ##   - skeena-bulkley-2021-197662_richfield_hwy16-odm_orthophoto-odm_orthophoto
-    ##   - skeena-bulkley-2021-197662_richfield_hwy16-odm_dem-dtm
-    ##   - skeena-bulkley-2021-197662_richfield_hwy16-odm_dem-dsm
-    ##   - skeena-bulkley-2024-bulkley-wilson01-odm_orthophoto-odm_orthophoto
-    ##   - skeena-bulkley-2024-bulkley-wilson01-odm_dem-dtm
-    ##   - skeena-bulkley-2024-bulkley-wilson01-odm_dem-dsm
-    ##   - skeena-bulkley-2024-bulkley-mckilligan-barren-ortho
-    ##   - ... with 22 more feature(s).
-    ## - assets: image
-    ## - item's fields: assets, bbox, collection, geometry, id, links, properties, stac_extensions, stac_version, type
-
-``` r
-q <- rstac::stac("http://www.a11s.one:8000/") |>
-  rstac::stac_search(collections = "uav-imagery-bc",
-                     bbox = c(-126.77000, 54.08832, -125.88822, 54.68786)) |>
-  rstac::post_request()
-
-q |>
-  rstac::items_fetch()
-```
-
-    ## ###Items
-    ## - features (32 item(s)):
-    ##   - skeena-bulkley-2021-197912_roberthatch-odm_orthophoto-odm_orthophoto
-    ##   - skeena-bulkley-2021-197912_roberthatch-odm_dem-dtm
-    ##   - skeena-bulkley-2021-197912_roberthatch-odm_dem-dsm
-    ##   - skeena-bulkley-2021-197662_richfield_hwy16-odm_orthophoto-odm_orthophoto
-    ##   - skeena-bulkley-2021-197662_richfield_hwy16-odm_dem-dtm
-    ##   - skeena-bulkley-2021-197662_richfield_hwy16-odm_dem-dsm
-    ##   - skeena-bulkley-2024-bulkley-wilson01-odm_orthophoto-odm_orthophoto
-    ##   - skeena-bulkley-2024-bulkley-wilson01-odm_dem-dtm
-    ##   - skeena-bulkley-2024-bulkley-wilson01-odm_dem-dsm
-    ##   - skeena-bulkley-2024-bulkley-mckilligan-barren-ortho
-    ##   - ... with 22 more feature(s).
-    ## - assets: image
-    ## - item's fields: assets, bbox, collection, geometry, id, links, properties, stac_extensions, stac_version, type
-
-Have a look at where to get things
-
-``` r
-q$features[[1]]$assets
-```
-
-    ## $image
-    ## $image$href
-    ## [1] "https://dev-imagery-uav-bc.s3.amazonaws.com/skeena/bulkley/2021/197912_roberthatch/odm_orthophoto/odm_orthophoto.tif"
-    ## 
-    ## $image$type
-    ## [1] "image/tiff; application=geotiff; profile=cloud-optimized"
-    ## 
-    ## $image$roles
-    ## [1] "data"
+Table @ref(tab:tab-uav-imagery-cap) shows links to the collection:
 
 As of QGIS 3.42 - ONE can also access stac items (orthoimagery, Digital
 Surface Models and Digital Terrain Models in our case) directly via the
 Data Source Manager. See a blog with details
 [here](https://www.lutraconsulting.co.uk/blogs/stac-in-qgis). It looks
-like this in the the `Layer / Data Source Manager` toolbar in QGIS:
+like this in the th `Layer / Data Source Manager` toolbar in QGIS:
 
-``` r
-knitr::include_graphics("fig/a11sone01.png")
-```
+<img src="fig/a11sone01.png" width="100%" />
 
-<img src="fig/a11sone01.png" width="1922" />
-
-``` r
-knitr::include_graphics("fig/a11sone02.png")
-```
-
-<img src="fig/a11sone02.png" width="1922" />
-
-``` r
-rmarkdown::render("README.Rmd", output_format = "github_document")
-rmarkdown::render("README.Rmd", output_format = "html_document")
-
-usethis::use_git_ignore("README.html")
-```
+<img src="fig/a11sone02.png" width="100%" />

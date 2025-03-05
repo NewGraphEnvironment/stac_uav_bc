@@ -1,7 +1,14 @@
 ---
-output: github_document
+title: "README"
+output:
+  html_document:
+    code_folding: hide
 ---
 
+```{r setup, echo=FALSE, include = TRUE}
+knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE, dpi=60, out.width = "100%")
+
+```
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # stac_uav_bc
@@ -21,38 +28,81 @@ knitr::include_graphics("fig/cover.JPG")
 
 
 
-This a bounding box for the [Neexdzi Kwa](https://www.newgraphenvironment.com/restoration_wedzin_kwa_2024/) watershed (aka - the Upper Bulkley River near Houston BC)
+
 
 ```{r, include = T}
-q <- rstac::stac("http://www.a11s.one:8000/") |>
-  rstac::stac_search(collections = "uav-imagery-bc",
-                     bbox = c(-126.77000, 54.08832, -125.88822, 54.68786)) |>
-  rstac::post_request()
 
-q |>
-  rstac::items_fetch()
+staticimports::import()
+source('scripts/staticimports.R')
+
 ```
 
 
 
 ```{r api1}
-q <- rstac::stac("http://www.a11s.one:8000/") |>
-  rstac::stac_search(collections = "uav-imagery-bc",
-                     bbox = c(-126.77000, 54.08832, -125.88822, 54.68786)) |>
+
+bcbbox <-  as.numeric(
+  sf::st_bbox(bcmaps::bc_bound()) |> sf::st_transform(crs = 4326)
+)
+
+q <- rstac::stac("http://images.a11s.one/") |>
+    rstac::stac_search(collections = "uav-imagery-bc",
+                       # bc bounding box
+                      bbox = bcbbox
+                      # This a bounding box for the [Neexdzi Kwa](https://www.newgraphenvironment.com/restoration_wedzin_kwa_2024/) watershed (aka - the Upper Bulkley River near Houston BC)
+                     # bbox = c(-126.77000, 54.08832, -125.88822, 54.68786)
+                     ) |>
   rstac::post_request()
 
-q |>
+r <- q |>
   rstac::items_fetch()
 ```
-Have a look at where to get things
+
+
+<br>
+
+Table \@ref(tab:tab-uav-imagery-cap) shows links to the collection:
+
+
+```{r tab-uav-imagery-cap, results="asis"}
+my_caption <- "Drone imagery download and viewer links."
+
+my_tab_caption(tip_text = " <b>NOTE: Links to viewer current may need to be manually altered in browser to begin with http vs https! This should resolved soon.</b>")
+```
+
+
+```{r tab-uav-imagery}
+tab |> 
+  my_dt_table(cols_freeze_left = 2, escape = FALSE)
+```
+
 
 ```{r}
-q$features[[1]]$assets
+tab <- tibble::tibble(url_download = purrr::map_chr(r$features, ~ purrr::pluck(.x, "assets", "image", "href"))) |> 
+  dplyr::mutate(stub = stringr::str_replace_all(url_download, "https://dev-imagery-uav-bc.s3.amazonaws.com/", "")) |> 
+  tidyr::separate(
+    col = stub, 
+    into = c("region", "watershed_group", "year", "item", "rest"),
+    sep = "/",
+    extra = "drop"
+  ) |> 
+  dplyr::mutate(link_view = ngr::ngr_str_link_url(
+                  url_base = "http://23cog.s3.amazonaws.com/viewer.html?cog=",
+                  url_resource = url_download, 
+                  url_resource_path = FALSE,
+                  anchor_text= "URL View"
+                  ),
+                link_download = ngr::ngr_str_link_url(url_base = url_download, anchor_text = "URL Download")) |> 
+  dplyr::select(region, watershed_group, year, item, link_view, link_download, url_download)
+
+
 ```
+
+
 
 As of QGIS 3.42 - ONE can also access stac items (orthoimagery, Digital Surface Models and Digital Terrain Models in our case) directly via
 the Data Source Manager. See a blog with details [here](https://www.lutraconsulting.co.uk/blogs/stac-in-qgis).  It looks like this in the 
-the `Layer / Data Source Manager` toolbar in QGIS:
+th `Layer / Data Source Manager` toolbar in QGIS:
 
 ```{r}
 knitr::include_graphics("fig/a11sone01.png")
@@ -64,7 +114,7 @@ knitr::include_graphics("fig/a11sone02.png")
 
 ```{r build, eval = FALSE}
 rmarkdown::render("README.Rmd", output_format = "github_document")
-rmarkdown::render("README.Rmd", output_format = "html_document")
+rmarkdown::render("README.Rmd", output_format = "html_document", output_file = "index.html")
 
 usethis::use_git_ignore("README.html")
 
