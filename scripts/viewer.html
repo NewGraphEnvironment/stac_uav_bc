@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>v1be sP4t1Al</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+    }
+    #map {
+      height: 100vh;
+      border: 5px solid lime;
+    }
+    .logo-control {
+      position: absolute;
+      top: -7.5px;
+      left: 40px;
+      z-index: 1000;
+      background: transparent;
+      padding: 5px;
+      border-radius: 5px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    }
+    .logo-control img {
+      max-width: 80px;
+      max-height: 80px;
+    }
+  </style>
+
+  <!-- Explicitly link to the favicon -->
+  <!-- Browsers automatically check for favicon.ico in the root, but this makes it explicit -->
+  <!-- <link rel="icon" href="https://viewer.a11s.one/favicon.ico" type="image/x-icon"> -->
+  <link rel="icon" href="https://github.com/NewGraphEnvironment/new_graphiti/blob/main/assets/logos/favicon_io/favicon.ico?raw=true" type="image/x-icon">
+</head>
+<body>
+  <div id="map"></div>
+  <script>
+    console.log("Initializing COG Viewer...");
+
+    // Function to reload the page dynamically when the URL changes
+    // This ensures the map updates when the query string is modified without a full reload
+    window.addEventListener("popstate", () => {
+      const params = new URLSearchParams(window.location.search);
+      const cogUrl = params.get('cog');
+      if (cogUrl) {
+        location.reload(); // Trigger a full reload to reinitialize the map with the new COG URL
+      }
+    });
+
+    // Extract COG URL from query parameter
+    const params = new URLSearchParams(window.location.search);
+    const cogUrl = params.get('cog');
+
+    if (!cogUrl) {
+      alert("No COG URL provided in the query string. Use ?cog=<COG_URL>");
+      throw new Error("COG URL not provided.");
+    }
+
+    console.log("COG URL extracted:", cogUrl);
+
+    // Titiler base URL (update with your actual titiler URL)
+    const titilerBaseUrl = "https://titiler.a11s.one";
+    console.log("Titiler base URL:", titilerBaseUrl);
+
+    // Initialize Leaflet map without a static view
+    const map = L.map("map");
+    console.log("Leaflet map initialized.");
+
+    // Add base layers
+    const satelliteMap = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+      subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+      attribution: 'Map data © 2025 Google',
+      maxZoom: 20
+    });
+
+    const streetMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
+      maxZoom: 19
+    });
+
+    satelliteMap.addTo(map);
+
+    // Fetch tile JSON from titiler
+    const tileJsonUrl = `${titilerBaseUrl}/cog/tilejson.json?url=${cogUrl}`;
+    console.log("Fetching tile JSON from:", tileJsonUrl);
+
+    fetch(tileJsonUrl)
+      .then(response => {
+        console.log("Received response:", response);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch tile JSON: ${response.statusText}`);
+        }
+        return response.json();
+      })
+      .then(tileJson => {
+        console.log("Tile JSON received:", tileJson);
+        console.log("Tile URL received:", tileJson.tiles[0]);
+
+        // Add COG layer to the map
+        const cogLayer = L.tileLayer(tileJson.tiles[0], {
+          attribution: tileJson.attribution,
+          maxZoom: 22 // Allow zooming further into the COG
+        });
+        cogLayer.addTo(map);
+
+        // Fit map to bounds
+        const [minX, minY, maxX, maxY] = tileJson.bounds;
+        console.log("Fitting map to bounds:", [[minY, minX], [maxY, maxX]]);
+        map.fitBounds([[minY, minX], [maxY, maxX]]);
+
+        // Add layer controls
+        L.control.layers({
+          "Satellite Map": satelliteMap,
+          "Street Map": streetMap
+        }, {
+          "Imagery": cogLayer
+        }).addTo(map);
+      })
+      .catch(error => {
+        console.error("Error during COG loading or rendering:", error);
+        alert("Failed to load COG. Check the console for more details.");
+      });
+
+    // Add a scale bar
+    L.control.scale().addTo(map);
+
+    // Add the logo control
+    const logoControl = L.control({ position: 'topleft' });
+
+    logoControl.onAdd = function () {
+      const div = L.DomUtil.create('div', 'logo-control');
+      div.innerHTML = `<a href="https://www.newgraphenvironment.com/new_graphiti/" target="_blank">
+                         <img src="https://github.com/NewGraphEnvironment/new_graphiti/blob/main/assets/logos/logo_newgraph/WHITE/PNG/nge-icon_white.png?raw=true" alt="NewGraph Logo">
+                       </a>`;
+      return div;
+    };
+
+    logoControl.addTo(map);
+
+    // Add a custom control with the clickable link
+    const linkControl = L.control({ position: 'topright' });
+
+    // Dynamically construct the download URL to point to the S3 website
+    const originalBaseUrl = new URL(cogUrl).origin;
+    const s3WebsiteBaseUrl = originalBaseUrl.replace(
+      "s3.amazonaws.com",
+      "s3-website-us-west-2.amazonaws.com"
+    );
+    const dlcogUrl = cogUrl.replace(originalBaseUrl, s3WebsiteBaseUrl);
+
+    linkControl.onAdd = function () {
+      const div = L.DomUtil.create('div', 'cog-link-control');
+      try {
+        console.log("Download COG URL:", dlcogUrl);
+
+        // Create the download link - was dlcogUrl but not sure why
+        div.innerHTML = `<a href="${cogUrl}"
+                            target="_blank"
+                            style="text-decoration: none; color: lime; font-weight: bold; background: rgba(0, 0, 0, 0.6); padding: 10px; border-radius: 5px;">
+                            Click Here to Download Imagery
+                          </a>`;
+      } catch (error) {
+        console.error("Error processing the download link:", error);
+        div.innerHTML = `<p style="color: red; font-weight: bold;">Invalid Download URL</p>`;
+      }
+
+      return div;
+    };
+
+    linkControl.addTo(map);
+  </script>
+</body>
+</html>
