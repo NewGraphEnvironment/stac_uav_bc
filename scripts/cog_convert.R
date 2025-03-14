@@ -1,3 +1,5 @@
+# this converts to cogs directly in the imagery_uav_bc directories (makes them first) so all we need to do is run the
+# stac build and sync to aws
 
 ################################################################################################################
 #--------------------------------------------------convert to COG---------------------------------------------------
@@ -21,6 +23,25 @@ path <- "/Volumes/backup_2022/backups/new_graph/uav_imagery/skeena"
 grep_this <- "/babine/|/kispiox/|/zymoetz/"
 invert_this <- FALSE
 
+# now - we have already processes the imagery for 2024 so we will not repeat.  we will filter out those that contain /2024/
+paths_in <- grep(grep_this, paths_in_raw, invert = invert_this, value = TRUE)
+
+path_out_stub <- "/Users/airvine/Projects/gis/uav_imagery/imagery_uav_bc"
+# convert outpaths to be same dir structure after archive but in new directory called imagery_uav_bc
+paths_out <- fs::path(
+  path_out_stub,
+  fs::path_rel(
+    paths_in, 
+    start = "/Volumes/backup_2022/backups/new_graph/uav_imagery"
+  )
+)
+
+# here is mackenzie
+path <- "/Users/airvine/Projects/gis/uav_imagery/mackenzie"
+# this regex pattern ($^) matches the end of a string immediately after the start, which is impossible, ensuring that nothing is filtered out
+grep_this <- ""
+invert_this <- FALSE
+
 paths_in_raw <- grep(
   
   "\\.xml$",
@@ -35,17 +56,17 @@ paths_in_raw <- grep(
   value = TRUE
 )
 
-# now - we have already processes the imagery for 2024 so we will not repeat.  we will filter out those that contain /2024/
-paths_in <- grep(grep_this, paths_in_raw, invert = invert_this, value = TRUE)
+# we don't need to subset for Mckenzieso we just transfer object name
+paths_in <- paths_in_raw
 
 
-path_out_stub <- "/Volumes/backup_2022/backups/new_graph/uav_imagery/imagery_uav_bc"
+path_out_stub <- "/Users/airvine/Projects/gis/uav_imagery/imagery_uav_bc"
 # convert outpaths to be same dir structure after archive but in new directory called imagery_uav_bc
 paths_out <- fs::path(
   path_out_stub,
   fs::path_rel(
     paths_in, 
-    start = "/Volumes/backup_2022/backups/new_graph/uav_imagery"
+    start = path
   )
 )
 
