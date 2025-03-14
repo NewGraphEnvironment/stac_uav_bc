@@ -45,13 +45,13 @@ d |>
 
 # add the viewer file
 d |> 
-  droplet_ssh("mkdir -p /var/www/html/viewer") |>
-  droplet_upload(
+  analogsea::droplet_ssh("mkdir -p /var/www/html/viewer") |>
+  analogsea::droplet_upload(
     'scripts/viewer.html', 
     "/var/www/html/viewer/") |>
   # these permissions are iimportant so nginx can serve
-  droplet_ssh("chmod 0755 /var/www/html/viewer") |> 
-  droplet_ssh("chmod 0644 /var/www/html/viewer/viewer.html") 
+  analogsea::droplet_ssh("chmod 0755 /var/www/html/viewer") |> 
+  analogsea::droplet_ssh("chmod 0644 /var/www/html/viewer/viewer.html") 
 
 # push the viewer.html file to the 
 
@@ -141,9 +141,9 @@ analogsea::domain_record_create(
 # }
 nginx_config <- '
 server {
-    listen 443;
+    listen 443 ssl;
     server_name images.a11s.one;
-    
+
     ssl_certificate /etc/letsencrypt/live/images.a11s.one/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/images.a11s.one/privkey.pem;
 
@@ -156,14 +156,14 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header X-Forwarded-Host $host;
 
-        add_header Access-Control-Allow-Origin *;
+        # add_header Access-Control-Allow-Origin *;
         add_header Access-Control-Allow-Methods GET;
         add_header Access-Control-Allow-Headers Content-Type;
     }
 }
 
 server {
-    listen 443;
+    listen 443 ssl;
     server_name rstudio.a11s.one;
     
     ssl_certificate /etc/letsencrypt/live/rstudio.a11s.one/fullchain.pem;
@@ -180,7 +180,7 @@ server {
 }
 
 server {
-    listen 443;
+    listen 443 ssl;
     server_name titiler.a11s.one;
     
     
@@ -189,6 +189,16 @@ server {
 
 
     location / {
+        # if ($request_method = OPTIONS) {
+        #         # add_header Access-Control-Allow-Origin "https://viewer.a11s.one" always;
+        #         # add_header Access-Control-Allow-Origin * always;
+        #         add_header Access-Control-Allow-Methods "GET, OPTIONS" always;
+        #         add_header Access-Control-Allow-Headers "Content-Type" always;
+        #         add_header Content-Length 0;
+        #         add_header Content-Type text/plain;
+        #         return 204;
+        # }
+            
         proxy_pass http://127.0.0.1:8001/;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -196,14 +206,15 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header X-Forwarded-Host $host;
 
-        add_header Access-Control-Allow-Origin *;
-        add_header Access-Control-Allow-Methods GET;
-        add_header Access-Control-Allow-Headers Content-Type;
+        # add_header Access-Control-Allow-Origin "https://viewer.a11s.one" always;
+        # add_header Access-Control-Allow-Origin * always;
+        add_header Access-Control-Allow-Methods "GET, OPTIONS" always;
+        add_header Access-Control-Allow-Headers "Content-Type" always;
     }
 }
 
 server {
-    listen 443;
+    listen 443 ssl;
     server_name viewer.a11s.one;
     
     
@@ -213,9 +224,10 @@ server {
     root /var/www/html/viewer;
     index viewer.html;
 
-    #there are conflicting cors policies here that we need to deal with!!
+    #we match the cors for titiler!
     location / {
-        add_header Access-Control-Allow-Origin "https://viewer.a11s.one" always;
+        # add_header Access-Control-Allow-Origin "https://titiler.a11s.one" always;
+        # add_header Access-Control-Allow-Origin * always;
         add_header Access-Control-Allow-Methods "GET, OPTIONS" always;
         add_header Access-Control-Allow-Headers "Content-Type" always;
     }
