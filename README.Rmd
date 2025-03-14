@@ -1,73 +1,76 @@
 ---
+title: "stac_uav_bc"
 output:
   html_document:
-    code_folding: hide
+    code_folding: show
+    self_contained: true
+params: 
+  rmd_on: TRUE
 ---
 
 ```{r setup, echo=FALSE, include = TRUE}
-knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE, dpi=60, out.width = "100%")
+knitr::opts_chunk$set(echo=TRUE, message=FALSE, warning=FALSE, dpi=60, out.width = "100%")
 
 ```
+
+
+```{r build, echo= FALSE, eval = FALSE}
+rmarkdown::render("README.Rmd", output_format = "github_document")
+rmarkdown::render("README.Rmd", output_format = "html_document", output_file = "index.html")
+
+usethis::use_git_ignore("README.html")
+```
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# stac_uav_bc
 
 ![groovy](https://img.shields.io/badge/status-groovy-gren)
 ![fUn](https://img.shields.io/badge/plays-fUn-red)
 
 The goal of `stac_uav_bc` is to document and serve out our UAV collection for British Columbia.  It is organized by
 watershed and can be queried by location and time using our API via the lovely [`rstac` R package](https://brazil-data-cube.github.io/rstac/)
-and [QGIS (v3.42+)](https://qgis.org/).  Still a work in progress but currently functioning.
+and [QGIS (v3.42+)](https://qgis.org/).  Still a work in progress but currently functioning at [images.a11s.one](images.a11s.one).
+See below how to add STAC items to QGIS.
 
-```{r fig, out.width="100%", fig.align="center"}
+<br>
+
+
+```{r fig, echo=FALSE, out.width="100%", fig.align="center"}
 
 fpr::fpr_photo_resize_convert("fig/cover.png", path = "fig")
 knitr::include_graphics("fig/cover.JPG")
 ```
 
-
-
-
-
-```{r, include = T}
+```{r, echo=FALSE, include = T}
 
 staticimports::import()
 source('scripts/staticimports.R')
 source('scripts/functions.R')
 ```
 
-
-
 ```{r api1}
-
+# bc bounding box
 bcbbox <-  as.numeric(
   sf::st_bbox(bcmaps::bc_bound()) |> sf::st_transform(crs = 4326)
 )
+# This a bounding box for the [Neexdzi Kwa](https://www.newgraphenvironment.com/restoration_wedzin_kwa_2024/) watershed (aka - the Upper Bulkley River near Houston BC) bbox = c(-126.77000, 54.08832, -125.88822, 54.68786)
 
-q <- rstac::stac("http://images.a11s.one/") |>
+# use rstac to query the collection
+q <- rstac::stac("https://images.a11s.one/") |>
     rstac::stac_search(collections = "uav-imagery-bc",
-                       # bc bounding box
                       bbox = bcbbox
-                      # This a bounding box for the [Neexdzi Kwa](https://www.newgraphenvironment.com/restoration_wedzin_kwa_2024/) watershed (aka - the Upper Bulkley River near Houston BC)
-                     # bbox = c(-126.77000, 54.08832, -125.88822, 54.68786)
+                      
                      ) |>
   rstac::post_request()
 
+# get deets of the items
 r <- q |>
   rstac::items_fetch()
 ```
 
 
-<br>
-
-
-```{r tab-uav-imagery-cap, results="asis", eval=knitr::opts_knit$get("output.format") != "gfm"}
-my_caption <- "Drone imagery download and viewer links."
-
-my_tab_caption_rmd(tip_text = " <b>NOTE: Links to viewer current may need to be manually altered in browser to begin with http vs https! This should be resolved soon.</b>")
-```
-
 ```{r}
+# build the table to display the info
 tab <- tibble::tibble(url_download = purrr::map_chr(r$features, ~ purrr::pluck(.x, "assets", "image", "href"))) |> 
   dplyr::mutate(stub = stringr::str_replace_all(url_download, "https://dev-imagery-uav-bc.s3.amazonaws.com/", "")) |> 
   tidyr::separate(
@@ -85,12 +88,19 @@ tab <- tibble::tibble(url_download = purrr::map_chr(r$features, ~ purrr::pluck(.
   ),
   link_download = ngr::ngr_str_link_url(url_base = url_download, anchor_text = url_download)) |> 
   dplyr::select(region, watershed_group, year, item, link_view, link_download)
+```
+
+<br>
 
 
+```{r tab-uav-imagery-cap, echo=FALSE, results="asis", eval=identical(params$rmd_on, TRUE)}
+my_caption <- "Drone imagery download and viewer links."
+
+my_tab_caption_rmd()
 ```
 
 
-```{r tab-uav-imagery, eval=knitr::opts_knit$get("output.format") != "gfm"}
+```{r tab-uav-imagery, echo=FALSE, eval=identical(params$rmd_on, TRUE)}
 tab |> 
   my_dt_table(cols_freeze_left = 2, escape = FALSE)
 ```
@@ -100,19 +110,11 @@ As of QGIS 3.42 - ONE can also access stac items (orthoimagery, Digital Surface 
 the Data Source Manager. See a blog with details [here](https://www.lutraconsulting.co.uk/blogs/stac-in-qgis).  It looks like this in the 
 th `Layer / Data Source Manager` toolbar in QGIS:
 
-```{r}
+```{r echo=FALSE}
 knitr::include_graphics("fig/a11sone01.png")
 ```
 
-```{r}
+```{r echo=FALSE}
 knitr::include_graphics("fig/a11sone02.png")
-```
-
-```{r build, eval = FALSE}
-rmarkdown::render("README.Rmd", output_format = "github_document")
-rmarkdown::render("README.Rmd", output_format = "html_document", output_file = "index.html")
-
-usethis::use_git_ignore("README.html")
-
 ```
 
