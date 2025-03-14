@@ -77,13 +77,14 @@ tab <- tibble::tibble(url_download = purrr::map_chr(r$features, ~ purrr::pluck(.
     extra = "drop"
   ) |> 
   dplyr::mutate(link_view = ngr::ngr_str_link_url(
-                  url_base = "http://23cog.s3.amazonaws.com/viewer.html?cog=",
-                  url_resource = url_download, 
-                  url_resource_path = FALSE,
-                  anchor_text= "URL View"
-                  ),
-                link_download = ngr::ngr_str_link_url(url_base = url_download, anchor_text = "URL Download")) |> 
-  dplyr::select(region, watershed_group, year, item, link_view, link_download, url_download)
+    url_base = "https://viewer.a11s.one/?cog=",
+    url_resource = url_download, 
+    url_resource_path = FALSE,
+    # anchor_text= "URL View"
+    anchor_text= tools::file_path_sans_ext(basename(url_download))
+  ),
+  link_download = ngr::ngr_str_link_url(url_base = url_download, anchor_text = url_download)) |> 
+  dplyr::select(region, watershed_group, year, item, link_view, link_download)
 
 
 ```
