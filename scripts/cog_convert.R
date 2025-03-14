@@ -66,7 +66,7 @@ paths_out <- fs::path(
   path_out_stub,
   fs::path_rel(
     paths_in, 
-    start = path
+    start = fs::path_dir(path)
   )
 )
 
