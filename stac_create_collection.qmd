@@ -21,8 +21,13 @@ from datetime import datetime
 
 ```{python collection-create}
 # path_collection = "/Volumes/backup_2022/backups/new_graph/uav_imagery/imagery_uav_bc/imagery_uav_bc.json"
-path_collection = "/Users/airvine/Projects/gis/imagery_uav_bc/imagery_uav_bc.json"
-path_s3_json = "https://dev-imagery-uav-bc.s3.amazonaws.com/imagery_uav_bc.json"
+path_collection = "/Users/airvine/Projects/gis/imagery_uav_bc/collection.json"
+# here is the prod version
+path_collection = "/Users/airvine/Projects/gis/uav_imagery/stac/prod/imagery_uav_bc/collection.json"
+
+path_s3_json = "https://dev-imagery-uav-bc.s3.amazonaws.com/collection.json"
+# prod
+path_s3_json = "https://imagery-uav-bc.s3.amazonaws.com/collection.json"
 
 
 # Define spatial extent (bounding box for BC)
@@ -36,11 +41,11 @@ extent = Extent(spatial=spatial_extent, temporal=temporal_extent)
 
 # Create the STAC Collection
 collection = Collection(
-    id="uav-imagery-bc",
+    id="imagery-uav-bc-prod",
     description="A collection of UAV imagery from British Columbia",
     extent=extent,
     license="CC-BY-4.0",
-    title="UAV Imagery from British Columbia",
+    title="UAV Imagery from British Columbia - Production Version",
     href=path_collection
 )
 
