@@ -14,7 +14,16 @@ knitr::opts_chunk$set(echo=TRUE, message=FALSE, warning=FALSE, dpi=60, out.width
 ```
 
 
+```{r, echo=FALSE, include = T}
+
+staticimports::import()
+source('scripts/staticimports.R')
+source('scripts/functions.R')
+```
+
+
 ```{r build, echo= FALSE, eval = FALSE}
+# we need to chabge the rmd_on param to FALSE to render the README.md for the github landing page
 rmarkdown::render("README.Rmd", output_format = "github_document")
 rmarkdown::render("README.Rmd", output_format = "html_document", output_file = "index.html")
 
@@ -41,13 +50,6 @@ fpr::fpr_photo_resize_convert("fig/cover.png", path = "fig")
 knitr::include_graphics("fig/cover.JPG")
 ```
 
-```{r, echo=FALSE, include = T}
-
-staticimports::import()
-source('scripts/staticimports.R')
-source('scripts/functions.R')
-```
-
 ```{r api1}
 # bc bounding box
 bcbbox <-  as.numeric(
@@ -57,7 +59,9 @@ bcbbox <-  as.numeric(
 
 # use rstac to query the collection
 q <- rstac::stac("https://images.a11s.one/") |>
-    rstac::stac_search(collections = "uav-imagery-bc",
+    rstac::stac_search(
+      # collections = "uav-imagery-bc",
+      collections = "imagery-uav-bc-prod",
                       bbox = bcbbox
                       
                      ) |>
@@ -72,7 +76,7 @@ r <- q |>
 ```{r}
 # build the table to display the info
 tab <- tibble::tibble(url_download = purrr::map_chr(r$features, ~ purrr::pluck(.x, "assets", "image", "href"))) |> 
-  dplyr::mutate(stub = stringr::str_replace_all(url_download, "https://dev-imagery-uav-bc.s3.amazonaws.com/", "")) |> 
+  dplyr::mutate(stub = stringr::str_replace_all(url_download, "https://imagery-uav-bc.s3.amazonaws.com/", "")) |> 
   tidyr::separate(
     col = stub, 
     into = c("region", "watershed_group", "year", "item", "rest"),

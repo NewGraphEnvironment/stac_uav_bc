@@ -27,7 +27,9 @@ bcbbox <-  as.numeric(
 
 # use rstac to query the collection
 q <- rstac::stac("https://images.a11s.one/") |>
-    rstac::stac_search(collections = "uav-imagery-bc",
+    rstac::stac_search(
+      # collections = "uav-imagery-bc",
+      collections = "imagery-uav-bc-prod",
                       bbox = bcbbox
                       
                      ) |>
@@ -41,7 +43,7 @@ r <- q |>
 ``` r
 # build the table to display the info
 tab <- tibble::tibble(url_download = purrr::map_chr(r$features, ~ purrr::pluck(.x, "assets", "image", "href"))) |> 
-  dplyr::mutate(stub = stringr::str_replace_all(url_download, "https://dev-imagery-uav-bc.s3.amazonaws.com/", "")) |> 
+  dplyr::mutate(stub = stringr::str_replace_all(url_download, "https://imagery-uav-bc.s3.amazonaws.com/", "")) |> 
   tidyr::separate(
     col = stub, 
     into = c("region", "watershed_group", "year", "item", "rest"),
