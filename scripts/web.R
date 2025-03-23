@@ -1,15 +1,22 @@
 library(analogsea)
 
 # spin up a machine
+# d <- droplet_create(
+#   image = "rstudio-20-04",
+#   size = "s-1vcpu-1gb"
+# )
+
+
 d <- droplet_create(
   image = "rstudio-20-04",
-  size = "s-1vcpu-1gb"
+  size = "s-2vcpu-2gb"
 )
 
 # see droplets to get the id
 analogsea::droplets()
 
 # assign the id
+# this is the s-1vcpu-1gb
 d <- analogsea::droplet(480789025)
 
 
@@ -52,6 +59,25 @@ d |>
   # these permissions are iimportant so nginx can serve
   analogsea::droplet_ssh("chmod 0755 /var/www/html/viewer") |> 
   analogsea::droplet_ssh("chmod 0644 /var/www/html/viewer/viewer.html") 
+
+# load a new stac collection to the fastapi instance
+d |> 
+  droplet_upload(
+    "scripts/config/stac_register.sh", 
+    "./config/") |>
+  droplet_ssh("chmod 0700 config/stac_register.sh") |> 
+  # run that file
+  droplet_ssh("config/stac_register.sh")
+
+# unregister a stac collection to the fastapi instance
+d |> 
+  droplet_upload(
+    "scripts/config/stac_unregister.sh", 
+    "./config/") |>
+  droplet_ssh("chmod 0700 config/stac_unregister.sh") |> 
+  # run that file
+  droplet_ssh("config/stac_unregister.sh")
+
 
 # push the viewer.html file to the 
 
@@ -300,7 +326,7 @@ server {
 }
 '
 
-writeLines(nginx_config, "config/a11s.one")
+writeLines(nginx_config, "scripts/config/a11s.one")
 
 
 analogsea::droplet_upload(d, "config/a11s.one", "/etc/nginx/sites-available/a11s.one")
