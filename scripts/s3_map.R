@@ -1,5 +1,6 @@
 path_out <- "s3://dev-imagery-uav-bc" 
 # path_out <- "s3://dev-backup-imagery-uav" 
+path_out <- "s3://imagery-uav-bc" 
 s3fs::s3_dir_ls(path_out, recurse = T )
 
 d_info_out <- s3fs::s3_dir_info(path_out,
