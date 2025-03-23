@@ -7,6 +7,11 @@
 
 path_in <- "/Users/airvine/Projects/gis/uav_imagery/imagery_uav_bc"
 path_out <- "s3://dev-imagery-uav-bc" 
+
+
+# prod
+path_in <- "/Users/airvine/Projects/gis/uav_imagery/stac/prod/imagery_uav_bc"
+path_out <- "s3://imagery-uav-bc" 
   
 ################################################################################################################
 #--------------------------------------------------backup everything---------------------------------------------------
@@ -22,6 +27,7 @@ path_out <- "s3://dev-imagery-uav-bc"
 #   janitor::adorn_totals(where = "row")
 
 # lets just use aws to load everything into our dev-imagery-uav-bc bucket except the dotfiles
+# aws s3 sync attempts to determine the Content-Type of each file based on its extension and system settings. For .json files, it typically assigns application/json
 cmd_raw <- paste0(
   "aws s3 sync ", 
   path_in, 
@@ -49,12 +55,15 @@ processx::run(
 
 # to stop the computer from sleeping we ran the following in  the terminal
 # caffeinate -s Rscript /Users/airvine/Projects/repo/stac_uav_bc/scripts/r/s3_sync.R
+
+# once uploaded we need to tell the bucket that the json file is a json
+cmd2 <- 'aws s3 cp s3://imagery-uav-bc/collection.json s3://imagery-uav-bc/collection.json --metadata-directive REPLACE --content-type "application/json"'
   
-# when we load the catalog json we need to make it the website config file
+# # when we load the catalog json we need to make it the website config file - we don't need this!!
 s3 <- paws::s3()
 s3$put_bucket_website(
-  Bucket = "dev-imagery-uav-bc",
+  Bucket = "imagery-uav-bc",
   WebsiteConfiguration = list(
-    IndexDocument = list(Suffix = "catalog.json")
+    IndexDocument = list(Suffix = "collection.json")
   )
 )
