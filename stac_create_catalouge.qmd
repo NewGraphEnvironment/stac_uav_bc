@@ -23,7 +23,7 @@ def create_stac_catalog(path_collection: str, path_catalogue: str):
     """
     # Create Catalog
     catalog = pystac.Catalog(
-        id="imagery_uav_bc_catalog",
+        id="imagery_uav_bc",
         description="Root catalog for UAV imagery in BC"
     )
     
@@ -49,8 +49,12 @@ def create_stac_catalog(path_collection: str, path_catalogue: str):
 ```
 
 ```{python cat-create}
-path_collection = "/Users/airvine/Projects/gis/uav_imagery/imagery_uav_bc/imagery_uav_bc.json"
-path_catalogue = "/Users/airvine/Projects/gis/uav_imagery/imagery_uav_bc"
+path_collection = "/Users/airvine/Projects/gis/uav_imagery/imagery_uav_bc/collection.json"
+path_collection = "/Users/airvine/Projects/gis/uav_imagery/test/collection.json"
+
+path_catalogue = "/Users/airvine/Projects/gis/uav_imagery/imagery_uav_bc/"
+path_catalogue = "/Users/airvine/Projects/gis/uav_imagery/test/"
+
 
 create_stac_catalog(path_collection, path_catalogue)
 ```
