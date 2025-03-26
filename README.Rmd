@@ -2,10 +2,10 @@
 title: "stac_uav_bc"
 output:
   html_document:
-    code_folding: show
+    code_folding: hide
     self_contained: true
 params: 
-  rmd_on: TRUE
+  rmd_on: true
 ---
 
 ```{r setup, echo=FALSE, include = TRUE}
@@ -20,6 +20,9 @@ staticimports::import()
 source('scripts/staticimports.R')
 source('scripts/functions.R')
 ```
+
+
+
 
 
 ```{r build, echo= FALSE, eval = FALSE}
@@ -83,18 +86,26 @@ tab <- tibble::tibble(url_download = purrr::map_chr(r$features, ~ purrr::pluck(.
     sep = "/",
     extra = "drop"
   ) |> 
-  dplyr::mutate(link_view = ngr::ngr_str_link_url(
-    url_base = "https://viewer.a11s.one/?cog=",
-    url_resource = url_download, 
-    url_resource_path = FALSE,
-    # anchor_text= "URL View"
-    anchor_text= tools::file_path_sans_ext(basename(url_download))
-  ),
-  link_download = ngr::ngr_str_link_url(url_base = url_download, anchor_text = url_download)) |> 
+  dplyr::mutate(
+    link_view = 
+                  dplyr::case_when(
+                    !tools::file_path_sans_ext(basename(url_download)) %in% c("dsm", "dtm") ~ 
+                      ngr::ngr_str_link_url(
+                        url_base = "https://viewer.a11s.one/?cog=",
+                        url_resource = url_download, 
+                        url_resource_path = FALSE,
+                        # anchor_text= "URL View"
+                        anchor_text= tools::file_path_sans_ext(basename(url_download))),
+                    T ~ "-"),
+                        link_download = ngr::ngr_str_link_url(url_base = url_download, anchor_text = url_download)
+    )|> 
   dplyr::select(region, watershed_group, year, item, link_view, link_download)
 ```
 
 <br>
+
+`r if (params$rmd_on == FALSE) "Please see http://www.newgraphenvironment.com/stac_uav_bc for published table of collection links/details."`
+
 
 
 ```{r tab-uav-imagery-cap, echo=FALSE, results="asis", eval=identical(params$rmd_on, TRUE)}

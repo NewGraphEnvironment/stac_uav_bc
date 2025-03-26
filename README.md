@@ -50,18 +50,26 @@ tab <- tibble::tibble(url_download = purrr::map_chr(r$features, ~ purrr::pluck(.
     sep = "/",
     extra = "drop"
   ) |> 
-  dplyr::mutate(link_view = ngr::ngr_str_link_url(
-    url_base = "https://viewer.a11s.one/?cog=",
-    url_resource = url_download, 
-    url_resource_path = FALSE,
-    # anchor_text= "URL View"
-    anchor_text= tools::file_path_sans_ext(basename(url_download))
-  ),
-  link_download = ngr::ngr_str_link_url(url_base = url_download, anchor_text = url_download)) |> 
+  dplyr::mutate(
+    link_view = 
+                  dplyr::case_when(
+                    !tools::file_path_sans_ext(basename(url_download)) %in% c("dsm", "dtm") ~ 
+                      ngr::ngr_str_link_url(
+                        url_base = "https://viewer.a11s.one/?cog=",
+                        url_resource = url_download, 
+                        url_resource_path = FALSE,
+                        # anchor_text= "URL View"
+                        anchor_text= tools::file_path_sans_ext(basename(url_download))),
+                    T ~ "-"),
+                        link_download = ngr::ngr_str_link_url(url_base = url_download, anchor_text = url_download)
+    )|> 
   dplyr::select(region, watershed_group, year, item, link_view, link_download)
 ```
 
 <br>
+
+Please see <http://www.newgraphenvironment.com/stac_uav_bc> for
+published table of collection links/details.
 
 As of QGIS 3.42 - ONE can also access stac items (orthoimagery, Digital
 Surface Models and Digital Terrain Models in our case) directly via the
