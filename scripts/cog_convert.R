@@ -5,11 +5,11 @@
 #--------------------------------------------------convert to COG---------------------------------------------------
 ################################################################################################################
 # find all the images with fs that are named ortho.tif, dtm.tif or dem.tif
-path <- "/Volumes/backup_2022/backups/new_graph/uav_imagery/skeena/bulkley"
-path <- "/Volumes/backup_2022/backups/new_graph/uav_imagery/skeena"
+# path <- "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley"
+path <- "/Users/airvine/Projects/gis/uav_imagery/skeena"
 ## for this we added 
-grep_this <- "/2024/"
-invert_this <- TRUE
+grep_this <- "bulkley/2025"
+invert_this <- FALSE
 
 # here is a subset of Fraser 
 path <- "/Volumes/backup_2022/backups/new_graph/uav_imagery/fraser/nechacko"
@@ -32,7 +32,7 @@ paths_out <- fs::path(
   path_out_stub,
   fs::path_rel(
     paths_in, 
-    start = "/Volumes/backup_2022/backups/new_graph/uav_imagery"
+    start = "/Users/airvine/Projects/gis/uav_imagery"
   )
 )
 
