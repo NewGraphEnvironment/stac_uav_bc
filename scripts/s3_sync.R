@@ -5,13 +5,14 @@
 
 # s3fs::s3_dir_ls()
 
-path_in <- "/Users/airvine/Projects/gis/uav_imagery/imagery_uav_bc"
+# path_in <- "/Users/airvine/Projects/gis/uav_imagery/imagery_uav_bc"
+path_in <- "/Users/airvine/Projects/gis/uav_imagery/stac/dev/imagery_uav_bc"
 path_out <- "s3://dev-imagery-uav-bc" 
 
 
 # prod
 path_in <- "/Users/airvine/Projects/gis/uav_imagery/stac/prod/imagery_uav_bc"
-path_out <- "s3://imagery-uav-bc" 
+path_out <- "s3://imagery-uav-bc"
   
 ################################################################################################################
 #--------------------------------------------------backup everything---------------------------------------------------
@@ -56,14 +57,6 @@ processx::run(
 # to stop the computer from sleeping we ran the following in  the terminal
 # caffeinate -s Rscript /Users/airvine/Projects/repo/stac_uav_bc/scripts/r/s3_sync.R
 
-# once uploaded we need to tell the bucket that the json file is a json
-cmd2 <- 'aws s3 cp s3://imagery-uav-bc/collection.json s3://imagery-uav-bc/collection.json --metadata-directive REPLACE --content-type "application/json"'
-  
-# # when we load the catalog json we need to make it the website config file - we don't need this!!
-s3 <- paws::s3()
-s3$put_bucket_website(
-  Bucket = "imagery-uav-bc",
-  WebsiteConfiguration = list(
-    IndexDocument = list(Suffix = "collection.json")
-  )
-)
+#list collections
+# curl -s https://images.a11s.one/collections | jq -r '.collections[].id'
+
