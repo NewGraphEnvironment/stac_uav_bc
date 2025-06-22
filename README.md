@@ -21,14 +21,15 @@ STAC items to QGIS.
 ``` r
 # bc bounding box
 bcbbox <-  as.numeric(
-  sf::st_bbox(bcmaps::bc_bound()) |> sf::st_transform(crs = 4326)
+  sf::st_bbox(bcmaps::bc_bound()) |> 
+    sf::st_transform(crs = 4326)
 )
 # This a bounding box for the [Neexdzi Kwa](https://www.newgraphenvironment.com/restoration_wedzin_kwa_2024/) watershed (aka - the Upper Bulkley River near Houston BC) bbox = c(-126.77000, 54.08832, -125.88822, 54.68786)
 
 # use rstac to query the collection
 q <- rstac::stac("https://images.a11s.one/") |>
     rstac::stac_search(
-      # collections = "uav-imagery-bc",
+      # collections = "imagery-uav-bc-dev",
       collections = "imagery-uav-bc-prod",
                       bbox = bcbbox
                       
@@ -42,8 +43,10 @@ r <- q |>
 
 ``` r
 # build the table to display the info
+url_bucket <- "https://dev-imagery-uav-bc.s3.amazonaws.com/"
+url_bucket <- "https://imagery-uav-bc.s3.amazonaws.com/"
 tab <- tibble::tibble(url_download = purrr::map_chr(r$features, ~ purrr::pluck(.x, "assets", "image", "href"))) |> 
-  dplyr::mutate(stub = stringr::str_replace_all(url_download, "https://imagery-uav-bc.s3.amazonaws.com/", "")) |> 
+  dplyr::mutate(stub = stringr::str_replace_all(url_download, url_bucket, "")) |> 
   tidyr::separate(
     col = stub, 
     into = c("region", "watershed_group", "year", "item", "rest"),
