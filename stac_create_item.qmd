@@ -93,13 +93,15 @@ collection.save_object(include_self_link=True, dest_href=path_collection)
 
 ```{python dev}
 # Define the path to the STAC collection JSON file.  
-path_collection = "/Users/airvine/Projects/gis/uav_imagery/imagery_uav_bc/imagery_uav_bc.json"
 path_collection = "/Users/airvine/Projects/gis/uav_imagery/stac/prod/imagery_uav_bc/collection.json"
+# path_collection = "/Users/airvine/Projects/gis/uav_imagery/stac/dev/imagery_uav_bc/collection.json"
+
 
 # Define the path to the STAC collection JSON file on S3.  Seems a bit weird that we actually
 # need to put a file here in able to build our collection
-path_s3_json = "https://dev-imagery-uav-bc.s3.amazonaws.com/imagery_uav_bc.json"
 path_s3_json = "https://imagery-uav-bc.s3.amazonaws.com/collection.json"
+# path_s3_json = "https://dev-imagery-uav-bc.s3.amazonaws.com/collection.json"
+
 
 
 # Load the existing STAC collection from the file
@@ -109,22 +111,19 @@ collection = pystac.Collection.from_file(path_collection)
 collection.set_self_href(path_s3_json)
 
 # Define the base local path where imagery is stored
-path_base = pathlib.Path("/Users/airvine/Projects/gis/uav_imagery/imagery_uav_bc/")
+# path_base = pathlib.Path("/Users/airvine/Projects/gis/uav_imagery/imagery_uav_bc/")
 path_base = pathlib.Path("/Users/airvine/Projects/gis/uav_imagery/stac/prod/imagery_uav_bc")
+# path_base = pathlib.Path("/Users/airvine/Projects/gis/uav_imagery/stac/dev/imagery_uav_bc")
+
 
 
 # Define the base S3 URL where assets are hosted
-path_s3 = "https://dev-imagery-uav-bc.s3.amazonaws.com/"
 path_s3 = "https://imagery-uav-bc.s3.amazonaws.com/"
+# path_s3 = "https://dev-imagery-uav-bc.s3.amazonaws.com/"
 
 # Define a list of paths to process
-
 path_items = list(path_base.rglob("*.tif"))
-# path_items = [
-#     pathlib.Path("/Users/airvine/Projects/gis/imagery_uav_bc/fraser/nechacko/2024/199171_burnt_cabin_gala/odm_orthophoto/odm_orthophoto.tif"),
-#     pathlib.Path("/Users/airvine/Projects/gis/imagery_uav_bc/fraser/nechacko/2024/199171_burnt_cabin_gala/odm_dem/dtm.tif"),
-#     pathlib.Path("/Users/airvine/Projects/gis/imagery_uav_bc/fraser/nechacko/2024/199171_burnt_cabin_gala/odm_dem/dsm.tif")
-# ]
+
 
 # Iterate over each image file in the list
 for path_item in path_items:
@@ -162,12 +161,7 @@ for path_item in path_items:
     # Save the STAC item JSON in the same directory as the TIFF file
     path_item_json = pathlib.Path(str(path_item.parent / f"{item_id}.json"))
     item.save_object(dest_href=path_item_json)
-    
-    # path_item_json = path_item.with_suffix(".json")
-    # item.save_object(dest_href=path_item_json)
-    
-    #     # Add the newly created item to the collection
-    # collection.add_item(item)
+
 
 # Save the updated STAC collection with the new items included
 collection.save_object(
@@ -182,7 +176,8 @@ collection.save_object(
 ```{r json-clean, eval= FALSE}
 # DELETE ATTACK - USE WITH CARE
 # list all the jsonsin the directory so we can delete them
-path_base = "/Users/airvine/Projects/gis/uav_imagery/imagery_uav_bc/"
+# path_base = "/Users/airvine/Projects/gis/uav_imagery/imagery_uav_bc/"
+path_base = "/Users/airvine/Projects/gis/uav_imagery/stac/dev/imagery_uav_bc"
 path_base = "/Users/airvine/Projects/gis/uav_imagery/stac/prod/imagery_uav_bc"
 
 j <- fs::dir_ls(path_base, glob = "*.json", recurse = TRUE)
