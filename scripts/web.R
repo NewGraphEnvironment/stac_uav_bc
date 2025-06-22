@@ -60,25 +60,19 @@ d |>
   analogsea::droplet_ssh("chmod 0755 /var/www/html/viewer") |> 
   analogsea::droplet_ssh("chmod 0644 /var/www/html/viewer/viewer.html") 
 
-# load a new stac collection to the fastapi instance
-d |> 
-  droplet_upload(
-    "scripts/config/stac_register.sh", 
-    "./config/") |>
-  droplet_ssh("chmod 0700 config/stac_register.sh") |> 
-  # run that file
-  droplet_ssh("config/stac_register.sh")
-
 # unregister a stac collection to the fastapi instance
-d |> 
-  droplet_upload(
-    "scripts/config/stac_unregister.sh", 
-    "./config/") |>
-  droplet_ssh("chmod 0700 config/stac_unregister.sh") |> 
-  # run that file
-  droplet_ssh("config/stac_unregister.sh")
+vm_upload_run(d, "scripts/config/stac_unregister.sh", "config")
+# if it is already there ready to go
+vm_upload_run(d, "scripts/config/stac_unregister.sh", "config", run_only = FALSE)
+
+# load a new stac collection to the fastapi instance
+vm_upload_run(d, "scripts/config/stac_register.sh", "config")
 
 
+
+# update a stac collection with new items
+# from function in the functions.R file
+vm_upload_run(d, "scripts/config/stac_update_items.sh", "config")
 # push the viewer.html file to the 
 
 # set up the domain
@@ -99,7 +93,7 @@ analogsea::domain_record_create(
   dom, 
   type = "A", 
   name = "@", 
-  data = "64.23.157.94", 
+  data = analogsea::droplet_ip(d), 
   ttl = 1800
 )
 
@@ -333,4 +327,7 @@ analogsea::droplet_upload(d, "config/a11s.one", "/etc/nginx/sites-available/a11s
 # make a symlink so nginx sees it
 analogsea::droplet_ssh(d, "ln -s /etc/nginx/sites-available/a11s.one /etc/nginx/sites-enabled/")
 analogsea::droplet_ssh(d, "systemctl restart nginx")
+
+# here we try to resize
+resize(d, delete_original = FALSE, size = "s-2vcpu-4gb")
 
