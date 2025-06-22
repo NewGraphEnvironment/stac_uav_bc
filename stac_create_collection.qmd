@@ -20,8 +20,8 @@ from datetime import datetime
 
 
 ```{python collection-create}
-# path_collection = "/Volumes/backup_2022/backups/new_graph/uav_imagery/imagery_uav_bc/imagery_uav_bc.json"
-path_collection = "/Users/airvine/Projects/gis/imagery_uav_bc/collection.json"
+
+path_collection = "/Users/airvine/Projects/gis/uav_imagery/stac/dev/imagery_uav_bc/collection.json"
 # here is the prod version
 path_collection = "/Users/airvine/Projects/gis/uav_imagery/stac/prod/imagery_uav_bc/collection.json"
 
@@ -34,7 +34,7 @@ path_s3_json = "https://imagery-uav-bc.s3.amazonaws.com/collection.json"
 spatial_extent = SpatialExtent([[-140, 48, -114, 60]])
 
 # Define temporal extent using datetime objects
-temporal_extent = TemporalExtent([[datetime(2020, 1, 1), datetime(2025, 1, 1)]])
+temporal_extent = TemporalExtent([[datetime(2020, 1, 1), datetime(2026, 1, 1)]])
 
 # Create the extent object
 extent = Extent(spatial=spatial_extent, temporal=temporal_extent)
@@ -48,6 +48,15 @@ collection = Collection(
     title="UAV Imagery from British Columbia - Production Version",
     href=path_collection
 )
+
+# collection = Collection(
+#     id="imagery-uav-bc-dev",
+#     description="A collection of UAV imagery from British Columbia",
+#     extent=extent,
+#     license="CC-BY-4.0",
+#     title="UAV Imagery from British Columbia - Development Version",
+#     href=path_collection
+# )
 
 # Save the collection JSON
 collection.save(catalog_type=pystac.CatalogType.ABSOLUTE_PUBLISHED)
