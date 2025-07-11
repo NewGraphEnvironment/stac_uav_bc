@@ -1,6 +1,13 @@
 # this converts to cogs directly in the imagery_uav_bc directories (makes them first) so all we need to do is run the
 # stac build and sync to aws
 
+# It is not that efficient but it takes a ton of fussing to figure out which cogs are already generated so at this
+# point - rather than do that we just rebuild the entire directory every time.  
+
+# first we define where we are putting the latest run
+dir_out <- "/Users/airvine/Projects/gis/uav_imagery/imagery_uav_bc"
+
+
 ################################################################################################################
 #--------------------------------------------------convert to COG---------------------------------------------------
 ################################################################################################################
@@ -10,6 +17,7 @@ path <- "/Users/airvine/Projects/gis/uav_imagery/skeena"
 ## for this we added 
 grep_this <- "bulkley/2025"
 invert_this <- FALSE
+
 
 # here is a subset of Fraser 
 path <- "/Volumes/backup_2022/backups/new_graph/uav_imagery/fraser/nechacko"
@@ -23,18 +31,8 @@ path <- "/Volumes/backup_2022/backups/new_graph/uav_imagery/skeena"
 grep_this <- "/babine/|/kispiox/|/zymoetz/"
 invert_this <- FALSE
 
-# now - we have already processes the imagery for 2024 so we will not repeat.  we will filter out those that contain /2024/
-paths_in <- grep(grep_this, paths_in_raw, invert = invert_this, value = TRUE)
 
-path_out_stub <- "/Users/airvine/Projects/gis/uav_imagery/imagery_uav_bc"
-# convert outpaths to be same dir structure after archive but in new directory called imagery_uav_bc
-paths_out <- fs::path(
-  path_out_stub,
-  fs::path_rel(
-    paths_in, 
-    start = "/Users/airvine/Projects/gis/uav_imagery"
-  )
-)
+
 
 # here is mackenzie
 path <- "/Users/airvine/Projects/gis/uav_imagery/mackenzie"
@@ -56,19 +54,23 @@ paths_in_raw <- grep(
   value = TRUE
 )
 
+
+# now - we have already processes the imagery for some so we will not repeat.  we will filter out those that contain our grep_this
+paths_in <- grep(grep_this, paths_in_raw, invert = invert_this, value = TRUE)
+
+
+# convert outpaths to be same dir structure after archive but in new directory called imagery_uav_bc
+paths_out <- fs::path(
+  dir_out,
+  fs::path_rel(
+    paths_in, 
+    start = "/Users/airvine/Projects/gis/uav_imagery"
+  )
+)
+
 # we don't need to subset for Mckenzieso we just transfer object name
 paths_in <- paths_in_raw
 
-
-path_out_stub <- "/Users/airvine/Projects/gis/uav_imagery/imagery_uav_bc"
-# convert outpaths to be same dir structure after archive but in new directory called imagery_uav_bc
-paths_out <- fs::path(
-  path_out_stub,
-  fs::path_rel(
-    paths_in, 
-    start = fs::path_dir(path)
-  )
-)
 
 args_stub <- c('run', '-n', 'dff', 'rio', 'cogeo', 'create')
 
@@ -113,3 +115,17 @@ system_run <- function(args){
 }
 
 purrr::walk(args, system_run)
+
+# We are just manually copying over the files into the /Users/airvine/Projects/gis/uav_imagery/stac location
+# note that we put overwrite as FALSE so that we don't update the time stamps so don't sync new data to s3.  if 
+# we thought therre were actual changes we would changes that
+
+dir_in <- "/Users/airvine/Projects/gis/uav_imagery/imagery_uav_bc"
+dir_out <- "/Users/airvine/Projects/gis/uav_imagery/stac/dev/imagery_uav_bc"
+ngr::ngr_fs_copy_if_missing(dir_in, dir_out)
+
+dir_in <- "/Users/airvine/Projects/gis/uav_imagery/imagery_uav_bc"
+dir_out <- "/Users/airvine/Projects/gis/uav_imagery/stac/prod/imagery_uav_bc"
+
+ngr::ngr_fs_copy_if_missing(dir_in, dir_out)
+
