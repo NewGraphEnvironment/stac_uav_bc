@@ -16,22 +16,53 @@ reticulate::use_condaenv("titiler", required = TRUE)
 import pystac
 from pystac import Collection, Extent, SpatialExtent, TemporalExtent
 from datetime import datetime
+
+import rasterio
+from rasterio.warp import transform_bounds
+from shapely.geometry import box
+from shapely.ops import unary_union
+
+from pathlib import Path
+```
+
+```{python function-bbox_combined}
+def bbox_combined(paths):
+    bboxes = []
+    for path in paths:
+        with rasterio.open(path) as src:
+            wgs_bounds = transform_bounds(src.crs, "EPSG:4326", *src.bounds, densify_pts=21)
+            bboxes.append(box(*wgs_bounds))
+    union = unary_union(bboxes)
+    return union.bounds  # (min lon, min lat, max lon, max lat)
 ```
 
 
 ```{python collection-create}
 
-path_collection = "/Users/airvine/Projects/gis/uav_imagery/stac/dev/imagery_uav_bc/collection.json"
 # here is the prod version
 path_collection = "/Users/airvine/Projects/gis/uav_imagery/stac/prod/imagery_uav_bc/collection.json"
+path_collection = "/Users/airvine/Projects/gis/uav_imagery/stac/dev/imagery_uav_bc/collection.json"
 
-path_s3_json = "https://dev-imagery-uav-bc.s3.amazonaws.com/collection.json"
 # prod
 path_s3_json = "https://imagery-uav-bc.s3.amazonaws.com/collection.json"
+path_s3_json = "https://dev-imagery-uav-bc.s3.amazonaws.com/collection.json"
+
+collection_id = "imagery-uav-bc-prod"
+collection_id = "imagery-uav-bc-dev"
+
+path_cogs = list(Path(path_collection).parent.rglob("*.tif"))
+
 
 
 # Define spatial extent (bounding box for BC)
-spatial_extent = SpatialExtent([[-140, 48, -114, 60]])
+# spatial_extent = SpatialExtent([[-140, 48, -114, 60]])
+
+# Get bbox from your COGs
+bbox = bbox_combined(path_cogs)
+spatial_extent = SpatialExtent([list(bbox)])
+
+# Create spatial extent
+spatial_extent = SpatialExtent([[minx, miny, maxx, maxy]])
 
 # Define temporal extent using datetime objects
 temporal_extent = TemporalExtent([[datetime(2020, 1, 1), datetime(2026, 1, 1)]])
@@ -41,22 +72,14 @@ extent = Extent(spatial=spatial_extent, temporal=temporal_extent)
 
 # Create the STAC Collection
 collection = Collection(
-    id="imagery-uav-bc-prod",
+    id=collection_id,
     description="A collection of UAV imagery from British Columbia",
     extent=extent,
     license="CC-BY-4.0",
-    title="UAV Imagery from British Columbia - Production Version",
+    title=f"UAV Imagery from British Columbia - {collection_id}",
     href=path_collection
 )
 
-# collection = Collection(
-#     id="imagery-uav-bc-dev",
-#     description="A collection of UAV imagery from British Columbia",
-#     extent=extent,
-#     license="CC-BY-4.0",
-#     title="UAV Imagery from British Columbia - Development Version",
-#     href=path_collection
-# )
 
 # Save the collection JSON
 collection.save(catalog_type=pystac.CatalogType.ABSOLUTE_PUBLISHED)
