@@ -1,4 +1,5 @@
 library(analogsea)
+source("scripts/functions.R")
 
 # spin up a machine
 # d <- droplet_create(
@@ -69,10 +70,6 @@ vm_upload_run(d, "scripts/config/stac_unregister.sh", "config", run_only = FALSE
 vm_upload_run(d, "scripts/config/stac_register.sh", "config")
 
 
-
-# update a stac collection with new items
-# from function in the functions.R file
-vm_upload_run(d, "scripts/config/stac_update_items.sh", "config")
 # push the viewer.html file to the 
 
 # set up the domain
