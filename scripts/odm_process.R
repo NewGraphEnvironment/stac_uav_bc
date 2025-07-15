@@ -87,10 +87,32 @@ args <- lapply(paths, ngr::ngr_spk_odm)
 ################################################################################################################
 
 path <- "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2025"
-
-# 20191015 didn't run - so try without the first one
 paths <- fs::dir_ls(path, type = "dir")
 
+################################################################################################################
+#--------------------------------------------------bulkley 2025b--------------------------------------------------
+################################################################################################################
+path <- "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2025"
+
+# in this path we want just the directories that do not already have subdirectories called odm_orthophoto
+# 20191015 didn't run - so try without the first one
+# 1. list only first‐level dirs
+
+my_dir_sel <- function(path, string){
+  dir_1 <- fs::dir_ls(path, type = "dir", recurse = FALSE)
+  
+  # 2. keep those that don’t have an “odm_orthophoto” subdir
+  dir_keep <- !fs::dir_exists(fs::path(dir_1, string))
+  dir_1[dir_keep]
+}
+
+paths <-my_dir_sel(path, string ="odm_orthophoto")
+
+
+
+#hack to redo buck_buc64----------------------------------------------------------------------------------------------------
+# paths <- "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2025/buck_buc64"
+# 
 args <- purrr::map(
   paths,
   purrr::partial(
@@ -99,14 +121,30 @@ args <- purrr::map(
   )
 )
 
+# args |>
+#   purrr::walk(
+#     ~ processx::run(
+#       command = "docker",
+#       args = .x,
+#       echo = TRUE
+#     )
+#   )
+
+# this is same as above except it moves on if it fails
 args |>
   purrr::walk(
-    ~ processx::run(
-      command = "docker",
-      args = .x,
-      echo = TRUE
+    ~ tryCatch(
+      processx::run(
+        command = "docker",
+        args    = .x,
+        echo    = TRUE
+      ),
+      error = function(e) message(
+        "Build failed for args [", paste(.x, collapse = " "), "]: ", e$message
+      )
     )
   )
+
 
 # to stop the computer from sleeping we ran the following in  the terminal - make sure docker is running
 # caffeinate -s Rscript /Users/airvine/Projects/repo/stac_uav_bc/scripts/odm_process.R
