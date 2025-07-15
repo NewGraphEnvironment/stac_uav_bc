@@ -129,3 +129,11 @@ dir_out <- "/Users/airvine/Projects/gis/uav_imagery/stac/prod/imagery_uav_bc"
 
 ngr::ngr_fs_copy_if_missing(dir_in, dir_out)
 
+# this ids the extra directories but we haven't deleted them yet
+dir_in <- "/Users/airvine/Projects/gis/uav_imagery/imagery_uav_bc"
+dir_out <- "/Users/airvine/Projects/gis/uav_imagery/stac/prod/imagery_uav_bc"
+ngr::ngr_fs_id_missing(dir_in = dir_out,
+                       dir_out = dir_in,
+                       type = "dir",
+                       recurse = TRUE)
+
