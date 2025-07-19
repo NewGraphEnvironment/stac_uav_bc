@@ -3,9 +3,13 @@
 
 set -e  # Exit immediately if a command fails
 
-BUCKET_URL="https://imagery-uav-bc.s3.amazonaws.com"
+# BUCKET_URL="https://dev-imagery-uav-bc.s3.amazonaws.com"
+# BUCKET_URL="https://imagery-uav-bc.s3.amazonaws.com"
+BUCKET_URL="https://stac-dem-bc.s3.amazonaws.com"
+
+
 JSON_NAME="collection.json"
-COLLECTION_JSON=$(curl -s "${BUCKET_URL}/${JSON_NAME}")
+COLLECTION_JSON=$(curl -sL "${BUCKET_URL}/${JSON_NAME}")
 COLLECTION_ID=$(echo "$COLLECTION_JSON" | jq -r '.id')
 
 curl -X DELETE http://localhost:8000/collections/${COLLECTION_ID}
@@ -22,5 +26,5 @@ echo "Registering STAC Items from S3..."
 for item in $(echo "$COLLECTION_JSON" | jq -r '.links[] | select(.rel=="item") | .href'); do
   curl -X POST "http://localhost:8000/collections/${COLLECTION_ID}/items" \
        -H "Content-Type: application/json" \
-       --data-binary @<(curl -s "$item")
+       --data-binary @<(curl -sL "$item")
 done
