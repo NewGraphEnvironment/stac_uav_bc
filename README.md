@@ -8,11 +8,12 @@ stac_uav_bc
 
 The goal of `stac_uav_bc` is to document and serve out our UAV
 collection for British Columbia. It is organized by watershed and can be
-queried by location and time using our API via the lovely [`rstac` R
+queried by location using our API via the lovely [`rstac` R
 package](https://brazil-data-cube.github.io/rstac/) and [QGIS
-(v3.42+)](https://qgis.org/). Still a work in progress but currently
-functioning at [images.a11s.one](images.a11s.one). See below how to add
-STAC items to QGIS.
+(v3.42+)](https://qgis.org/). Still a work in progress (need to assign
+time data to allow API queries) but currently functioning at
+[images.a11s.one](images.a11s.one). See below how to add STAC items to
+QGIS.
 
 <br>
 
@@ -39,9 +40,14 @@ q <- rstac::stac("https://images.a11s.one/") |>
 # get deets of the items
 r <- q |>
   rstac::items_fetch()
+
+saveRDS(r, "data/stac_result.rds")
 ```
 
 ``` r
+r <- readRDS("data/stac_result.rds")
+
+
 # build the table to display the info
 url_bucket <- "https://dev-imagery-uav-bc.s3.amazonaws.com/"
 url_bucket <- "https://imagery-uav-bc.s3.amazonaws.com/"

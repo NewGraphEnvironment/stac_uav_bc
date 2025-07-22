@@ -6,6 +6,7 @@ output:
     self_contained: true
 params: 
   rmd_on: true
+  update_query: false
 ---
 
 ```{r setup, echo=FALSE, include = TRUE}
@@ -23,15 +24,24 @@ source('scripts/functions.R')
 
 
 
-
-
 ```{r build, echo= FALSE, eval = FALSE}
 # we need to chabge the rmd_on param to FALSE to render the README.md for the github landing page
-rmarkdown::render("README.Rmd", output_format = "github_document")
-rmarkdown::render("README.Rmd", output_format = "html_document", output_file = "index.html")
+rmarkdown::render(
+  "README.Rmd", 
+  output_format = "github_document", 
+  params = list(rmd_on = FALSE, update_query = FALSE)
+  )
+
+rmarkdown::render(
+  "README.Rmd", 
+  output_format = "html_document", 
+  output_file = "index.html", 
+  params = list(rmd_on = TRUE, update_query = FALSE)
+  )
 
 usethis::use_git_ignore("README.html")
 ```
+
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -40,8 +50,8 @@ usethis::use_git_ignore("README.html")
 ![fUn](https://img.shields.io/badge/plays-fUn-red)
 
 The goal of `stac_uav_bc` is to document and serve out our UAV collection for British Columbia.  It is organized by
-watershed and can be queried by location and time using our API via the lovely [`rstac` R package](https://brazil-data-cube.github.io/rstac/)
-and [QGIS (v3.42+)](https://qgis.org/).  Still a work in progress but currently functioning at [images.a11s.one](images.a11s.one).
+watershed and can be queried by location using our API via the lovely [`rstac` R package](https://brazil-data-cube.github.io/rstac/)
+and [QGIS (v3.42+)](https://qgis.org/).  Still a work in progress (need to assign time data to allow API queries) but currently functioning at [images.a11s.one](images.a11s.one).
 See below how to add STAC items to QGIS.
 
 <br>
@@ -53,7 +63,7 @@ fpr::fpr_photo_resize_convert("fig/cover.png", path = "fig")
 knitr::include_graphics("fig/cover.JPG")
 ```
 
-```{r api1}
+```{r api1, eval=params$update_query}
 # bc bounding box
 bcbbox <-  as.numeric(
   sf::st_bbox(bcmaps::bc_bound()) |> 
@@ -74,10 +84,16 @@ q <- rstac::stac("https://images.a11s.one/") |>
 # get deets of the items
 r <- q |>
   rstac::items_fetch()
+
+saveRDS(r, "data/stac_result.rds")
 ```
 
 
-```{r}
+```{r tab-make}
+
+r <- readRDS("data/stac_result.rds")
+
+
 # build the table to display the info
 url_bucket <- "https://dev-imagery-uav-bc.s3.amazonaws.com/"
 url_bucket <- "https://imagery-uav-bc.s3.amazonaws.com/"
