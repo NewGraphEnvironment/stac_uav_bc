@@ -41,18 +41,16 @@ def bbox_combined(paths):
 
 # here is the prod version
 path_collection = "/Users/airvine/Projects/gis/uav_imagery/stac/prod/imagery_uav_bc/collection.json"
-path_collection = "/Users/airvine/Projects/gis/uav_imagery/stac/dev/imagery_uav_bc/collection.json"
+# path_collection = "/Users/airvine/Projects/gis/uav_imagery/stac/dev/imagery_uav_bc/collection.json"
 
 # prod
 path_s3_json = "https://imagery-uav-bc.s3.amazonaws.com/collection.json"
-path_s3_json = "https://dev-imagery-uav-bc.s3.amazonaws.com/collection.json"
+# path_s3_json = "https://dev-imagery-uav-bc.s3.amazonaws.com/collection.json"
 
 collection_id = "imagery-uav-bc-prod"
-collection_id = "imagery-uav-bc-dev"
+# collection_id = "imagery-uav-bc-dev"
 
 path_cogs = list(Path(path_collection).parent.rglob("*.tif"))
-
-
 
 # Define spatial extent (bounding box for BC)
 # spatial_extent = SpatialExtent([[-140, 48, -114, 60]])
@@ -60,9 +58,6 @@ path_cogs = list(Path(path_collection).parent.rglob("*.tif"))
 # Get bbox from your COGs
 bbox = bbox_combined(path_cogs)
 spatial_extent = SpatialExtent([list(bbox)])
-
-# Create spatial extent
-spatial_extent = SpatialExtent([[minx, miny, maxx, maxy]])
 
 # Define temporal extent using datetime objects
 temporal_extent = TemporalExtent([[datetime(2020, 1, 1), datetime(2026, 1, 1)]])
