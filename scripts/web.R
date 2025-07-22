@@ -63,12 +63,22 @@ d |>
 
 # unregister a stac collection to the fastapi instance
 vm_upload_run(d, "scripts/config/stac_unregister.sh", "config")
-# if it is already there ready to go
-vm_upload_run(d, "scripts/config/stac_unregister.sh", "config", run_only = FALSE)
 
 # load a new stac collection to the fastapi instance
 vm_upload_run(d, "scripts/config/stac_register.sh", "config")
 
+
+# here we are going to shut down the api and push our custom config file there to deal with pagination then
+# restart the api usig the safer config
+# this whole bit didn't work yet
+d |> 
+  analogsea::droplet_ssh("mkdir -p /home/airvine/stac_fastapi") |>
+  analogsea::droplet_upload(
+    'scripts/config/main.py', 
+    "/home/airvine/stac_fastapi/") |>
+  analogsea::droplet_ssh("chmod 0755 /home/airvine/stac_fastapi/main.py")
+
+vm_upload_run(d, "scripts/config/02b_stac_fast_api.sh", "/home/airvine/stac_fastapi")
 
 # push the viewer.html file to the 
 
