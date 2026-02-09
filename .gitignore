@@ -48,3 +48,7 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 README.html
+
+scripts/config/.msmtprc
+scripts/config/01_server.sh
+scripts/config/02_server.sh
