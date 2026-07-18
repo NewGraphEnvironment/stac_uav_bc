@@ -1,6 +1,43 @@
 # DigitalOcean Droplet Setup — STAC API Stack
 
-Reference architecture for a single Ubuntu droplet serving a STAC API for UAV imagery. Used at [images.a11s.one](https://images.a11s.one). This document is intended as a specification for reproducing the stack with OpenTofu/IaC.
+STAC API for UAV imagery at [images.a11s.one](https://images.a11s.one).
+
+> **The droplet is built by the [rtj](https://github.com/NewGraphEnvironment/rtj) repo** (`rtj/env/do/prod/geoserv/cloud-init.yaml` → `/opt/geoserv/docker-compose.yml` via OpenTofu + cloud-init). Server build questions belong there; this directory documents the catalog-side workflow. Everything below the **Historical reference** heading describes the pre-rtj stack and is kept for context only.
+
+## Current Stack (geoserv, 2026)
+
+Containers on the droplet (`root@146.190.12.8`, hostname `geopro`):
+
+| Container | Image | Port | Serves |
+|---|---|---|---|
+| `geoserv-stac` | `stac-fastapi-pgstac` | 8000 | `images.a11s.one` |
+| `geoserv-stac-ortho` | `stac-fastapi-pgstac` | 8002 | ortho catalog (db `stac_ortho`) |
+| `geoserv-db` | `pgstac:v0.9.8` | 5432 | postgres, user/db `stac` |
+| `geoserv-titiler` | titiler | 8001 | `titiler.a11s.one` |
+| `geoserv-caddy` | caddy | 80/443 | TLS + reverse proxy |
+
+The public API is **read-only**: the transactions extension is off, so POST/PUT/DELETE return 405. That is deliberate — writes go through pypgstac on the droplet host (installed by the rtj build at `/opt/geoserv/scripts` via `uv`).
+
+## Adding New Imagery — the Recipe
+
+1. Process with ODM — `scripts/odm_process.R` (docker, `ngr::ngr_spk_odm`)
+2. QC the ortho — check `odm_report/stats.json` (all images reconstructed? reprojection error ~1-2 px?) and eyeball a preview
+3. COG convert into the `imagery_uav_bc` tree — `scripts/cog_convert.R` (`conda run -n dff rio cogeo create`)
+4. Copy new COGs into the `stac/prod` tree — `scripts/cog_convert.R` tail (dev tree/bucket retired 2026-07)
+5. Create items + update collection.json — `conda run -n titiler python scripts/stac_create_item.py <tifs relative to prod tree>`
+6. Upload to S3 — `scripts/s3_sync.R`; for large/interruptible uploads prefer per-file `aws s3 cp` smallest-first so completed files survive a shutdown
+7. Register items into the API db — `scripts/config/stac_register_item.sh <item jsons>` (step 5 prints the exact command)
+8. Verify — `curl https://images.a11s.one/collections/imagery-uav-bc-prod/items/<id>` and `curl "https://titiler.a11s.one/cog/info?url=<s3 tif url>"`
+
+### Gotchas
+
+- **s3://imagery-uav-bc has ACLs disabled** — public read comes from the bucket policy. Never pass `--acl`; `put-object-acl` fails with `AccessControlListNotSupported`.
+- **TiTiler caches failed lookups**: if a COG is probed before its upload finishes, GDAL caches the 403 and the URL stays broken. Fix: `ssh root@146.190.12.8 docker restart geoserv-titiler`.
+- `stac_register.sh` / `stac_unregister.sh` are **legacy**: they need the transactions extension (now off) so they currently 405. Their purposes — full collection rebuild and collection/item deletion — still matter; port them to pypgstac (`pypgstac load` / SQL deletes) when next needed.
+
+---
+
+## Historical reference (pre-rtj stack)
 
 > **Note:** The numbered setup scripts (`01_server.sh`, `02_server.sh`, etc.) are `.gitignore`d — they contain credentials and server config.
 

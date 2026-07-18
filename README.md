@@ -17,6 +17,9 @@ the [`rstac` R package](https://brazil-data-cube.github.io/rstac/), QGIS
 <https://images.a11s.one>; an interactive single-COG viewer lives at
 <https://viewer.a11s.one>.
 
+To add new imagery to the catalog follow the recipe in
+[`scripts/config/README.md`](scripts/config/README.md).
+
 <br>
 
 Sister collections on the same `images.a11s.one` endpoint:

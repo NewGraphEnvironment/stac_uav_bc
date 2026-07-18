@@ -1,4 +1,7 @@
 #!/bin/bash
+# LEGACY: needs the transactions extension, which is OFF in the current geoserv
+# stack (POST returns 405). For routine adds use stac_register_item.sh; for a
+# full collection rebuild port this to pypgstac load (see README.md).
 # This script registers a STAC collection and its items from S3 in chunks of 1000.
 
 set -e
