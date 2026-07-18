@@ -5,10 +5,7 @@
 
 # s3fs::s3_dir_ls()
 
-# path_in <- "/Users/airvine/Projects/gis/uav_imagery/imagery_uav_bc"
-path_in <- "/Users/airvine/Projects/gis/uav_imagery/stac/dev/imagery_uav_bc"
-path_out <- "s3://dev-imagery-uav-bc" 
-
+# dev tree/bucket retired 2026-07 - prod only now
 
 # prod
 path_in <- "/Users/airvine/Projects/gis/uav_imagery/stac/prod/imagery_uav_bc"

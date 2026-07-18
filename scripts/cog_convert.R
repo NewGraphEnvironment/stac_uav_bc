@@ -117,13 +117,10 @@ system_run <- function(args){
 purrr::walk(args, system_run)
 
 # We are just manually copying over the files into the /Users/airvine/Projects/gis/uav_imagery/stac location
-# note that we put overwrite as FALSE so that we don't update the time stamps so don't sync new data to s3.  if 
+# note that we put overwrite as FALSE so that we don't update the time stamps so don't sync new data to s3.  if
 # we thought therre were actual changes we would changes that
 
-dir_in <- "/Users/airvine/Projects/gis/uav_imagery/imagery_uav_bc"
-dir_out <- "/Users/airvine/Projects/gis/uav_imagery/stac/dev/imagery_uav_bc"
-ngr::ngr_fs_copy_if_missing(dir_in, dir_out)
-
+# dev tree/bucket retired 2026-07 - prod only now
 dir_in <- "/Users/airvine/Projects/gis/uav_imagery/imagery_uav_bc"
 dir_out <- "/Users/airvine/Projects/gis/uav_imagery/stac/prod/imagery_uav_bc"
 
