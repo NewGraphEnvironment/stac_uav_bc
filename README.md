@@ -11,9 +11,10 @@ The goal of
 [`stac_uav_bc`](https://github.com/NewGraphEnvironment/stac_uav_bc) is
 to document and serve out UAV imagery collected in British Columbia as a
 [SpatioTemporal Asset Catalog (STAC)](https://stacspec.org/) collection,
-organized by region / watershed-group / year. Queryable by location via
-the [`rstac` R package](https://brazil-data-cube.github.io/rstac/), QGIS
-(v3.42+), or any STAC-compliant client. The API endpoint is
+organized by region / watershed-group / year. Queryable by location and
+time (items carry flight capture datetimes) via the [`rstac` R
+package](https://brazil-data-cube.github.io/rstac/), QGIS (v3.42+), or
+any STAC-compliant client. The API endpoint is
 <https://images.a11s.one>; an interactive single-COG viewer lives at
 <https://viewer.a11s.one>.
 
@@ -153,14 +154,6 @@ chunks for memory safety.
 
 ## Roadmap
 
-- **Per-item timestamps**
-  ([\#9](https://github.com/NewGraphEnvironment/stac_uav_bc/issues/9)) —
-  add capture-date metadata so the catalog can be time-filtered
-  (currently only spatial filtering works for older items).
-- **Larger titiler server**
-  ([\#8](https://github.com/NewGraphEnvironment/stac_uav_bc/issues/8)) —
-  upgrade the tile-rendering host for snappier QGIS / browser preview on
-  large rasters.
 - **UAV-specific QGIS symbology**
   ([\#5](https://github.com/NewGraphEnvironment/stac_uav_bc/issues/5)) —
   default styling that distinguishes orthomosaic vs DSM vs DTM at a
