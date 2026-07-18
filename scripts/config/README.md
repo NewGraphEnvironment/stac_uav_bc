@@ -26,7 +26,7 @@ The public API is **read-only**: the transactions extension is off, so POST/PUT/
 4. Copy new COGs into the `stac/prod` tree — `scripts/cog_convert.R` tail (dev tree/bucket retired 2026-07)
 5. Create items + update collection.json — `conda run -n titiler python scripts/stac_create_item.py <tifs relative to prod tree>`
 6. Upload to S3 — `scripts/s3_sync.R`; for large/interruptible uploads prefer per-file `aws s3 cp` smallest-first so completed files survive a shutdown
-7. Register items into the API db — `scripts/config/stac_register_item.sh <item jsons>` (step 5 prints the exact command)
+7. Register items into the API db — `scripts/config/stac_register_item.sh <item jsons>` (step 5 prints the exact command); if collection.json changed (e.g. temporal extent), also `scripts/config/stac_register_collection.sh <collection.json>`
 8. Verify — `curl https://images.a11s.one/collections/imagery-uav-bc-prod/items/<id>` and `curl "https://titiler.a11s.one/cog/info?url=<s3 tif url>"`
 
 ### Gotchas

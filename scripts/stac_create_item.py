@@ -13,11 +13,24 @@
 # After creating items, upload to S3 (scripts/s3_sync.R) then register into the
 # API database with scripts/config/stac_register_item.sh (it prints the command).
 import argparse
+import datetime
 import pathlib
 import sys
 
 import pystac
+import rasterio
 import rio_stac
+
+def flight_datetime(path):
+    # ODM propagates the capture time from the image EXIF into TIFFTAG_DATETIME,
+    # but in EXIF colon format (2026:07:14 14:49:57+00:00) which rio_stac cannot
+    # parse — it warns and falls back to processing time (issue #9).
+    with rasterio.open(path) as src:
+        tag = src.tags().get("TIFFTAG_DATETIME")
+    if not tag:
+        return None
+    date, _, time = tag.partition(" ")
+    return datetime.datetime.fromisoformat(f"{date.replace(':', '-')}T{time}")
 
 def main():
     p = argparse.ArgumentParser()
@@ -44,9 +57,13 @@ def main():
             print(f"SKIP (already in collection): {item_id}")
             continue
 
+        dt = flight_datetime(path_item)
+        if dt is None:
+            print(f"WARNING: no TIFFTAG_DATETIME in {rel}; item will get processing time")
         item = rio_stac.stac.create_stac_item(
             str(path_item),
             id=item_id,
+            input_datetime=dt,
             asset_media_type="image/tiff; application=geotiff; profile=cloud-optimized",
             asset_name="image",
             asset_href=f"{args.s3_url}{href_item}",
