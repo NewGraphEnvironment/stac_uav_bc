@@ -106,7 +106,7 @@ my_dir_sel <- function(path, string){
   dir_1[dir_keep]
 }
 
-paths <-my_dir_sel(path, string ="odm_orthophoto")
+paths <- my_dir_sel(path, string ="odm_orthophoto")
 
 
 
@@ -148,3 +148,35 @@ args |>
 
 # to stop the computer from sleeping we ran the following in  the terminal - make sure docker is running
 # caffeinate -s Rscript /Users/airvine/Projects/repo/stac_uav_bc/scripts/odm_process.R
+
+################################################################################################################
+#--------------------------------------------------mackenzie 2026 (parsnip + pine)-----------------------------
+################################################################################################################
+# flown 20260714 at ~300m (parsnip trib chco) and ~250m (pine oxbow) AGL - higher/faster than previous flights
+
+paths <- c(
+  "/Users/airvine/Projects/gis/uav_imagery/mackenzie/parsnip/2026/1996663_parsnip_trib_chco_11000",
+  "/Users/airvine/Projects/gis/uav_imagery/mackenzie/pine/2026/6971_pine_oxbox_hwy97S"
+)
+
+args <- purrr::map(
+  paths,
+  purrr::partial(
+    ngr::ngr_spk_odm,
+    params_default = c("--dtm", "--dsm", "--pc-quality", "low", "--dem-resolution", "5")
+  )
+)
+
+# args |>
+#   purrr::walk(
+#     ~ tryCatch(
+#       processx::run(
+#         command = "docker",
+#         args    = .x,
+#         echo    = TRUE
+#       ),
+#       error = function(e) message(
+#         "Build failed for args [", paste(.x, collapse = " "), "]: ", e$message
+#       )
+#     )
+#   )
