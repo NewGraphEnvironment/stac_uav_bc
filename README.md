@@ -24,8 +24,6 @@ Sister collections on the same `images.a11s.one` endpoint:
 
 - [`stac_dem_bc`](https://github.com/NewGraphEnvironment/stac_dem_bc) —
   LidarBC digital elevation models (~58k GeoTIFFs)
-- [`stac_orthophoto_bc`](https://github.com/NewGraphEnvironment/stac_orthophoto_bc)
-  — BC government orthophotos
 - [`stac_airphoto_bc`](https://github.com/NewGraphEnvironment/stac_airphoto_bc)
   — historic airphoto thumbnails (1963–2019)
 
