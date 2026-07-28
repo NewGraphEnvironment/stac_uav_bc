@@ -18,9 +18,6 @@ any STAC-compliant client. The API endpoint is
 <https://images.a11s.one>; an interactive single-COG viewer lives at
 <https://viewer.a11s.one>.
 
-To add new imagery to the catalog follow the recipe in
-[`scripts/config/README.md`](scripts/config/README.md).
-
 <br>
 
 Sister collections on the same `images.a11s.one` endpoint:
@@ -31,6 +28,9 @@ Sister collections on the same `images.a11s.one` endpoint:
   — BC government orthophotos
 - [`stac_airphoto_bc`](https://github.com/NewGraphEnvironment/stac_airphoto_bc)
   — historic airphoto thumbnails (1963–2019)
+
+To add new imagery to the catalog follow the recipe in
+[`scripts/config/README.md`](scripts/config/README.md).
 
 <br>
 
