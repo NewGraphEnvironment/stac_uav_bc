@@ -33,7 +33,7 @@ The public API is **read-only**: the transactions extension is off, so POST/PUT/
 
 - **s3://imagery-uav-bc has ACLs disabled** — public read comes from the bucket policy. Never pass `--acl`; `put-object-acl` fails with `AccessControlListNotSupported`.
 - **TiTiler caches failed lookups**: if a COG is probed before its upload finishes, GDAL caches the 403 and the URL stays broken. Fix: `ssh root@146.190.12.8 docker restart geoserv-titiler`.
-- `stac_register.sh` / `stac_unregister.sh` are **legacy**: they need the transactions extension (now off) so they currently 405. Their purposes — full collection rebuild and collection/item deletion — still matter; port them to pypgstac (`pypgstac load` / SQL deletes) when next needed.
+- Full collection rebuild and collection deletion are **server-side operations** — that tooling lives with the server build in the rtj repo (`rtj/scripts/geoserv/`: `stac_register-all.sh`, `stac_register-pypgstac.sh`, `stac_unregister.sh`), not here.
 
 ---
 
@@ -97,15 +97,13 @@ The public API is **read-only**: the transactions extension is off, so POST/PUT/
 5. `04_titiler.sh` — TiTiler Docker container on port 8001
 
 Post-setup:
-- `stac_register.sh` — Register a collection + items from S3 into the API (chunked)
-- `stac_unregister.sh` — Delete a collection and its items from the API
+- Collection registration/unregistration scripts (since moved to `rtj/scripts/geoserv/`)
 
 ## Data Flow
 
 ```
 S3 buckets (COGs)                    Clients (rstac, QGIS)
-  stac-orthophoto-bc.s3.amazonaws.com       │
-  stac-dem-bc.s3.amazonaws.com              │
+  imagery-uav-bc.s3.amazonaws.com           │
         │                                   ▼
         │                          images.a11s.one (Nginx)
         │                                   │
