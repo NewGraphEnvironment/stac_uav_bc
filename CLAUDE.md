@@ -16,7 +16,7 @@ STAC catalog for UAV imagery in British Columbia, organized by watershed. Served
 - `scripts/odm_process.R` - OpenDroneMap processing pipeline
 - `scripts/s3_*.R` - S3 storage sync, indexing, and mapping
 - `scripts/web.R` - Web/viewer utilities
-- `scripts/config/` - Catalog-side server docs + item registration (`stac_register_item.sh`). The droplet itself is built by the `rtj` repo — see `scripts/config/README.md` for the add-imagery recipe
+- `scripts/config/` - Catalog-side server docs + item registration (`stac_register_item.sh`). The droplet itself is built from our internal infrastructure repo — see `scripts/config/README.md` for the add-imagery recipe
 
 ## Dependencies
 
@@ -85,6 +85,14 @@ Add new checks here when a bug class is discovered — they compound over time.
 - `set -eu` does NOT propagate exit codes through pipelines. `ssh ... | tee log` returns tee's exit (always 0 for healthy tee), masking ssh failure.
 - Use `set -euo pipefail` for any script that pipes a meaningful command into tee/cat/grep/etc. Or check `${PIPESTATUS[0]}` explicitly.
 - Symptom when wrong: task notifications report "exit 0 / completed" while remote work was actually skipped or errored.
+
+### A wrapper's exit 0 is not "the work completed" — gate on in-band error + output mtime
+- A wrapper reports its OWN exit, not the inner job's. `caffeinate -s bash -c '...'`, `/usr/bin/time -p …`, and background tasks routinely surface **exit 0 / "completed"** while the wrapped R/Python script hit `Execution halted` partway. The interpreter's error goes to the log, not the wrapper's exit code.
+- **Most dangerous in A/B validation:** if the run crashes *before* it (re)writes its output file, a compare step reads the **stale previous output** and reports a false "identical / passed" — a false positive that looks like success.
+- Before trusting any run's result, gate on BOTH:
+  1. **In-band error markers** — `grep -c "Execution halted\|Error:" "$log"` is 0 (R); the language's equivalent otherwise.
+  2. **The output was actually (re)written** — its mtime is newer than a marker touched at run start (`[ output -nt "$marker" ]`), not merely that the file exists.
+- Caught the hard way 2026-07 in `floodplains`: a Pass-2 reuse change was declared "12.4×, byte-identical" and **merged to main** — but the run had `Execution halted` before writing, so the A/B compared the unchanged baseline against its own backup. Broke every step-3 run until hotfixed. Same class as the ssh+tee pipefail symptom above, generalized to any wrapped/background job.
 
 ### Paths
 - Hardcoded absolute paths (`/Users/airvine/...`) break for other users
@@ -186,6 +194,12 @@ Add new checks here when a bug class is discovered — they compound over time.
 - Missing outputs that scripts need — add them to main.tf
 - Snapshot/image IDs in tfvars after deleting the snapshot — stale reference
 
+### Duplicate module blocks across envs double-track global resources
+- A module instantiated in two env dirs (e.g. `module "iam"` in both `env/prod` and `env/dev`) means account-global resources (IAM users, roles) can be tracked in BOTH local states. Removing the module block from one env turns its state copies into pending DESTROYS — which would delete the real resource out from under the other env.
+- Caught 2026-07-18 (rtj#185): `env/dev` state secretly held `role_terraform_awshak` — the role every `role-assume.sh` apply depends on — and a config cleanup turned it into a planned destroy.
+- Fix: `tofu state rm '<addresses>'` in the env relinquishing ownership (no cloud change; auto-backs-up state), leaving exactly one owning env. Verify the resource survives (`aws iam get-role ...`).
+- Review check: any plan that destroys resources in a shared/global-resource module → first confirm which OTHER env states track the same addresses (`grep <name> env/*/terraform.tfstate` or check the remote backend keys).
+
 ### Destructive Operations
 - Validate resource IDs before destroy: `[ -n "$ID" ] || exit 1`
 - `tofu destroy` without `-target` destroys everything including reserved IPs
@@ -196,6 +210,11 @@ Add new checks here when a bug class is discovered — they compound over time.
 - If you didn't delete the resource and the plan says it's gone, **verify against the cloud API before applying**: `aws s3 head-bucket --bucket X`, `aws iam get-role --role-name X`, etc. A `tofu plan -refresh=true` re-run a moment later often reports "No changes."
 - Caught 2026-05-14 in rtj env/prod for stac-era5-land: bucket fully intact (60 objects, 307 MB) but plan said deleted with 5 child resources "must be replaced." Apply would have clobbered the policy + lifecycle configs against the still-existing bucket. Recovery via `-target` on the unrelated resource being added (rtj#157 then codifies `lifecycle { prevent_destroy = true }` on the bucket + load-bearing children).
 - **Belt-and-suspenders defense:** add `lifecycle { prevent_destroy = true }` to high-value resources (S3 buckets, RDS instances, anything irreplaceable) in their module. Tofu will refuse to plan a destroy until the lifecycle line itself is removed in config — converts the failure mode from "apply silently clobbers" into "plan errors with `Instance cannot be destroyed`." Don't apply it to count-based resources where `count: 1 → 0` is a legitimate transition.
+
+### Check IaC ownership before CLI-mutating cloud config
+- Before changing bucket policies, lifecycle rules, IAM policies, etc. with the aws CLI, grep the Terraform modules for the resource. If tofu owns it, a CLI change is not "drift" — it is **reverted on the next apply** (silent rule deletion). `put-bucket-lifecycle-configuration` additionally REPLACES the whole config, so a CLI "add one rule" can also clobber tofu-owned rules immediately.
+- Caught 2026-07-18 (water-temp-bc#23): a NoncurrentVersionExpiration rule was one `aws s3api put` away from being applied — rtj `modules/s3` owns `aws_s3_bucket_lifecycle_configuration`, so it would have first clobbered the IA-transition rule, then been reverted. Correct path was a module variable + `tofu apply` (rtj#187).
+- Corollary: when a pipeline's write pattern evolves (append-only → rewrite-in-place), **re-audit the IAM verbs its role actually needs**. water-temp-bc's GHA role lacked `s3:DeleteObject`; the first compaction run half-applied a `sync --delete` and left the store with duplicate keys until manually repaired (rtj#147 reopened). Check for an existing module toggle first — `allow_delete` already existed.
 
 ## DigitalOcean
 
@@ -296,6 +315,11 @@ Configuration patterns and false-positive handling for the `gitleaks` pre-commit
 - **`pre-commit install` legacy-hook handling**: running `pre-commit install` on a repo with an existing `.git/hooks/pre-commit` renames it to `.legacy` and keeps invoking it after framework hooks. No breakage, but means hook surface is split between `.pre-commit-config.yaml` and `.git/hooks/pre-commit.legacy`. For full visibility, migrate the legacy check into `.pre-commit-config.yaml` as a `local` hook so the whole hook surface is declared in one place.
 - **AWS canonical example keys are allowlisted by default** (`AKIAIOSFODNN7EXAMPLE` etc.) — don't use those in test fixtures expecting a block. Use `ghp_`-shape PAT lookalikes or other non-allowlisted patterns for hook-trigger tests.
 
+### "Public bucket" ≠ listable: GetObject vs ListBucket
+- A bucket policy granting only `s3:GetObject` on `bucket/*` makes exact-key fetches public but NOT listing — and dataset discovery (`arrow::open_dataset()`, duckdb globs, STAC `/vsicurl/` directory reads) requires `s3:ListBucket` on the **bucket ARN** (no `/*`; it's a bucket-level action).
+- The breakage hides: anyone with ANY ambient AWS credentials lists fine, so "anonymous access works" goes unverified for years. Caught 2026-07-18 (water-temp-bc#23 → rtj#187): anonymous `open_dataset()` had never worked on a bucket whose whole purpose was credential-less querying.
+- Review checks: for an open-data bucket, the policy needs BOTH statements (GetObject on `bucket/*`, ListBucket on `bucket`); acceptance-test anonymous access from a credential-stripped environment (`env -u AWS_ACCESS_KEY_ID ... AWS_CONFIG_FILE=/dev/null`). Note ListBucket makes the full key listing publicly enumerable — intended for open data, wrong for mixed-content buckets.
+
 ## R / Package Installation
 
 ### pak Behavior
@@ -328,6 +352,33 @@ Configuration patterns and false-positive handling for the `gitleaks` pre-commit
 ### terra: operator dispatch and edge cases in package code
 - **SpatRaster `%in%` is not dispatched when terra is *imported* (only when *attached*).** Inside a package (terra in `Imports`, used via `::`), `some_raster %in% vec` falls through to base `match()` and errors with `'match' requires vector arguments`. A `library(terra)` smoke test passes (attaching installs the S4 method), so the bug hides until package context. Use `terra::subst(x, from, to, others = ...)` or `terra::classify()` for code-set membership/masking instead of the `%in%` operator. Same trap for any operator terra defines via S4 that base also defines as an ordinary function. (drift#34)
 - **`terra::freq()` errors on an all-NA raster** (`replacement has length zero`) rather than returning a 0-row table. Any path that can yield an all-NA layer (an impossible filter, everything masked out) must guard: `f <- tryCatch(terra::freq(r), error = function(e) NULL)`, then treat `NULL`/0 rows as "no values". Don't assume the empty case gives `nrow(freq(r)) == 0`. (drift#34)
+
+### sf: `st_join(largest = TRUE)` ignores the join predicate
+- `sf::st_join(x, y, join = predicate, largest = TRUE)` does **not** use `predicate` to decide matches — with `largest = TRUE`, sf runs `st_intersection(x, y)` and keeps the feature of greatest overlap area, so matching is *always* intersection-based regardless of what `join =` is set to. A function that exposes a configurable predicate AND a largest-overlap mode therefore silently mis-attributes when both are combined: pass `st_within` expecting containment, get anything that merely *overlaps*. Verify against sf source, not the argument list — the `join` arg is accepted and ignored, not rejected. Fix: abort when a non-default predicate is combined with the largest-overlap mode, rather than honouring one and dropping the other. (drift#42)
+- Corollary: `largest = TRUE` also drops zero-area geometries from consideration — so a predicate join against **point** or **line** overlays cannot use largest mode at all (no area to compare). Point/line attribution must go through the plain (`largest = FALSE`) predicate path.
+
+### sf: name validation must account for the geometry column
+- The active geometry column is a named entry in `names(x)`, but its name is **not fixed** — `"geometry"` from `sf::st_read()` of some sources, `"geom"` from a GeoPackage/PostGIS layer, `"geometry"` or `"_ogr_geometry_"` elsewhere. Code that validates user-supplied column names with `cols %in% names(x)` will happily accept the geometry column, then break downstream (`st_join` drops `y`'s geometry, so a requested "attribute" column silently never appears; a 0-row short-circuit path may instead attach a stray empty sfc). A same-name collision check across two sf objects also misses this when the two layers name their geometry differently. Guard explicitly with `attr(x, "sf_column")` — reject it from the caller-supplied column set. (drift#42)
+
+### arrow dplyr backend: no grouped slice — bridge to duckdb
+- arrow's dplyr backend errors on grouped `slice_max`/`slice_min` (`arrow_not_supported("Slicing grouped data")`). The working pattern for any "latest per group" over parquet/S3: `arrow::open_dataset(...) |> dplyr::filter(...) |> arrow::to_duckdb() |> dplyr::group_by(...) |> dplyr::slice_max(...)`.
+- The `to_duckdb()` bridge is also a return-type contract: helpers that return the lazy query should keep the bridge even when they no longer need it internally, or downstream callers using grouped verbs break. (water-temp-bc#17, #23)
+
+### as.POSIXct.Date silently ignores tz=
+- `as.POSIXct(x, tz = "UTC")` on a `Date` ignores `tz` and converts in the system local zone — west of UTC this shifts date boundaries by the local offset and silently drops edge data. Force UTC via `as.POSIXct(format(x), tz = "UTC")` when accepting Date inputs; widen Date upper bounds to `< next-day-midnight` so the whole calendar day is included. (water-temp-bc#17)
+
+### open_dataset(unify_schemas = TRUE) requires aligned types
+- Cross-prefix/file schema unification only merges what types allow: `timestamp[us, tz=UTC]` will not merge with naked `timestamp[us]`, `Grade: string` not with `Grade: double`. Audit the schemas of every file group BEFORE promising unified reads over a mixed archive; plan a normalization pass otherwise. (water-temp-bc#17)
+
+### duckdb larger-than-memory dedup: shard the work — settings won't save you
+- duckdb's **window operator** (QUALIFY row_number ...) does not spill enough to survive big partitions (OOM'd an 8 GB limit on a ~124M-row input). The **arg_max/struct-payload hash aggregate** cannot spill its state either (observed OOM with an empty temp dir). `preserve_insertion_order = false` and fewer threads help but do not fix it.
+- **In-memory duckdb connections never offload to disk at all** — `SET temp_directory` on `dbConnect(duckdb())` is a no-op for operator spill. File-backed (`dbdir = <file>`) is required for any spilling.
+- The structure that works at any scale: **hash-shard by a column inside the group key** (e.g. `hash(STATION_NUMBER) % K = k`, K = `ceiling(input_rows / shard_rows)`), one aggregation pass per shard, each writing its own ordered output file. A key never crosses shards, so dedup stays exact; memory scales 1/K. Extra passes cost scan time only — per-pass aggregate state is what OOMs, so when in doubt shard smaller. (water-temp-bc#23)
+- **Local runs at the same duckdb `memory_limit`/`threads` do NOT validate a constrained runner.** 10M-row shards passed a Mac at the exact 4 GB / 2-thread settings but OOM'd the real 7 GB GHA runner (partition 46 squeaked through in 94s, 47 died 15s in) — abundant physical RAM masks how tight duckdb's accounting runs at its internal limit. Only the real runner is the real test; size shards with margin (water-temp-bc ships 6M), and treat a near-timeout/near-limit pass as a failure to fix, not a pass. (water-temp-bc#23 run 29675228557, fixed in PR #25)
+
+### Test fixtures must mirror production column TYPES, not just shapes
+- A fixture-green suite can hide type bugs that only real data exposes: water-temp-bc#23's fixtures had `Grade` as string when production has double, so a `coalesce(Grade, '')` sentinel inside the dedup ordering passed all 27 tests and broke on first contact with real data.
+- When writing fixtures for a pipeline over an existing dataset, print the real schema (`arrow::open_dataset(...)$schema`) and copy the types verbatim. Any type-sensitive expression (coalesce sentinels, casts, comparisons) is only tested if the fixture types match.
 
 ## General
 
@@ -453,210 +504,6 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
-
-
-# New Graph Environment Conventions
-
-Core patterns for professional, efficient workflows across New Graph Environment repositories.
-
-## Ecosystem Overview
-
-Six repos form the governance and operations layer across all New Graph Environment work:
-
-| Repo | Purpose | Analogy |
-|------|---------|---------|
-| [compass](https://github.com/NewGraphEnvironment/compass) | Ethics, values, guiding principles | The "why" |
-| [soul](https://github.com/NewGraphEnvironment/soul) | Standards, skills, conventions for LLM agents | The "how" |
-| [compost](https://github.com/NewGraphEnvironment/compost) | Communications templates, email workflows, contact management | The "who" |
-| [rtj](https://github.com/NewGraphEnvironment/rtj) (formerly awshak) | Infrastructure as Code, deployment | The "where" |
-| [gq](https://github.com/NewGraphEnvironment/gq) | Cartographic style management across QGIS, tmap, leaflet, web | The "look" |
-| [crate](https://github.com/NewGraphEnvironment/crate) | Data governance: canonical schemas, data dictionary, QC rules (scoping; normalization functions are Year 2+) | The "what" |
-
-**Adaptive management:** Conventions evolve from real project work, not theory. When a pattern is learned or refined during project work, propagate it back to soul so all projects benefit. The `/claude-md-init` skill builds each project's `CLAUDE.md` from soul conventions.
-
-**Cross-references:** [sred](https://github.com/NewGraphEnvironment/sred) tracks R&D activities across repos. Compost is the centralized communications workflow — all email drafts, contact registry, and external outreach are authored there, not in individual project repos.
-
-## Three-Layer Repo Architecture
-
-Repos live in one of three layers, distinguished by audience and what context they carry:
-
-| Layer | Role | Examples |
-|---|---|---|
-| **Public — tools** | Atomic, reusable, no NGE-specific context | R packages (`mc`, `crate`, `fresh`, `drift`, `flooded`, `gq`, `link`), `bcfishpass`, `fwapg`, STAC catalogs, post-publication reports |
-| **Private — coordination** | How tools compose into NGE workflows. The competitive moat. | `compost` (uses `mc`), `rfp` (uses `fresh`/`link`/etc.), `rtj` (uses `crate`, deploys), `fish_passage_template_reporting`, all proposals (never public) |
-| **Private — governance** | Strategy, values, conventions, R&D | `soul`, `logic`, `compass`, `sred` |
-
-**Rule:** tools don't know about each other or about NGE. Coordination repos know how to use tools. `mc/CLAUDE.md` does not know `compost` exists; `compost/CLAUDE.md` knows "for email use `mc`."
-
-**Publication flip:** when a private repo flips public (e.g., `crate` once `link` requires it; reports on publication), three things happen in the same commit: removed from comms peer list, `comms/` directory purged, `CLAUDE.md` scrubbed to public-safe form. Use `/claude-md-init --public-clean` for the scrub.
-
-**Per-repo classification** is recorded in `.claude/visibility` (one line: `public` or `internal`; default `internal` if missing). Soul conventions carry `visibility:` frontmatter (`public-safe` or `internal`); `/claude-md-init` filter skips internal-only conventions when repo is marked public.
-
-Strategic call recorded in `logic/comms/soul/20260428_public_vs_internal_repo_architecture.md`.
-
-## Issue Workflow
-
-### Before Creating an Issue (non-negotiable)
-
-1. **Check for duplicates:** `gh issue list --state open --search "<keywords>"` -- search before creating
-2. **One issue, one concern.** Keep focused.
-
-SRED cross-refs go in **PR bodies only** (via `/gh-pr-push`), not in issues or commits. PRs aggregate commits and are the merge unit; per-issue and per-commit SRED tags add noise without adding traceability.
-
-### Professional Issue Writing
-
-Write issues with clear technical focus:
-
-- **Use normal technical language** in titles and descriptions
-- **Focus on the problem and solution** approach
-- **Add tracking links at the end** (e.g., `Relates to Owner/repo#N`)
-
-#### Client-aware tone
-
-Issues, PR descriptions, and commit messages are client-visible deliverables, not internal notes.
-
-Avoid in these artifacts:
-- Framing work as unsolicited or unpaid ("not assigned by a client")
-- Self-justifying adjectives ("defensible", "rigorous") — show, don't claim
-- Internal workflow meta (PWF refs, SRED xrefs, planning context)
-- Performative effort language ("attempts were unsuccessful") — state factual current state
-
-**Integrity-preserving ≠ self-effacing.** Factual, not performatively humble.
-
-**Scope:** repo artifacts (issues, PRs, commits, reports). Does not apply to internal planning docs, CLAUDE.md, or chat.
-
-**Issue body structure:**
-```markdown
-## Problem
-<what's wrong or missing>
-
-## Proposed Solution
-<approach>
-
-Relates to #<local>
-```
-
-#### Infrastructure references
-
-Use **tailnet hostnames** (`cypher`, `m1`, `openclaw`) in issue and PR bodies, not public IPs. Within NGE infrastructure, those hostnames are how scripts and operators address machines anyway; the public IP is an implementation detail that belongs in gitignored `*.tfvars` and the Tailscale admin panel.
-
-Public IPs in issues are appropriate only when the IP itself is the subject — reserved-IP migrations, DNS records, firewall rules that key on a specific IP. For everything else, use a placeholder like `<cypher_public_ip>` if the shape of the value matters at all.
-
-Aggregation is the risk: any single IP in a private repo is fine, but issue bodies tend to collect IP + hostname + service description + access path into a coherent attack-surface map. Tailnet hostnames keep the map terse.
-
-### GitHub Issue Creation - Always Use Files
-
-The `gh issue create` command with heredoc syntax fails repeatedly with EOF errors. ALWAYS use `--body-file`:
-
-```bash
-cat > /tmp/issue_body.md << 'EOF'
-## Problem
-...
-
-## Proposed Solution
-...
-EOF
-
-gh issue create --title "Brief technical title" --body-file /tmp/issue_body.md
-```
-
-## Closing Issues
-
-**DO:** Close issues via commit messages. The commit IS the closure and the documentation.
-
-```
-Fix broken DEM path in loading pipeline
-
-Update hardcoded path to use config-driven resolution.
-
-Fixes #20
-Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
-```
-
-**DON'T:** Close issues with `gh issue close`. This breaks the audit trail — there's no linked diff showing what changed.
-
-- `Fixes #N` or `Closes #N` — auto-closes and links the commit to the issue
-- `Relates to #N` — partial progress, does not close
-- Always close issues when work is complete. Don't leave stale open issues.
-
-## Commit Quality
-
-Write clear, informative commit messages:
-
-```
-Brief description (50 chars or less)
-
-Detailed explanation of changes and impact.
-
-Fixes #<issue> (or Relates to #<issue>)
-
-Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
-```
-
-**When to commit:**
-- Logical, atomic units of work
-- Working state (tests pass)
-- Clear description of changes
-
-**What to avoid:**
-- "WIP" or "temp" commits in main branch
-- Combining unrelated changes
-- Vague messages like "fixes" or "updates"
-
-## LLM Agent Conventions
-
-Rules learned from real project sessions. These apply across all repos.
-
-- **Install missing packages, don't workaround** — if a package is needed, ask the user to install it (e.g. `pak::pak("pkg")`). Don't write degraded fallback code to avoid the dependency.
-- **Never hardcode extractable data** — if coordinates, station names, or metadata can be pulled from an API or database at runtime, do that. Don't hardcode values that have a programmatic source.
-- **Close issues via commits, not `gh issue close`** — see Closing Issues above.
-- **Cite primary sources** — see references conventions.
-
-## Naming Conventions
-
-**Pattern: `noun_verb-detail`** -- noun first, verb second across all naming:
-
-| What | Example |
-|------|---------|
-| Skills | `claude-md-init`, `gh-issue-create`, `planning-update` |
-| Scripts | `stac_register-baseline.sh`, `stac_register-pypgstac.sh` |
-| Logs | `20260209_stac_register-baseline_stac-dem-bc.txt` |
-| Log format | `yyyymmdd_noun_verb-detail_target.ext` |
-
-Scripts and logs live together: `scripts/<module>/logs/`
-
-### Which logs to commit
-
-Logs are R&D evidence — but only the curated ones. Distinguish two classes:
-
-- **Evidence logs** (commit): the dated, conventionally-named runs at the top of a `logs/` dir
-  (`yyyymmdd_noun_verb-detail_target.ext`). One benchmark/timing/run log per intentional run. These
-  are committed to the **default branch** — git gives free versioning and commit-provenance (the log
-  sits next to the change that produced it), and committed logs are discoverable cross-machine via the
-  GitHub API without cloning.
-- **Bulk run-output** (gitignore): archives, per-shard/per-watershed dumps, aborted/offline reruns, and
-  other machine-generated iteration output. Put these under a gitignored subdir (e.g. `logs/runs/`,
-  `logs/archive/`) so they never bloat the repo.
-
-Rules of thumb: if you'd hand it to an auditor as proof of an experiment, commit it. If it's hundreds of
-files a pipeline emitted, gitignore it. Don't reach for S3 for text logs — git is the right home;
-external object storage only earns its place for large binaries. Logs that aren't committed to the
-default branch are invisible to other machines and to evidence tooling — so commit evidence logs
-**before** moving machines, or it's stranded.
-
-## Projects vs Milestones
-
-- **Projects** = daily cross-repo tracking (always add to relevant project)
-- **Milestones** = iteration boundaries (only for release/claim prep)
-- Don't double-track unless there's a reason
-
-| Content | Project |
-|---------|---------|
-| R&D, experiments, SRED-related | **SRED R&D Tracking (#8)** |
-| Data storage, sqlite, postgres, pipelines | **Data Architecture (#9)** |
-| Fish passage field/reporting | **Fish Passage 2025 (#6)** |
-| Restoration planning | **Aquatic Restoration Planning (#5)** |
-| QGIS, Mergin, field forms | **Collaborative GIS (#3)** |
 
 
 # Planning Conventions
@@ -883,46 +730,3 @@ Always verify downloads: `file paper.pdf` should say "PDF document", not HTML.
 - NEVER write abstracts manually — if CrossRef has no abstract, leave blank
 - NEVER cite specific numbers without verifying from the source PDF via ragnar search
 - NEVER paraphrase equations — copy exact notation and cite page/section
-
-
-# SRED Conventions
-
-How SR&ED tracking integrates with New Graph Environment's development workflows.
-
-## The Claim: One Project
-
-All SRED-eligible work across NGE falls under a **single continuous project**:
-
-> **Dynamic GIS-based Data Processing and Reporting Framework**
-
-- **Field:** Software Engineering (2.02.09)
-- **Start date:** May 2022
-- **Fiscal year:** May 1 – April 30
-- **Consultant:** Boast Capital (prepares final technical report)
-
-**Do not fragment work into separate claims.** Each fiscal year's work is structured as iterations within this one project. Internal tracking (experiment numbers in `sred`) maps to iterations — Boast assembles the final narrative.
-
-## Tagging Work for SRED
-
-### PRs (single enforcement point)
-
-SRED cross-references (`Relates to NewGraphEnvironment/sred#N`) go in **PR body templates only** — not in issue bodies, commit messages, or any other surface. The `/gh-pr-push` skill is the single enforcement point. PRs aggregate commits and are the merge unit, so per-issue and per-commit SRED tags only add noise.
-
-### Time entries (rolex)
-
-Tag hours with `sred_ref` field linking to the relevant `sred` issue number.
-
-## What Qualifies as SRED
-
-**Eligible (systematic investigation to overcome technological uncertainty):**
-- Building tools/functions that don't exist in standard practice
-- Prototyping new integrations between systems (GIS ↔ reporting ↔ field collection)
-- Testing whether an approach works and documenting why it did/didn't
-- Iterating on failed approaches with new hypotheses
-
-**Not eligible:**
-- Standard configuration of known tools
-- Routine bug fixes in working systems
-- Writing reports using the framework (that's service delivery)
-
-**The test:** "Did we try something we weren't sure would work, and did we learn something from the attempt?" If yes, it's likely eligible.

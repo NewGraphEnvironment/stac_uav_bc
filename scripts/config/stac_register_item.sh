@@ -3,8 +3,7 @@
 #
 # The public API at images.a11s.one is read-only (transactions extension off,
 # POST returns 405 — deliberate), so items are loaded with pypgstac, which the
-# rtj build installs on the droplet host for exactly this purpose
-# (rtj/env/do/prod/geoserv/cloud-init.yaml).
+# server build installs on the droplet host for exactly this purpose.
 #
 # Usage:
 #   scripts/config/stac_register_item.sh item1.json [item2.json ...]

@@ -2,7 +2,7 @@
 
 STAC API for UAV imagery at [images.a11s.one](https://images.a11s.one).
 
-> **The droplet is built by the [rtj](https://github.com/NewGraphEnvironment/rtj) repo** (`rtj/env/do/prod/geoserv/cloud-init.yaml` → `/opt/geoserv/docker-compose.yml` via OpenTofu + cloud-init). Server build questions belong there; this directory documents the catalog-side workflow. Everything below the **Historical reference** heading describes the pre-rtj stack and is kept for context only.
+> **The droplet is built from our internal infrastructure-as-code repo** (OpenTofu + cloud-init → `/opt/geoserv/docker-compose.yml`). Server build questions belong there; this directory documents the catalog-side workflow. Everything below the **Historical reference** heading describes the previous stack and is kept for context only.
 
 ## Current Stack (geoserv, 2026)
 
@@ -16,7 +16,7 @@ Containers on the droplet (`root@146.190.12.8`, hostname `geopro`):
 | `geoserv-titiler` | titiler | 8001 | `titiler.a11s.one` |
 | `geoserv-caddy` | caddy | 80/443 | TLS + reverse proxy |
 
-The public API is **read-only**: the transactions extension is off, so POST/PUT/DELETE return 405. That is deliberate — writes go through pypgstac on the droplet host (installed by the rtj build at `/opt/geoserv/scripts` via `uv`).
+The public API is **read-only**: the transactions extension is off, so POST/PUT/DELETE return 405. That is deliberate — writes go through pypgstac on the droplet host (installed by the server build at `/opt/geoserv/scripts` via `uv`).
 
 ## Adding New Imagery — the Recipe
 
@@ -33,11 +33,11 @@ The public API is **read-only**: the transactions extension is off, so POST/PUT/
 
 - **s3://imagery-uav-bc has ACLs disabled** — public read comes from the bucket policy. Never pass `--acl`; `put-object-acl` fails with `AccessControlListNotSupported`.
 - **TiTiler caches failed lookups**: if a COG is probed before its upload finishes, GDAL caches the 403 and the URL stays broken. Fix: `ssh root@146.190.12.8 docker restart geoserv-titiler`.
-- Full collection rebuild and collection deletion are **server-side operations** — that tooling lives with the server build in the rtj repo (`rtj/scripts/geoserv/`: `stac_register-all.sh`, `stac_register-pypgstac.sh`, `stac_unregister.sh`), not here.
+- Full collection rebuild and collection deletion are **server-side operations** — that tooling lives with the server build in our internal infrastructure repo, not here.
 
 ---
 
-## Historical reference (pre-rtj stack)
+## Historical reference (previous stack)
 
 > **Note:** The numbered setup scripts (`01_server.sh`, `02_server.sh`, etc.) are `.gitignore`d — they contain credentials and server config.
 
@@ -97,7 +97,7 @@ The public API is **read-only**: the transactions extension is off, so POST/PUT/
 5. `04_titiler.sh` — TiTiler Docker container on port 8001
 
 Post-setup:
-- Collection registration/unregistration scripts (since moved to `rtj/scripts/geoserv/`)
+- Collection registration/unregistration scripts (since moved to the internal infrastructure repo)
 
 ## Data Flow
 
