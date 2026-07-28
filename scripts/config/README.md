@@ -20,14 +20,19 @@ The public API is **read-only**: the transactions extension is off, so POST/PUT/
 
 ## Adding New Imagery — the Recipe
 
-1. Process with ODM — `scripts/odm_process.R` (docker, `ngr::ngr_spk_odm`)
+Two commands with a human QC gate between them:
+
+1. Stitch — `caffeinate -s scripts/odm_process-batch.sh <project-dir>...` (skips already-processed dirs; resume-safe after interruption)
 2. QC the ortho — check `odm_report/stats.json` (all images reconstructed? reprojection error ~1-2 px?) and eyeball a preview
-3. COG convert into the `imagery_uav_bc` tree — `scripts/cog_convert.R` (`conda run -n dff rio cogeo create`)
-4. Copy new COGs into the `stac/prod` tree — `scripts/cog_convert.R` tail (dev tree/bucket retired 2026-07)
-5. Create items + update collection.json — `conda run -n titiler python scripts/stac_create_item.py <tifs relative to prod tree>`
-6. Upload to S3 — `scripts/s3_sync.R`; for large/interruptible uploads prefer per-file `aws s3 cp` smallest-first so completed files survive a shutdown
-7. Register items into the API db — `scripts/config/stac_register_item.sh <item jsons>` (step 5 prints the exact command); if collection.json changed (e.g. temporal extent), also `scripts/config/stac_register_collection.sh <collection.json>`
-8. Verify — `curl https://images.a11s.one/collections/imagery-uav-bc-prod/items/<id>` and `curl "https://titiler.a11s.one/cog/info?url=<s3 tif url>"`
+3. Publish — `scripts/stac_publish.sh <project-dir>...` (COG convert + validate → prod tree → items with flight datetimes → durable S3 upload → register items + collection extent → verify via API; idempotent, safe to re-run)
+
+The underlying single-purpose tools these orchestrate, for one-off use:
+
+- `scripts/stac_create_item.py <tifs relative to prod tree>` — items + collection.json (conda env `titiler`)
+- `scripts/config/stac_register_item.sh <item jsons>` — upsert items into the API db
+- `scripts/config/stac_register_collection.sh <collection.json>` — upsert the collection doc
+- `conda run -n dff rio cogeo create <in> <out>` — COG conversion (see `scripts/cog_convert.R` for the batch-log history)
+- Dev tree/bucket retired 2026-07 — prod only
 
 ### Gotchas
 
