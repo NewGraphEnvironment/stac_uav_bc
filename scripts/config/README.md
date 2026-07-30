@@ -34,6 +34,16 @@ The underlying single-purpose tools these orchestrate, for one-off use:
 - `conda run -n dff rio cogeo create <in> <out>` — COG conversion (see `scripts/cog_convert.R` for the batch-log history)
 - Dev tree/bucket retired 2026-07 — prod only
 
+### Large datasets (>~300 images)
+
+Single-pass ODM memory scales with the whole flight and the meshing stage can run 10+ hours or OOM (observed: 817 images → 20+ h, >70 GB RAM). Use split-merge instead:
+
+```bash
+caffeinate -s scripts/odm_process-batch.sh --split 250 <project-dir>
+```
+
+ODM carves the flight into ~250-image submodels (100 m overlap), processes each like a normal dataset, and merges orthos/DEMs at the end — memory bounded per submodel, progress checkpointed between them. Other escape hatches: `--fast-orthophoto` (skips dense reconstruction; ortho only, no usable DEMs) and, when a meshing-stage OOM needs rescue, rerun with a lower `--mesh-octree-depth` from `--rerun-from odm_meshing`. For routinely-large campaigns consider a NodeODM ephemeral droplet (tracked in the infrastructure repo).
+
 ### Gotchas
 
 - **s3://imagery-uav-bc has ACLs disabled** — public read comes from the bucket policy. Never pass `--acl`; `put-object-acl` fails with `AccessControlListNotSupported`.
