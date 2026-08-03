@@ -4,14 +4,14 @@
 # Per project: COG convert + validate → prod tree → create items (flight
 # datetimes) → S3 upload; then once per invocation: refresh the collection
 # temporal extent, final sync, register items + collection, verify via the API.
-# Orchestrates the existing tools (stac_create_item.py, stac_register_item.sh,
-# stac_register_collection.sh); see scripts/config/README.md for the recipe.
+# Orchestrates the existing tools (item_create.py, item_register.sh,
+# collection_register.sh); see scripts/config/README.md for the recipe.
 #
 # Idempotent: existing COGs, items, uploads, and registrations are skipped or
 # upserted, so re-running after an interruption is safe and cheap.
 #
 # Usage:
-#   scripts/stac_publish.sh <project-dir> [<project-dir>...]
+#   scripts/dataset_publish.sh <project-dir> [<project-dir>...]
 # project-dir is a dataset dir under the imagery root, e.g.
 #   /Users/airvine/Projects/gis/uav_imagery/mackenzie/pine/2026/6971_pine_oxbox_hwy97S
 set -euo pipefail
@@ -57,7 +57,7 @@ for proj in "$@"; do
 done
 
 echo "=== create items"
-conda run -n titiler python "$REPO/scripts/stac_create_item.py" "${new_tifs[@]}"
+conda run -n titiler python "$REPO/scripts/item_create.py" "${new_tifs[@]}"
 
 echo "=== upload (per-dataset sync: durable + skips what is already up)"
 for rel in "${rels[@]}"; do
@@ -95,10 +95,10 @@ jsons=()
 for rel in "${rels[@]}"; do
   while IFS= read -r j; do jsons+=("$j"); done < <(find "$PROD/$rel" -name "*.json" | sort)
 done
-"$REPO/scripts/config/stac_register_item.sh" "${jsons[@]}"
+"$REPO/scripts/config/item_register.sh" "${jsons[@]}"
 
 echo "=== register collection"
-"$REPO/scripts/config/stac_register_collection.sh" "$PROD/collection.json"
+"$REPO/scripts/config/collection_register.sh" "$PROD/collection.json"
 
 echo "=== verify via API"
 fail=0

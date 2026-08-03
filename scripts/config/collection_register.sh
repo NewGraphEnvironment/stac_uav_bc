@@ -1,9 +1,9 @@
 #!/bin/bash
 # Register (upsert) a STAC collection JSON into the API database (pgstac) on the
-# geoserv droplet. Companion to stac_register_item.sh — same pypgstac transport.
+# geoserv droplet. Companion to item_register.sh — same pypgstac transport.
 #
 # Usage:
-#   scripts/config/stac_register_collection.sh /path/to/collection.json
+#   scripts/config/collection_register.sh /path/to/collection.json
 #
 # Upsert is idempotent: re-registering an existing collection updates it in place.
 set -euo pipefail

@@ -4,7 +4,7 @@ format: html
 jupyter: titiler  # Use your Conda environment
 ---
 
-<!-- NOTE: routine item creation is now scripted — use scripts/stac_create_item.py
+<!-- NOTE: routine item creation is now scripted — use scripts/item_create.py
 (additive-only, skips existing ids). This qmd remains for prototyping and the
 full-rebuild chunks. See scripts/config/README.md for the add-imagery recipe. -->
 
