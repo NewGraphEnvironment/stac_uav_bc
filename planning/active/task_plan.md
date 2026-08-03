@@ -32,8 +32,8 @@ Item metadata lives implicitly in directory names with bbox-only geometries; no 
 
 ### Phase 5 — Ecosystem convergence issues
 
-- [ ] stac_dem_bc issue: adopt client-side registration scripts (`item_register.sh`/`collection_register.sh` pattern) + versioned-registry release pattern where applicable
-- [ ] soul issue: capture converged stac-repo conventions (script names, registry pattern, registration split, release workflow) as a convention candidate so future stac repos start from it; note stac_airphoto_bc / stac_orthophoto_bc / floodplains for later audit against it
+- [x] stac_dem_bc issue: adopt client-side registration scripts (`item_register.sh`/`collection_register.sh` pattern) + versioned-registry release pattern where applicable
+- [x] soul issue: capture converged stac-repo conventions (script names, registry pattern, registration split, release workflow) as a convention candidate so future stac repos start from it; note stac_airphoto_bc / stac_orthophoto_bc / floodplains for later audit against it
 
 
 ## Validation
