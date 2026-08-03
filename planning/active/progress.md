@@ -9,3 +9,4 @@
 - Next: Phase 1 (renames + sites.csv/footprint wiring)
 
 - Phase 1 complete: renames landed, item_create.py registry+footprint+rebuild+version, item_validate.py; full rebuild tested (224 items, 224 links, 225 valid)
+- Phase 2 complete: catalogue_release.sh, NEWS.md v1.0.0 entry, sites.csv committed, recipe README registry section

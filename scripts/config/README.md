@@ -18,6 +18,16 @@ Containers on the droplet (`root@146.190.12.8`, hostname `geopro`):
 
 The public API is **read-only**: the transactions extension is off, so POST/PUT/DELETE return 405. That is deliberate — writes go through pypgstac on the droplet host (installed by the server build at `/opt/geoserv/scripts` via `uv`).
 
+## The Registry: data/sites.csv
+
+`data/sites.csv` is the **source of truth** for site metadata — stream names (up to three per flight), FWA watershed group codes, bcfishpass `aggregated_crossings_id`, aliases, project, `published` flag, and notes. Items carry it as `title` + queryable `nge:` properties, and item geometries are true `gdal_footprint` outlines. The catalogue is a versioned build artifact of (sites.csv, COGs).
+
+**Releasing a registry change:**
+
+1. Edit `data/sites.csv`; add a `NEWS.md` entry; commit
+2. `git tag vX.Y.Z`
+3. `scripts/catalogue_release.sh` — rebuilds all items, validates, syncs, registers, verifies (~5 min, idempotent)
+
 ## Adding New Imagery — the Recipe
 
 Two commands with a human QC gate between them:

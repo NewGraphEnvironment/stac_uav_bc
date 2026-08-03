@@ -15,9 +15,9 @@ Item metadata lives implicitly in directory names with bbox-only geometries; no 
 
 ### Phase 2 — Release plumbing
 
-- [ ] `catalogue_release.sh` — one command: `item_create.py --rebuild` → `item_validate.py` → `aws s3 sync` (JSONs) → `item_register.sh` (bulk upsert) → `collection_register.sh` → API verify
-- [ ] `NEWS.md` v1.0.0 entry; commit `data/sites.csv`
-- [ ] README + `scripts/config/README.md`: registry/release workflow, renamed script references
+- [x] `catalogue_release.sh` — one command: `item_create.py --rebuild` → `item_validate.py` → `aws s3 sync` (JSONs) → `item_register.sh` (bulk upsert) → `collection_register.sh` → API verify
+- [x] `NEWS.md` v1.0.0 entry; commit `data/sites.csv`
+- [x] README + `scripts/config/README.md`: registry/release workflow, renamed script references
 
 ### Phase 3 — Release v1.0.0
 
