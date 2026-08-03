@@ -5,13 +5,13 @@ Item metadata lives implicitly in directory names with bbox-only geometries; no 
 
 ### Phase 1 — Converge naming; wire sites.csv + footprints
 
-- [ ] Renames (git mv; update references in READMEs, CLAUDE.md, recipe):
+- [x] Renames (git mv; update references in READMEs, CLAUDE.md, recipe):
       `stac_create_item.py`→`item_create.py` · `stac_register_item.sh`→`item_register.sh` · `stac_register_collection.sh`→`collection_register.sh` · `stac_publish.sh`→`dataset_publish.sh`
-- [ ] `item_create.py`: load `data/sites.csv` keyed on path parts `(region, watershed, year, item)`; skip `published=false`; stamp `title` + `nge:region`, `nge:watershed_group`, `nge:wsg_code`, `nge:site_id`, `nge:stream_name`(+`_02`/`_03`), `nge:alias`, `nge:project` (empty cells omitted)
-- [ ] Item geometry via `gdal_footprint -ovr 2 -simplify 10 -t_srs EPSG:4326` (proven <1 s/ortho, 54–112 vertices); `bbox` stays raster extent
-- [ ] `--rebuild` mode: regenerate every item JSON in the prod tree (~5 min full rebuild, no incremental complexity)
-- [ ] Collection version stamp: STAC Version Extension, value from latest git tag
-- [ ] New `item_validate.py` (adopt stac_dem_bc's explicit QA gate): pystac-validate all items, nonzero exit on failure
+- [x] `item_create.py`: load `data/sites.csv` keyed on path parts `(region, watershed, year, item)`; skip `published=false`; stamp `title` + `nge:region`, `nge:watershed_group`, `nge:wsg_code`, `nge:site_id`, `nge:stream_name`(+`_02`/`_03`), `nge:alias`, `nge:project` (empty cells omitted)
+- [x] Item geometry via `gdal_footprint -ovr 2 -simplify 10 -t_srs EPSG:4326` (proven <1 s/ortho, 54–112 vertices); `bbox` stays raster extent
+- [x] `--rebuild` mode: regenerate every item JSON in the prod tree (~5 min full rebuild, no incremental complexity)
+- [x] Collection version stamp: STAC Version Extension, value from latest git tag
+- [x] New `item_validate.py` (adopt stac_dem_bc's explicit QA gate): pystac-validate all items, nonzero exit on failure
 
 ### Phase 2 — Release plumbing
 

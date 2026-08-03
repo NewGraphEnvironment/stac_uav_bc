@@ -6,7 +6,7 @@
 # server build installs on the droplet host for exactly this purpose.
 #
 # Usage:
-#   scripts/config/stac_register_item.sh item1.json [item2.json ...]
+#   scripts/config/item_register.sh item1.json [item2.json ...]
 #
 # Upsert is idempotent: re-registering an existing item is harmless.
 # Raw-SQL fallback if pypgstac is ever unavailable:

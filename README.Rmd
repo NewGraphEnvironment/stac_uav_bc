@@ -171,9 +171,9 @@ The `scripts/` directory holds the orchestration helpers:
 | `odm_process.R` | OpenDroneMap processing (orthomosaic, DSM, DTM generation) |
 | `s3_sync.R` | Sync COGs to the `imagery-uav-bc` S3 bucket |
 | `s3_index.R`, `s3_map.R` | Index + map S3 contents for ingestion |
-| `stac_create_item.py` | Create STAC items + update collection.json for new COGs (additive-only) |
+| `item_create.py` | Create STAC items + update collection.json for new COGs (additive-only) |
 | `web.R` | Web/viewer utilities |
-| `config/` | Server docs + registration scripts (`stac_register_item.sh`, `stac_register_collection.sh`) — see the [add-imagery recipe](scripts/config/README.md) |
+| `config/` | Server docs + registration scripts (`item_register.sh`, `collection_register.sh`) — see the [add-imagery recipe](scripts/config/README.md) |
 | `viewer.html` | Standalone viewer-page template for single-COG previews |
 
 Recent infrastructure work — see commit history — added client-side pagination handling (so very large queries return correctly via successive `items_next()` fetches) and split S3 uploads into 1000-item chunks for memory safety.

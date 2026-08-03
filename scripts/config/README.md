@@ -24,13 +24,13 @@ Two commands with a human QC gate between them:
 
 1. Stitch — `caffeinate -s scripts/odm_process-batch.sh <project-dir>...` (skips already-processed dirs; resume-safe after interruption)
 2. QC the ortho — check `odm_report/stats.json` (all images reconstructed? reprojection error ~1-2 px?) and eyeball a preview
-3. Publish — `scripts/stac_publish.sh <project-dir>...` (COG convert + validate → prod tree → items with flight datetimes → durable S3 upload → register items + collection extent → verify via API; idempotent, safe to re-run)
+3. Publish — `scripts/dataset_publish.sh <project-dir>...` (COG convert + validate → prod tree → items with flight datetimes → durable S3 upload → register items + collection extent → verify via API; idempotent, safe to re-run)
 
 The underlying single-purpose tools these orchestrate, for one-off use:
 
-- `scripts/stac_create_item.py <tifs relative to prod tree>` — items + collection.json (conda env `titiler`)
-- `scripts/config/stac_register_item.sh <item jsons>` — upsert items into the API db
-- `scripts/config/stac_register_collection.sh <collection.json>` — upsert the collection doc
+- `scripts/item_create.py <tifs relative to prod tree>` — items + collection.json (conda env `titiler`)
+- `scripts/config/item_register.sh <item jsons>` — upsert items into the API db
+- `scripts/config/collection_register.sh <collection.json>` — upsert the collection doc
 - `conda run -n dff rio cogeo create <in> <out>` — COG conversion (see `scripts/cog_convert.R` for the batch-log history)
 - Dev tree/bucket retired 2026-07 — prod only
 

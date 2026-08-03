@@ -9,14 +9,14 @@ STAC catalog for UAV imagery in British Columbia, organized by watershed. Served
 
 ## Architecture
 
-- `stac_create_*.qmd` - Quarto docs for creating STAC catalogs, collections, and items (prototyping; routine adds use `scripts/stac_create_item.py`)
-- `scripts/stac_create_item.py` - Create STAC items + update collection.json for new COGs (additive-only)
+- `stac_create_*.qmd` - Quarto docs for creating STAC catalogs, collections, and items (prototyping; routine adds use `scripts/item_create.py`)
+- `scripts/item_create.py` - Create STAC items + update collection.json for new COGs (additive-only)
 - `scripts/functions.R`, `scripts/utils.R` - Shared R functions
 - `scripts/cog_convert.R` - COG (Cloud Optimized GeoTIFF) conversion
 - `scripts/odm_process.R` - OpenDroneMap processing pipeline
 - `scripts/s3_*.R` - S3 storage sync, indexing, and mapping
 - `scripts/web.R` - Web/viewer utilities
-- `scripts/config/` - Catalog-side server docs + item registration (`stac_register_item.sh`). The droplet itself is built from our internal infrastructure repo — see `scripts/config/README.md` for the add-imagery recipe
+- `scripts/config/` - Catalog-side server docs + item registration (`item_register.sh`). The droplet itself is built from our internal infrastructure repo — see `scripts/config/README.md` for the add-imagery recipe
 
 ## Dependencies
 

@@ -7,3 +7,5 @@
 - Created branch `16-versioned-csv-driven-registry-sites-csv` off main
 - Scaffolded PWF baseline from issue #16 with approved phases
 - Next: Phase 1 (renames + sites.csv/footprint wiring)
+
+- Phase 1 complete: renames landed, item_create.py registry+footprint+rebuild+version, item_validate.py; full rebuild tested (224 items, 224 links, 225 valid)
