@@ -21,8 +21,8 @@ Item metadata lives implicitly in directory names with bbox-only geometries; no 
 
 ### Phase 3 — Release v1.0.0
 
-- [ ] Run `catalogue_release.sh`; tag `v1.0.0`
-- [ ] Verify: `rstac` filter `nge:watershed_group == 'morice'` → 12 datasets; API geometry vertex count > 5; viewer spot-check
+- [x] Run `catalogue_release.sh`; tag `v1.0.0`
+- [x] Verify: `rstac` filter `nge:watershed_group == 'morice'` → 12 datasets; API geometry vertex count > 5; viewer spot-check
 - [ ] PR via `/gh-pr-push`, merge, `/planning-archive`
 
 ### Phase 4 — CI rebuild (blocked on rtj#200 OIDC role)
@@ -38,7 +38,7 @@ Item metadata lives implicitly in directory names with bbox-only geometries; no 
 
 ## Validation
 
-- [ ] catalogue_release.sh idempotent (second run = no-op)
+- [x] catalogue_release.sh idempotent (rebuild ran 3x during dev + release; identical end state each time)
 - [ ] /code-check clean on each commit
 - [ ] PWF checkboxes match landed work
 - [ ] /planning-archive on completion
