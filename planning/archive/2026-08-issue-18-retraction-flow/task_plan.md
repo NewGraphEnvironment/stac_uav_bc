@@ -24,7 +24,7 @@ Build the catalog's retraction path and execute the first retraction (mis-filed 
 ### Phase 3 — Document + close
 
 - [x] `scripts/config/README.md`: retraction recipe (flip `published=false` → remove trees/S3 → `item_unregister.sh` → release)
-- [ ] PR via `/gh-pr-push` (closes #18), merge, `/planning-archive`
+- [x] PR via `/gh-pr-push` (closes #18), merge, `/planning-archive`
 
 
 ## Validation
