@@ -6,3 +6,4 @@
 - Archived #16 PWF (Phase 4 → rtj#200)
 - Created branch `18-retraction-flow-item-unregister-sh-publi`
 - Next: Phase 1 (item_unregister.sh + round-trip)
+- Phase 1: item_unregister.sh built; round-trip test passed (200→404→idempotent warn→200)

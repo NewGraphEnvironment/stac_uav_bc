@@ -9,8 +9,8 @@ Build the catalog's retraction path and execute the first retraction (mis-filed 
 
 ### Phase 1 — `item_unregister.sh`
 
-- [ ] `scripts/config/item_unregister.sh <item-id>...` — deletes items from pgstac over SSH (`pgstac.delete_item`), sibling to `item_register.sh`; idempotent (missing id → warning, not failure)
-- [ ] Round-trip test on one live item: unregister → verify 404 on API → re-register via `item_register.sh` → verify 200 (proves both tools, changes nothing net)
+- [x] `scripts/config/item_unregister.sh <item-id>...` — deletes items from pgstac over SSH (`pgstac.delete_item`), sibling to `item_register.sh`; idempotent (missing id → warning, not failure)
+- [x] Round-trip test on one live item: unregister → verify 404 on API → re-register via `item_register.sh` → verify 200 (proves both tools, changes nothing net)
 
 ### Phase 2 — Retract the nechacko kenneth copy (order matters)
 
