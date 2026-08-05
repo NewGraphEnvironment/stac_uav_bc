@@ -3,7 +3,7 @@ fraser,morkill,MORK,2024,199256_kenneth_hwy16,199256,Kenneth Creek,,,,,true,bcfi
 fraser,nechacko,FRAN,2024,199171_burnt_cabin_gala,199171,Burnt Cabin Creek,,,,,true,pscis,
 fraser,nechacko,NECR,2024,199173_necr_trib_dog,199173,Tributary To Nechako River,,,,,true,pscis,
 fraser,nechacko,NECR,2024,199174_necr_trib_dog_settlement,199174,Tributary To Nechako River,,,,,true,pscis,
-fraser,nechacko,MORK,2024,199256_kenneth_hwy16,199256,Kenneth Creek,,,,,true,bcfishpass_gnis,
+fraser,nechacko,MORK,2024,199256_kenneth_hwy16,199256,Kenneth Creek,,,,,false,bcfishpass_gnis,RETRACTED 2026-08-05: mis-filed (Kenneth Creek is MORK); replaced by fraser/morkill/2024/199256_kenneth_hwy16; Fraser 2023 report updated first (PR #161)
 fraser,nechacko,LCHL,2024,chilako_mud1,,Chilako River,,,,,true,fwa_nearest_23m,
 kootenay,elk,ELKR,2021,parker,,Parker Creek,,,,,true,fwa_nearest_98m,
 kootenay,regent,,2025,20250616,,,,,,,false,,6-image test flight; excluded from catalog by decision 2026-07-29
