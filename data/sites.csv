@@ -5,6 +5,7 @@ fraser,nechacko,NECR,2024,199174_necr_trib_dog_settlement,199174,Tributary To Ne
 fraser,nechacko,MORK,2024,199256_kenneth_hwy16,199256,Kenneth Creek,,,,,true,bcfishpass_gnis,
 fraser,nechacko,LCHL,2024,chilako_mud1,,Chilako River,,,,,true,fwa_nearest_23m,
 kootenay,elk,ELKR,2021,parker,,Parker Creek,,,,,true,fwa_nearest_98m,
+kootenay,regent,,2025,20250616,,,,,,,false,,6-image test flight; excluded from catalog by decision 2026-07-29
 kootenay,upper_arrow_lake,UARL,2024,arrow-whiskey-hadow,,Hadow Creek,,,,,true,fwa_nearest_97m,
 mackenzie,carp,CRKD,2024,198692_kerry_lake_trib,198692,Tributary To Kerry Lake,,,,,true,pscis,
 mackenzie,parsnip,PARS,2022,125000_parsnip_trib_arctic,125000,tributary to Parsnip River,,,,,true,pscis,
@@ -68,6 +69,7 @@ skeena,morice,MORR,2023,198935_knapper_trib,198935,Tributary to Knapper Creek,,,
 skeena,morice,MORR,2023,198936_morice_trib,198936,Tributary to Morice River,,,,,true,pscis,
 skeena,morice,MORR,2023,198940_knapper_trib,198940,Tributary to Knapper Creek,,,,,true,pscis,
 skeena,morice,MORR,2023,198942_houston_tommy_trib,198942,Tributary to Houston Tommy Creek,,,,,true,pscis,
+skeena,morice,MORR,2025,197962_peacock_morice,197962,Peacock Creek,,,,,true,bcfishpass_gnis,dir name suggests Morice River confluence - add stream_name_02 if in frame
 skeena,morice,MORR,2026,wedzin_braid_001,,Tributary to Morice River,,,,,true,guess_nearest_216m,
 skeena,morice,MORR,2026,wedzin_canyon_km25,,Tributary to Morice River,,,,,true,guess_nearest_224m,
 skeena,morice,MORR,2026,wedzin_cedric,,Tributary to Morice River,,,,,true,guess_nearest_201m,
@@ -75,4 +77,3 @@ skeena,morice,MORR,2026,wedzin_lwd001,,Tributary to Morice River,,,,,true,guess_
 skeena,zymoetz,ZYMO,2023,8478_mcdonell_trib,8478,Copper,,,,,true,pscis,
 skeena,zymoetz,ZYMO,2023,8525_coal_trib,8525,Copper,,,,,true,pscis,
 skeena,zymoetz,ZYMO,2024,8530_sandstone_mcdonell,8530,Sandstone Creek,,,,,true,bcfishpass_gnis,
-kootenay,regent,,2025,20250616,,,,,,,false,,6-image test flight; excluded from catalog by decision 2026-07-29
