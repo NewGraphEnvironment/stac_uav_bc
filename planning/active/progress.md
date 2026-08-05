@@ -7,3 +7,5 @@
 - Created branch `18-retraction-flow-item-unregister-sh-publi`
 - Next: Phase 1 (item_unregister.sh + round-trip)
 - Phase 1: item_unregister.sh built; round-trip test passed (200→404→idempotent warn→200)
+- Phase 2: nechacko kenneth retracted (CSV flip, trees, S3 6 objects, 3 API items); v1.0.1 released — live version 1.0.1, 230 items, nechacko 404 / morkill 200
+- Phase 3: retraction recipe documented; PR next

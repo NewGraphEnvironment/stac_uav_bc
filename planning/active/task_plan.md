@@ -14,21 +14,21 @@ Build the catalog's retraction path and execute the first retraction (mis-filed 
 
 ### Phase 2 — Retract the nechacko kenneth copy (order matters)
 
-- [ ] `data/sites.csv`: flip nechacko kenneth row to `published=false`, note the retraction date + replacement path
-- [ ] Remove the dataset from the prod tree and the `imagery_uav_bc` COG tree (prevents stale JSONs re-syncing; raw source images under `uav_imagery/fraser/nechacko/` are left for the user to keep or delete)
-- [ ] `aws s3 rm --recursive` the `fraser/nechacko/2024/199256_kenneth_hwy16/` prefix (6 objects: 3 tifs + 3 item JSONs)
-- [ ] `item_unregister.sh` the 3 nechacko item ids
-- [ ] Release v1.0.1: NEWS entry, tag, `catalogue_release.sh` (rebuild drops the collection links; verify live version 1.0.1, 230 items)
-- [ ] Verify: 3 nechacko ids 404 via API; morkill ids still 200; S3 prefix empty
+- [x] `data/sites.csv`: flip nechacko kenneth row to `published=false`, note the retraction date + replacement path
+- [x] Remove the dataset from the prod tree and the `imagery_uav_bc` COG tree (prevents stale JSONs re-syncing; raw source images under `uav_imagery/fraser/nechacko/` are left for the user to keep or delete)
+- [x] `aws s3 rm --recursive` the `fraser/nechacko/2024/199256_kenneth_hwy16/` prefix (6 objects: 3 tifs + 3 item JSONs)
+- [x] `item_unregister.sh` the 3 nechacko item ids
+- [x] Release v1.0.1: NEWS entry, tag, `catalogue_release.sh` (rebuild drops the collection links; verify live version 1.0.1, 230 items)
+- [x] Verify: 3 nechacko ids 404 via API; morkill ids still 200; S3 prefix empty
 
 ### Phase 3 — Document + close
 
-- [ ] `scripts/config/README.md`: retraction recipe (flip `published=false` → remove trees/S3 → `item_unregister.sh` → release)
+- [x] `scripts/config/README.md`: retraction recipe (flip `published=false` → remove trees/S3 → `item_unregister.sh` → release)
 - [ ] PR via `/gh-pr-push` (closes #18), merge, `/planning-archive`
 
 
 ## Validation
 
-- [ ] Round-trip test passes before any real deletion
-- [ ] /code-check clean per commit; PWF checkboxes match landed work
-- [ ] /planning-archive on completion
+- [x] Round-trip test passes before any real deletion
+- [x] /code-check clean per commit; PWF checkboxes match landed work
+- [x] /planning-archive on completion
