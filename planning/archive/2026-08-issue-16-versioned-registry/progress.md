@@ -12,3 +12,8 @@
 - Phase 2 complete: catalogue_release.sh, NEWS.md v1.0.0 entry, sites.csv committed, recipe README registry section
 - Phase 5 complete: stac_dem_bc#27 (adopt registration + versioning), soul#62 (stac-catalog convention candidate)
 - Phase 3: v1.0.0 tagged + released. Live: version 1.0.0, 224 items, query ext verified (morice=42 items, MORR=45 incl. 3 cross-boundary sites, alias moose resolves), footprint geometries serving. Merge + archive pending PR.
+
+## Archive hand-off 2026-08-05
+
+- Phases 1-3, 5 complete; v1.0.0 merged (PR #17), issue #16 closed
+- OPEN: Phase 4 (CI update.yml on stac_dem_bc pattern) — blocked on rtj#200 OIDC role; pick up there
