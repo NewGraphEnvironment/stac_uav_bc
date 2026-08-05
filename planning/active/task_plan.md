@@ -1,44 +1,34 @@
-# Task: Versioned CSV-driven registry: sites.csv as source of truth, footprint geometries, CI rebuild (#16)
+# Task: Retraction flow: item_unregister.sh + published=false lifecycle (#18)
 
-Item metadata lives implicitly in directory names with bbox-only geometries; no versioned source of truth or changelog. data/sites.csv becomes the source of truth, the catalog a reproducible versioned build artifact, converging script conventions with stac_dem_bc across the ecosystem.
+Build the catalog's retraction path and execute the first retraction (mis-filed nechacko kenneth copy) as a v1.0.1 patch release. Replacement (fraser/morkill) is live; Fraser 2023 report verified serving morkill URLs — zero dependents remain on the old URL.
 
 
-### Phase 1 — Converge naming; wire sites.csv + footprints
+### Phase 0 — Hand off the #16 PWF
 
-- [x] Renames (git mv; update references in READMEs, CLAUDE.md, recipe):
-      `stac_create_item.py`→`item_create.py` · `stac_register_item.sh`→`item_register.sh` · `stac_register_collection.sh`→`collection_register.sh` · `stac_publish.sh`→`dataset_publish.sh`
-- [x] `item_create.py`: load `data/sites.csv` keyed on path parts `(region, watershed, year, item)`; skip `published=false`; stamp `title` + `nge:region`, `nge:watershed_group`, `nge:wsg_code`, `nge:site_id`, `nge:stream_name`(+`_02`/`_03`), `nge:alias`, `nge:project` (empty cells omitted)
-- [x] Item geometry via `gdal_footprint -ovr 2 -simplify 10 -t_srs EPSG:4326` (proven <1 s/ortho, 54–112 vertices); `bbox` stays raster extent
-- [x] `--rebuild` mode: regenerate every item JSON in the prod tree (~5 min full rebuild, no incremental complexity)
-- [x] Collection version stamp: STAC Version Extension, value from latest git tag
-- [x] New `item_validate.py` (adopt stac_dem_bc's explicit QA gate): pystac-validate all items, nonzero exit on failure
+- [x] `/planning-archive` the completed #16 PWF (issue closed; its open Phase 4 / CI workflow is tracked by rtj#200 and noted in the archived plan + progress hand-off)
 
-### Phase 2 — Release plumbing
+### Phase 1 — `item_unregister.sh`
 
-- [x] `catalogue_release.sh` — one command: `item_create.py --rebuild` → `item_validate.py` → `aws s3 sync` (JSONs) → `item_register.sh` (bulk upsert) → `collection_register.sh` → API verify
-- [x] `NEWS.md` v1.0.0 entry; commit `data/sites.csv`
-- [x] README + `scripts/config/README.md`: registry/release workflow, renamed script references
+- [x] `scripts/config/item_unregister.sh <item-id>...` — deletes items from pgstac over SSH (`pgstac.delete_item`), sibling to `item_register.sh`; idempotent (missing id → warning, not failure)
+- [x] Round-trip test on one live item: unregister → verify 404 on API → re-register via `item_register.sh` → verify 200 (proves both tools, changes nothing net)
 
-### Phase 3 — Release v1.0.0
+### Phase 2 — Retract the nechacko kenneth copy (order matters)
 
-- [x] Run `catalogue_release.sh`; tag `v1.0.0`
-- [x] Verify: `rstac` filter `nge:watershed_group == 'morice'` → 12 datasets; API geometry vertex count > 5; viewer spot-check
-- [ ] PR via `/gh-pr-push`, merge, `/planning-archive`
+- [x] `data/sites.csv`: flip nechacko kenneth row to `published=false`, note the retraction date + replacement path
+- [x] Remove the dataset from the prod tree and the `imagery_uav_bc` COG tree (prevents stale JSONs re-syncing; raw source images under `uav_imagery/fraser/nechacko/` are left for the user to keep or delete)
+- [x] `aws s3 rm --recursive` the `fraser/nechacko/2024/199256_kenneth_hwy16/` prefix (6 objects: 3 tifs + 3 item JSONs)
+- [x] `item_unregister.sh` the 3 nechacko item ids
+- [x] Release v1.0.1: NEWS entry, tag, `catalogue_release.sh` (rebuild drops the collection links; verify live version 1.0.1, 230 items)
+- [x] Verify: 3 nechacko ids 404 via API; morkill ids still 200; S3 prefix empty
 
-### Phase 4 — CI rebuild (blocked on rtj#200 OIDC role)
+### Phase 3 — Document + close
 
-- [ ] `.github/workflows/update.yml` modeled on stac_dem_bc: push to `data/sites.csv` + `workflow_dispatch`; dataset enumeration **from sites.csv** (`published=true`); COG reads via `/vsicurl/` (headers/overviews only — no local tifs in CI); `item_validate.py` gate; `aws s3 sync`
-- [ ] Registration stays a documented manual step, matching the stac_dem_bc split
-
-### Phase 5 — Ecosystem convergence issues
-
-- [x] stac_dem_bc issue: adopt client-side registration scripts (`item_register.sh`/`collection_register.sh` pattern) + versioned-registry release pattern where applicable
-- [x] soul issue: capture converged stac-repo conventions (script names, registry pattern, registration split, release workflow) as a convention candidate so future stac repos start from it; note stac_airphoto_bc / stac_orthophoto_bc / floodplains for later audit against it
+- [x] `scripts/config/README.md`: retraction recipe (flip `published=false` → remove trees/S3 → `item_unregister.sh` → release)
+- [ ] PR via `/gh-pr-push` (closes #18), merge, `/planning-archive`
 
 
 ## Validation
 
-- [x] catalogue_release.sh idempotent (rebuild ran 3x during dev + release; identical end state each time)
-- [ ] /code-check clean on each commit
-- [ ] PWF checkboxes match landed work
-- [ ] /planning-archive on completion
+- [x] Round-trip test passes before any real deletion
+- [x] /code-check clean per commit; PWF checkboxes match landed work
+- [x] /planning-archive on completion

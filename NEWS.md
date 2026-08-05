@@ -1,5 +1,11 @@
 # stac_uav_bc
 
+## v1.0.1 (2026-08-05)
+
+- Retraction flow: `scripts/config/item_unregister.sh` (pgstac delete over SSH, idempotent) and the `published=false` lifecycle documented in the recipe (#18)
+- First retraction: mis-filed `fraser/nechacko/2024/199256_kenneth_hwy16` removed from API + S3 (Kenneth Creek is in Morkill; replacement published at `fraser/morkill/2024/199256_kenneth_hwy16`; Fraser 2023 report updated to the new URLs first)
+- New datasets since v1.0.0: Peacock Creek (morice 2025), Tributary to Waterfall Creek (bulkley 2025), Kenneth Creek morkill copy — catalog at 230 items
+
 ## v1.0.0 (2026-08-03)
 
 First versioned release of the catalogue — 224 items across fraser, skeena, mackenzie, and kootenay.

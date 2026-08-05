@@ -28,6 +28,14 @@ The public API is **read-only**: the transactions extension is off, so POST/PUT/
 2. `git tag vX.Y.Z`
 3. `scripts/catalogue_release.sh` — rebuilds all items, validates, syncs, registers, verifies (~5 min, idempotent)
 
+**Retracting a dataset** (#18 — check nothing external links the URLs first, e.g. published reports):
+
+1. Flip its `data/sites.csv` row to `published=false` with a dated note
+2. Remove the dataset dir from the prod tree and the `imagery_uav_bc` COG tree
+3. `aws s3 rm s3://imagery-uav-bc/<region>/<wsg>/<year>/<item> --recursive --profile airvine`
+4. `scripts/config/item_unregister.sh <item-id>...` (idempotent; API 404s confirm)
+5. Release as usual (NEWS + tag + `catalogue_release.sh`) — the rebuild drops the collection links
+
 ## Adding New Imagery — the Recipe
 
 Two commands with a human QC gate between them:
