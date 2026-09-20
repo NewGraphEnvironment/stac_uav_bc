@@ -61,8 +61,15 @@ Order matters — stale JSONs go before any sync.
 
 ## Phase 5 — QC gate (human)
 
-- [ ] `odm_report/stats.json` per dataset: all images reconstructed, reprojection error ~1-2 px
-- [ ] Eyeball each ortho preview
+**Never gate this on the batch script's exit code.** `odm_process-batch.sh` runs `set -u` only and
+captures `ec=$?` at `:54` purely to echo it — the loop continues and the script's final `echo` returns
+0 whether or not ODM failed. Gate on artifacts instead.
+
+- [x] pedley — all 3 TIFs + `odm_report/stats.json` present; 33/33 reconstructed, 0.131 px, 1.66 cm GSD;
+      the 32 error-matching log lines are all DEBUG pairwise match failures between non-overlapping frames
+- [ ] parsnip post-replacement — same artifact + stats check
+- [x] Eyeball pedley ortho (sent to user; crossing and riprap sharp, margin smearing is normal corridor edge)
+- [ ] Eyeball parsnip ortho
 
 ## Phase 6 — Publish
 
@@ -90,7 +97,11 @@ Order matters — stale JSONs go before any sync.
 
 - [ ] `/code-check` clean on each commit
 - [ ] PWF checkboxes match landed work
-- [ ] Old `1996663` ids 404; new `199663` ids 200; old S3 prefix gone
+- [ ] Old `1996663` ids 404; new `199663` ids 200
+- [x] Old S3 prefix empty — verified after the `aws s3 mv`, as an explicit step rather than an implied
+      side effect of a later sync (#18 treats it the same way)
+- [ ] `EXPECT_ITEMS=236 scripts/catalogue_release.sh` — the count is now asserted, not just printed,
+      and every live item is checked for `nge:` properties so a silent registry miss fails the release
 - [ ] Catalogue at 236 items, live version 1.0.2
 - [ ] Parsnip row `stream_name` untouched, so v1.1.0 still has its test
 - [ ] `/planning-archive` on completion
