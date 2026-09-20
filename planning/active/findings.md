@@ -124,3 +124,33 @@ already queued for v1.1.0. The new post-replacement row nonetheless carries **"T
   under two different stream names until v1.1.0
 
 Both rows' notes name the discrepancy so v1.1.0 corrects them together.
+
+## The spatial-extent bug was pre-existing and much larger than pedley
+
+The review framed G1 as "pedley would fall outside the advertised bbox". Measuring against the prod
+tree showed **21 items across 7 datasets already outside it** before pedley existed:
+
+```
+old bbox: [-127.741, 53.830, -121.741, 55.314]
+new bbox: [-127.741, 49.209, -114.529, 56.078]
+
+kootenay-elk-2021-parker                              @ 49.209 N, -114.552
+kootenay-upper_arrow_lake-2024-arrow                  @ 50.742 N, -117.800
+mackenzie-pine-2026-6971_pine_oxbox_hwy97S            @ 55.605 N
+mackenzie-peace_arm-2026-16701333_carbon_trib…        @ 55.909 N
+mackenzie-upper_peace-2026-23502870_track_ck…         @ 55.970 N
+mackenzie-peace_arm-2026-16701523_table_ck…           @ 56.060 N
+fraser-cottonwood-2026-198285_pedley_lake_creek_rd    @ 53.383 N   (the new one)
+```
+
+Every kootenay dataset in the catalogue was unreachable by a bbox-filtered search against the
+collection extent, and had been since it was published. Pedley was simply the first case anyone was
+going to trip over. Fixed for all of them by the same change.
+
+## Release arithmetic — why EXPECT_ITEMS could not be used on this run
+
+Live count read 236 immediately after publish, which *looks* like the target but was 233 real items
+plus the 3 stale `1996663` registrations, with the 3 renamed ids not yet created. The release rebuild
+took it to 239; only the unregister brought it to a correct 236. Asserting 236 during the release
+would have failed on the right number at the wrong moment. The `nge:` coverage guard ran instead
+(239/239), and 236 was asserted after the unregister.
