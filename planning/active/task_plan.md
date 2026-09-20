@@ -48,7 +48,7 @@ Order matters — stale JSONs go before any sync.
 
 ## Phase 4 — Stitch
 
-- [ ] `caffeinate -s scripts/odm_process-batch.sh <pedley> <parsnip post-replacement>` (no `--split`)
+- [x] `caffeinate -s scripts/odm_process-batch.sh <pedley> <parsnip post-replacement>` (no `--split`)
 - [ ] **Never re-run the batch script to resume.** Its skip guard is `odm_orthophoto/`
       (`odm_process-batch.sh:35`), which an interrupted run has not written yet, so it falls through to
       the `rm -rf "$proj"/opensfm "$proj"/odm_* …` at `:41` and destroys the very state you meant to
@@ -67,9 +67,9 @@ captures `ec=$?` at `:54` purely to echo it — the loop continues and the scrip
 
 - [x] pedley — all 3 TIFs + `odm_report/stats.json` present; 33/33 reconstructed, 0.131 px, 1.66 cm GSD;
       the 32 error-matching log lines are all DEBUG pairwise match failures between non-overlapping frames
-- [ ] parsnip post-replacement — same artifact + stats check
+- [x] parsnip post-replacement — same artifact + stats check
 - [x] Eyeball pedley ortho (sent to user; crossing and riprap sharp, margin smearing is normal corridor edge)
-- [ ] Eyeball parsnip ortho
+- [x] Eyeball parsnip ortho
 
 ## Phase 6 — Publish
 
@@ -78,7 +78,7 @@ captures `ec=$?` at `:54` purely to echo it — the loop continues and the scrip
 
 ## Phase 7 — Release v1.0.2
 
-- [ ] `NEWS.md`: two new datasets, the parsnip id correction, the alias-in-title change
+- [x] `NEWS.md`: two new datasets, the parsnip id correction, the alias-in-title change
 - [ ] `git tag v1.0.2`; `scripts/catalogue_release.sh` — the `--rebuild` writes the 3 renamed-parsnip
       items under their new ids and registers them
 - [ ] **Immediately after**, `scripts/config/item_unregister.sh` the 3 old `...-1996663_...` ids, so the
