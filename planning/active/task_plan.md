@@ -29,7 +29,12 @@ Order matters — stale JSONs go before any sync.
 - [x] Delete the 3 stale `...-1996663_...json` files from the renamed prod dir
 - [x] Rename the new dir to `199663_parsnip_trib_chco_11000_post_replacement`
 - [x] `data/sites.csv:17`: `item` -> `199663_parsnip_trib_chco_11000`, `alias` -> `moose pre-replacement`, note the id correction; **leave `stream_name` alone** (v1.1.0's job)
-- [ ] `scripts/config/item_unregister.sh` the 3 old ids; confirm 404 via API
+- [x] `aws s3 mv --recursive` the old S3 prefix to the new one — **server-side, before any sync.**
+      `aws s3 sync` has no rename detection: it would have deleted 4.34 GB of TIFs at the old prefix
+      and re-uploaded them from local under `--only-show-errors`, silently, over the home link.
+- [ ] _(moved to Phase 7)_ the old-id unregister — doing it here would take the pre-replacement site
+      dark from now until the release clears the unbounded human QC gate. #18 published the
+      replacement first, then retracted, minutes apart.
 
 ## Phase 3 — Registry rows for the two new flights
 
@@ -40,7 +45,15 @@ Order matters — stale JSONs go before any sync.
 ## Phase 4 — Stitch
 
 - [ ] `caffeinate -s scripts/odm_process-batch.sh <pedley> <parsnip post-replacement>` (no `--split`)
-- [ ] If interrupted: resume with the identical command, never re-point the batch script at an in-flight dir
+- [ ] **Never re-run the batch script to resume.** Its skip guard is `odm_orthophoto/`
+      (`odm_process-batch.sh:35`), which an interrupted run has not written yet, so it falls through to
+      the `rm -rf "$proj"/opensfm "$proj"/odm_* …` at `:41` and destroys the very state you meant to
+      resume. Both dirs are in one invocation, so a second batch call aimed at the parsnip dir would
+      wipe pedley. Resume with the `docker run` at `:47` directly:
+      ```
+      docker run --rm -v <parent-of-project-dir>:/datasets opendronemap/odm \
+        --project-path /datasets/ <project-name> --dtm --dsm --pc-quality low --dem-resolution 5
+      ```
 
 ## Phase 5 — QC gate (human)
 
@@ -55,7 +68,10 @@ Order matters — stale JSONs go before any sync.
 ## Phase 7 — Release v1.0.2
 
 - [ ] `NEWS.md`: two new datasets, the parsnip id correction, the alias-in-title change
-- [ ] `git tag v1.0.2`; `scripts/catalogue_release.sh`
+- [ ] `git tag v1.0.2`; `scripts/catalogue_release.sh` — the `--rebuild` writes the 3 renamed-parsnip
+      items under their new ids and registers them
+- [ ] **Immediately after**, `scripts/config/item_unregister.sh` the 3 old `...-1996663_...` ids, so the
+      new ids are already live before the old ones go (#18 ordering); confirm 404
 - [ ] Verify live version `1.0.2`, 236 items, pre/post titles now differ
 
 ## Phase 8 — Document and close

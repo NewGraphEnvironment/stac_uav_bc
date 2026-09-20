@@ -73,6 +73,46 @@ So `pedley` gets `name_source=pscis` with a real gazetted name — no guess need
 **The `1996663` typo is confirmed.** Filtering `aggregated_crossings_id IN ('199663','1996663','198285')`
 returns only `199663` and `198285`; `1996663` does not exist in the crossings table.
 
+## Plan-agent review — three blockers, all confirmed and fixed
+
+### B1 — the plan's ODM resume instruction would have destroyed an in-flight run
+
+`odm_process-batch.sh:35` skips a project only when `odm_orthophoto/` exists, and that directory is
+written near the *end* of a run. An interrupted run therefore falls through to the `rm -rf
+"$proj"/opensfm "$proj"/odm_* …` at `:41`, wiping exactly the state being resumed — the CLAUDE.md
+footgun verbatim. The original bullet said "resume with the identical command", and the identical
+command *is* the batch script. Worse: both dirs run in one invocation, so a second batch call aimed
+at the parsnip dir would have wiped pedley mid-flight. Fixed to spell out the `docker run` form.
+
+### B2 — a silent 4.34 GB re-upload, avoided
+
+`aws s3 sync` has no rename detection; it compares keys. With the prod dir renamed, the sync at
+`dataset_publish.sh:91` would have deleted the three old-prefix TIFs and re-uploaded them from local —
+956 MB + 1.22 GB + 2.16 GB = **4.34 GB** over the home link, under `--only-show-errors`, so with no
+progress output at all. Verified against the live bucket before acting.
+
+Fixed with a server-side move before any sync:
+
+```
+aws s3 mv --recursive --profile airvine \
+  s3://imagery-uav-bc/mackenzie/parsnip/2026/1996663_parsnip_trib_chco_11000/ \
+  s3://imagery-uav-bc/mackenzie/parsnip/2026/199663_parsnip_trib_chco_11000/
+```
+
+Ran at ~1.5 GiB/s in-region. Old prefix now empty; all 6 objects at the new prefix. The three stale
+old-id JSONs came across with the move and will be removed by the later `sync --delete`, since they
+no longer exist locally.
+
+**Generalisable:** the README's renaming recipe now carries this — a prefix rename on S3 must be an
+`aws s3 mv`, never left to `sync` to reconcile.
+
+### B3 — the retraction was sequenced backwards against the #18 precedent
+
+The unregister sat in Phase 2, but the renamed dataset is only re-registered by `catalogue_release.sh`
+in Phase 7 — behind an unbounded human QC gate. That would have taken the pre-replacement site dark
+for the whole interval. #18 deliberately did the reverse (publish the replacement, *then* retract,
+minutes apart). Moved the unregister to sit immediately after the release.
+
 ### Deliberate deviation on the post-replacement row's stream_name
 
 The db says the PSCIS name for 199663 is **"Tributary to Colbourne Creek"**, corroborating the correction
