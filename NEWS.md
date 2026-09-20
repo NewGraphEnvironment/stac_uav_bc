@@ -26,9 +26,12 @@ Also in this release:
 - Item titles include the alias when a row has one: `"<stream> (<alias>) — <year> <product>"`.
   Without it, the two parsnip flights would both read "Tributary to Parsnip River — 2026 orthophoto",
   since they share a stream name and a year. Rows without an alias title exactly as before.
-- Collection `extent.spatial` is now recomputed on publish and on rebuild. It never was before, so
-  the collection could advertise an extent excluding its own items — Pedley Creek sits south of the
-  previous bbox and would have been missed by a bbox-filtered search.
+- Collection `extent.spatial` is now recomputed on publish and on rebuild. It never was before, and
+  the advertised bbox had drifted badly: **21 items across 7 datasets already fell outside it**,
+  including everything in kootenay (Parker Creek at 49.21°N, Hadow Creek at 50.74°N) and four
+  mackenzie peace/pine datasets north of 55.6°N. A bbox-filtered `rstac` or QGIS search against the
+  collection extent silently missed all of them. The corrected bbox spans
+  `[-127.741, 49.209, -114.529, 56.078]`, up from `[-127.741, 53.830, -121.741, 55.314]`.
 - `catalogue_release.sh` asserts rather than announces: optional `EXPECT_ITEMS=<n>` checks the live
   count, and every live item is checked for `nge:region` + `nge:stream_name` so a silent registry
   miss — which titles an item from its directory name — fails the release instead of shipping.

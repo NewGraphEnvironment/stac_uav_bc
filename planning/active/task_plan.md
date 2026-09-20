@@ -36,7 +36,7 @@ Order matters — stale JSONs go before any sync.
 - [x] `aws s3 mv --recursive` the old S3 prefix to the new one — **server-side, before any sync.**
       `aws s3 sync` has no rename detection: it would have deleted 4.34 GB of TIFs at the old prefix
       and re-uploaded them from local under `--only-show-errors`, silently, over the home link.
-- [ ] _(moved to Phase 7)_ the old-id unregister — doing it here would take the pre-replacement site
+> _(moved to Phase 7)_ the old-id unregister — doing it here would take the pre-replacement site
       dark from now until the release clears the unbounded human QC gate. #18 published the
       replacement first, then retracted, minutes apart.
 
@@ -49,7 +49,7 @@ Order matters — stale JSONs go before any sync.
 ## Phase 4 — Stitch
 
 - [x] `caffeinate -s scripts/odm_process-batch.sh <pedley> <parsnip post-replacement>` (no `--split`)
-- [ ] **Never re-run the batch script to resume.** Its skip guard is `odm_orthophoto/`
+> **Never re-run the batch script to resume.** Its skip guard is `odm_orthophoto/`
       (`odm_process-batch.sh:35`), which an interrupted run has not written yet, so it falls through to
       the `rm -rf "$proj"/opensfm "$proj"/odm_* …` at `:41` and destroys the very state you meant to
       resume. Both dirs are in one invocation, so a second batch call aimed at the parsnip dir would
@@ -90,7 +90,8 @@ captures `ec=$?` at `:54` purely to echo it — the loop continues and the scrip
 
 ## Phase 8 — Document and close
 
-- [ ] `scripts/config/README.md`: the repeat-flight convention (alias disambiguates the title)
+- [x] `scripts/config/README.md`: the repeat-flight convention (alias disambiguates the title), plus
+      the renaming recipe (three trees, stale JSONs, `aws s3 mv` not `sync`)
 - [ ] `/planning-archive`, then `/gh-pr-push` (closes #22)
 
 ## Validation
