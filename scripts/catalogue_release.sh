@@ -52,18 +52,25 @@ fi
 # A registry miss is silent: item_create.py falls back to the directory name as
 # title and emits no nge: properties at all. Count checks cannot see it, so
 # assert every live item actually joined its sites.csv row (#22).
+#
+# Check nge:stream_name as well as nge:region, because registry_props drops any
+# column that is blank after strip: a row that joins fine but has an empty
+# stream_name still titles from the directory name while carrying nge:region.
+# stream_name is the property the title actually reads, so it is the one that
+# has to be present.
 curl -s -X POST "https://images.a11s.one/search" -H "Content-Type: application/json" \
   -d '{"collections":["imagery-uav-bc-prod"],"limit":1000}' | python3 -c "
 import json, sys
 feats = json.load(sys.stdin)['features']
-orphans = [f['id'] for f in feats if 'nge:region' not in f.get('properties', {})]
+need = {'nge:region', 'nge:stream_name'}
+orphans = [f['id'] for f in feats if not need <= f.get('properties', {}).keys()]
 if orphans:
-    print('RELEASE INCOMPLETE: %d item(s) missing nge: properties -- registry miss, '
-          'title fell back to the directory name:' % len(orphans), file=sys.stderr)
+    print('RELEASE INCOMPLETE: %d item(s) missing nge: properties -- registry miss or blank '
+          'stream_name; the title fell back to the directory name:' % len(orphans), file=sys.stderr)
     for i in orphans[:10]:
         print('   ', i, file=sys.stderr)
     sys.exit(1)
-print('    registry coverage OK: %d/%d items carry nge: properties' % (len(feats), len(feats)))
+print('    registry coverage OK: %d/%d items carry nge:region + nge:stream_name' % (len(feats), len(feats)))
 " || exit 1
 
 echo "RELEASE COMPLETE: v$VERSION"
