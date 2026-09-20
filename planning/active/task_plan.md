@@ -18,7 +18,11 @@ Branch: `22-process-publish-and-register-two-new-202`
 ## Phase 1 — Alias in the item title
 
 - [x] `scripts/item_create.py:94` — when `nge:alias` is set, title becomes `"{stream} ({alias}) — {year} {product}"`
-- [x] Verify against the 3 parsnip items; confirm unaliased items are byte-identical
+- [x] Unit-check the title expression in isolation: aliased rows gain `(alias)`, unaliased are unchanged
+- [ ] At release, snapshot the prod JSONs, run `--rebuild`, and diff — expect **only** the 3 renamed
+      parsnip paths to move and no other item's title to change (the isolation check above does not
+      prove this, and byte-identity also rests on gdal/pystac/rio_stac being unchanged since the
+      2026-08-05 rebuild, which nothing pins)
 
 ## Phase 2 — Correct the parsnip id (`1996663` -> `199663`)
 
@@ -72,7 +76,10 @@ Order matters — stale JSONs go before any sync.
       items under their new ids and registers them
 - [ ] **Immediately after**, `scripts/config/item_unregister.sh` the 3 old `...-1996663_...` ids, so the
       new ids are already live before the old ones go (#18 ordering); confirm 404
+- [ ] `git push origin v1.0.2` — v1.0.0/v1.0.1 are on origin; a local-only tag strands the release marker
 - [ ] Verify live version `1.0.2`, 236 items, pre/post titles now differ
+- [ ] Verify the collection `extent.spatial.bbox` now contains pedley (53.3838 was below the old south
+      edge of 53.8303 — nothing recomputed spatial before this change)
 
 ## Phase 8 — Document and close
 

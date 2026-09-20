@@ -1,5 +1,5 @@
 region,watershed,watershed_group_code,year,item,aggregated_crossings_id,stream_name,stream_name_02,stream_name_03,alias,project,published,name_source,notes
-fraser,cottonwood,COTR,2026,pedley,198285,Pedley Creek,,,,,true,pscis,PSCIS crossing 9.6m from first-image GPS; Lake Creek Rd; flown 2026-09-13
+fraser,cottonwood,COTR,2026,198285_pedley_lake_creek_rd,198285,Pedley Creek,,,,,true,pscis,PSCIS crossing 9.6m from first-image GPS; Lake Creek Rd; flown 2026-09-13; item carries the crossing id per registry convention - every other row with a known id does
 fraser,morkill,MORK,2024,199256_kenneth_hwy16,199256,Kenneth Creek,,,,,true,bcfishpass_gnis,correctly-filed replacement for fraser/nechacko copy (mis-filed; retract after Fraser 2023 report URL swap)
 fraser,nechacko,FRAN,2024,199171_burnt_cabin_gala,199171,Burnt Cabin Creek,,,,,true,pscis,
 fraser,nechacko,NECR,2024,199173_necr_trib_dog,199173,Tributary To Nechako River,,,,,true,pscis,

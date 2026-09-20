@@ -154,10 +154,15 @@ def main():
                 collection.add_item(item)
                 item.save_object(dest_href=str(t.parent / f"{item.id}.json"))
                 built += 1
+        # A full rebuild is the one place that holds every item, so recompute the
+        # extent here — nothing else did, and a collection can otherwise advertise
+        # an extent that excludes its own items (#22).
+        collection.update_extent_from_items()
         stamp_version(collection, args.version or git_version())
         collection.save_object(dest_href=str(base / "collection.json"))
+        bbox = collection.extent.spatial.bboxes[0]
         print(f"REBUILD: {built} items from {len(tifs)} tifs; collection v{collection.extra_fields['version']}, "
-              f"{len(collection.get_links('item'))} links")
+              f"{len(collection.get_links('item'))} links; bbox {[round(v, 5) for v in bbox]}")
         return
 
     existing = {l.href.rsplit("/", 1)[-1].removesuffix(".json") for l in collection.get_links("item")}
