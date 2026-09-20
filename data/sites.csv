@@ -1,4 +1,5 @@
 region,watershed,watershed_group_code,year,item,aggregated_crossings_id,stream_name,stream_name_02,stream_name_03,alias,project,published,name_source,notes
+fraser,cottonwood,COTR,2026,pedley,198285,Pedley Creek,,,,,true,pscis,PSCIS crossing 9.6m from first-image GPS; Lake Creek Rd; flown 2026-09-13
 fraser,morkill,MORK,2024,199256_kenneth_hwy16,199256,Kenneth Creek,,,,,true,bcfishpass_gnis,correctly-filed replacement for fraser/nechacko copy (mis-filed; retract after Fraser 2023 report URL swap)
 fraser,nechacko,FRAN,2024,199171_burnt_cabin_gala,199171,Burnt Cabin Creek,,,,,true,pscis,
 fraser,nechacko,NECR,2024,199173_necr_trib_dog,199173,Tributary To Nechako River,,,,,true,pscis,
@@ -14,7 +15,8 @@ mackenzie,parsnip,PARS,2022,125179_missinka_trib,125179,Unnamed tributary to Mis
 mackenzie,parsnip,PARS,2023,125231_table_trib_tablefsr_21k,125231,Tributary to Table River,,,,,true,pscis,
 mackenzie,parsnip,PARS,2023,125261_fern_tablefsr_2k,125261,Fern Creek,,,,,true,bcfishpass_gnis,
 mackenzie,parsnip,PARS,2024,125231_table_trib_tablefsr_21k,125231,Tributary to Table River,,,,,true,pscis,
-mackenzie,parsnip,PARS,2026,1996663_parsnip_trib_chco_11000,199663,Tributary to Parsnip River,,,moose,,true,guess_nearest_353m,dir name has an extra 6; id corrected from 1996663; working name 'moose'; verify in bcfishpass
+mackenzie,parsnip,PARS,2026,199663_parsnip_trib_chco_11000,199663,Tributary to Parsnip River,,,moose pre-replacement,,true,guess_nearest_353m,id corrected 1996663 -> 199663 and dataset renamed in v1.0.2 (#22); pre-replacement flight of the pair; stream_name is still the pending guess - PSCIS has 'Tributary to Colbourne Creek' - correct with the post row in v1.1.0
+mackenzie,parsnip,PARS,2026,199663_parsnip_trib_chco_11000_post_replacement,199663,Tributary to Parsnip River,,,moose post-replacement,,true,guess_nearest_353m,post-replacement flight 2026-09-15; pre-replacement is 199663_parsnip_trib_chco_11000; stream_name mirrors the pre row's pending guess - PSCIS has 'Tributary to Colbourne Creek' - correct both in v1.1.0
 mackenzie,peace_arm,PCEA,2026,16701333_carbon_trib_johnson_fsr,1016701333,Tributary to Carbon Creek,,,,,true,guess_nearest_709m,aggregated id computed from modelled id 16701333 (+1e9); verify in bcfishpass
 mackenzie,peace_arm,PCEA,2026,16701523_table_ck_table_fsr,1016701523,Table Creek,,,,,true,fwa_nearest_52m,aggregated id computed from modelled id 16701523 (+1e9); verify in bcfishpass
 mackenzie,pine,PINE,2026,6971_pine_oxbox_hwy97S,6971,Pine River,,,,,true,bcfishpass_gnis,

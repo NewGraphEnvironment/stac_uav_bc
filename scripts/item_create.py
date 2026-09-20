@@ -91,7 +91,10 @@ def build_item(path_item, base, s3_url, collection, registry):
     props = registry_props(row) if row else {}
     stream = props.get("nge:stream_name", parts[3])
     product = PRODUCT_LABEL.get(path_item.stem, path_item.stem)
-    props["title"] = f"{stream} — {parts[2]} {product}"
+    # Repeat flights of one site (e.g. a before/after culvert replacement) share
+    # stream name and year, so the alias is what separates their titles (#22).
+    alias = props.get("nge:alias", "")
+    props["title"] = f"{stream} ({alias}) — {parts[2]} {product}" if alias else f"{stream} — {parts[2]} {product}"
 
     item = rio_stac.stac.create_stac_item(
         str(path_item),

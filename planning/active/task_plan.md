@@ -10,32 +10,32 @@ Branch: `22-process-publish-and-register-two-new-202`
 
 ## Phase 0 — Establish registry facts (read-only; the only open unknowns)
 
-- [ ] Resolve the Cottonwood FWA watershed group code for 53.383799, -122.555596 against fwapg/bcfishpass (`/db-newgraph`)
-- [ ] Resolve `pedley`: `aggregated_crossings_id` and gazetted stream name if a crossing exists; otherwise an explicit `guess_*`/`user` `name_source` plus note, per the `wedzin_*` row pattern
-- [ ] Confirm `199663` is the correct aggregated id for the parsnip crossing
-- [ ] Record values and the queries used in `findings.md`
+- [x] Resolve the Cottonwood FWA watershed group code for 53.383799, -122.555596 against fwapg/bcfishpass (`/db-newgraph`)
+- [x] Resolve `pedley`: `aggregated_crossings_id` and gazetted stream name if a crossing exists; otherwise an explicit `guess_*`/`user` `name_source` plus note, per the `wedzin_*` row pattern
+- [x] Confirm `199663` is the correct aggregated id for the parsnip crossing
+- [x] Record values and the queries used in `findings.md`
 
 ## Phase 1 — Alias in the item title
 
-- [ ] `scripts/item_create.py:94` — when `nge:alias` is set, title becomes `"{stream} ({alias}) — {year} {product}"`
-- [ ] Verify against the 3 parsnip items; confirm unaliased items are byte-identical
+- [x] `scripts/item_create.py:94` — when `nge:alias` is set, title becomes `"{stream} ({alias}) — {year} {product}"`
+- [x] Verify against the 3 parsnip items; confirm unaliased items are byte-identical
 
 ## Phase 2 — Correct the parsnip id (`1996663` -> `199663`)
 
 Order matters — stale JSONs go before any sync.
 
-- [ ] Record the dependency-gate evidence in `findings.md` (#18 requires it before retracting)
-- [ ] Rename the dataset dir in all three trees: raw `uav_imagery/`, COG `imagery_uav_bc/`, prod `stac/prod/imagery_uav_bc/`
-- [ ] Delete the 3 stale `...-1996663_...json` files from the renamed prod dir
-- [ ] Rename the new dir to `199663_parsnip_trib_chco_11000_post_replacement`
-- [ ] `data/sites.csv:17`: `item` -> `199663_parsnip_trib_chco_11000`, `alias` -> `moose pre-replacement`, note the id correction; **leave `stream_name` alone** (v1.1.0's job)
+- [x] Record the dependency-gate evidence in `findings.md` (#18 requires it before retracting)
+- [x] Rename the dataset dir in all three trees: raw `uav_imagery/`, COG `imagery_uav_bc/`, prod `stac/prod/imagery_uav_bc/`
+- [x] Delete the 3 stale `...-1996663_...json` files from the renamed prod dir
+- [x] Rename the new dir to `199663_parsnip_trib_chco_11000_post_replacement`
+- [x] `data/sites.csv:17`: `item` -> `199663_parsnip_trib_chco_11000`, `alias` -> `moose pre-replacement`, note the id correction; **leave `stream_name` alone** (v1.1.0's job)
 - [ ] `scripts/config/item_unregister.sh` the 3 old ids; confirm 404 via API
 
 ## Phase 3 — Registry rows for the two new flights
 
-- [ ] `fraser,cottonwood,<WSG>,2026,pedley,...` using Phase 0 values
-- [ ] `mackenzie,parsnip,PARS,2026,199663_parsnip_trib_chco_11000_post_replacement,199663,...`, alias `moose post-replacement`
-- [ ] Confirm each `(region, watershed, year, item)` key matches its directory path exactly — a mismatch publishes silently wrong
+- [x] `fraser,cottonwood,<WSG>,2026,pedley,...` using Phase 0 values
+- [x] `mackenzie,parsnip,PARS,2026,199663_parsnip_trib_chco_11000_post_replacement,199663,...`, alias `moose post-replacement`
+- [x] Confirm each `(region, watershed, year, item)` key matches its directory path exactly — a mismatch publishes silently wrong
 
 ## Phase 4 — Stitch
 

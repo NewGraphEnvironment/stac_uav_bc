@@ -49,6 +49,38 @@ The three out-of-repo hits are coincidental matches of the digit string `1996663
 
 ODM also writes `*.original.tif` beside each output (~5 GB extra per flight); `item_create.py` skips them.
 
-## Phase 0 — registry facts
+## Phase 0 — registry facts (resolved 2026-09-20)
 
-_To be filled during Phase 0._
+Queried against the local `fwapg` Docker DB (`fresh-db`, port 5432) — no SSH tunnel needed, since
+`whse_basemapping.fwa_watershed_groups_poly` and `fresh.crossings_vw_bcfp` are both present locally.
+
+**Watershed groups** — point-in-polygon on `fwa_watershed_groups_poly`:
+
+| site | code | name |
+|---|---|---|
+| pedley (53.383799, -122.555596) | **COTR** | Cottonwood River |
+| parsnip post (55.001370, -122.758782) | **PARS** | Parsnip River |
+
+**Crossings** — nearest on `fresh.crossings_vw_bcfp`:
+
+| site | aggregated_crossings_id | source | stream | road | dist |
+|---|---|---|---|---|---|
+| pedley | **198285** | PSCIS | Pedley Creek (gnis + pscis agree) | Lake Creek Rd | 9.6 m |
+| parsnip post | **199663** | PSCIS | Tributary to Colbourne Creek | Chco 11000 FSR | 77.1 m |
+
+So `pedley` gets `name_source=pscis` with a real gazetted name — no guess needed.
+
+**The `1996663` typo is confirmed.** Filtering `aggregated_crossings_id IN ('199663','1996663','198285')`
+returns only `199663` and `198285`; `1996663` does not exist in the crossings table.
+
+### Deliberate deviation on the post-replacement row's stream_name
+
+The db says the PSCIS name for 199663 is **"Tributary to Colbourne Creek"**, corroborating the correction
+already queued for v1.1.0. The new post-replacement row nonetheless carries **"Tributary to Parsnip River"**
+— the same pending guess as its pre-replacement sibling — because:
+
+- v1.0.2 was scoped as additive datasets with no registry corrections; the correction is v1.1.0's test
+- writing the correct name on only the new row would split the pair, leaving the before/after flights
+  under two different stream names until v1.1.0
+
+Both rows' notes name the discrepancy so v1.1.0 corrects them together.
