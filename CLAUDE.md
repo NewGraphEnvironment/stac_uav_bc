@@ -564,7 +564,7 @@ alias" below, arriving through PATH order rather than through a function — and
   - Worth running whenever a PR deliberately does *not* close the issue it references. When it
     is meant to close it, the field failing to list it is the same check pointing the other way.
 
-*29 lines of evidence for this rule are in `conventions/code-check-shell.md`, which `/code-check` reads in full.*
+*35 lines of evidence for this rule are in `conventions/code-check-shell.md`, which `/code-check` reads in full.*
 
 ### On a fork, `main` may track upstream by design — comparing it answers nothing
 
@@ -778,6 +778,8 @@ containing those digits.
 - That direction is survivable because it is loud. The dangerous one is a wrapper that exits 0 on a comparison it never performed, which reads as "verified".
 - For anything whose output you are about to treat as evidence, bypass the lookup: `command diff`, `\diff`, or a tool with no common wrapper — `cmp -s` for byte-equality, `md5` / `sha256sum` for a value you can print. Printing the digest beats printing a verdict: it stays checkable after the fact.
 - `type <cmd>` tells you what you actually have. Worth running the first time a verification step returns something surprising, before believing the surprise.
+
+*7 lines of evidence for this rule are in `conventions/code-check-shell.md`, which `/code-check` reads in full.*
 
 ### psql does not interpolate `:'var'` inside a dollar-quoted string, and `\quit N` exits 0
 
@@ -1397,7 +1399,7 @@ cache key and the request on the wire. If it reaches neither, the two runs are o
 and the comparison cannot fail — say the property holds by construction rather than
 dressing a tautology as evidence.
 
-*11 recorded instances of this are in `conventions/code-check.md`, which `/code-check` reads in full.*
+*12 recorded instances of this are in `conventions/code-check.md`, which `/code-check` reads in full.*
 
 ### A guard's scope, escape hatches, and remedies
 
@@ -1500,7 +1502,7 @@ several sources — a rule promoted out of its instances, a summary over a measu
 execute it against each source rather than against itself: the compression reads correct on
 its own, and the condition it dropped is visible only in the thing it compressed.
 
-*24 recorded instances of this are in `conventions/code-check.md`, which `/code-check` reads in full.*
+*25 recorded instances of this are in `conventions/code-check.md`, which `/code-check` reads in full.*
 
 ### A fix lands in one of two callers that share a harness
 
