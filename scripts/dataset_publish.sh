@@ -65,24 +65,41 @@ for rel in "${rels[@]}"; do
   echo "  synced: $rel"
 done
 
-echo "=== refresh collection temporal extent"
+echo "=== refresh collection extent (spatial + temporal)"
 python3 - "$PROD" <<'PYEOF'
 import json, pathlib, sys
 base = pathlib.Path(sys.argv[1])
-dts = []
+dts, bboxes = [], []
 for p in base.rglob("*.json"):
     if p.name == "collection.json":
         continue
     d = json.loads(p.read_text())
     if d.get("type") == "Feature":
         dts.append(d["properties"]["datetime"])
+        if d.get("bbox"):
+            bboxes.append(d["bbox"])
 pc = base / "collection.json"
 c = json.loads(pc.read_text())
+changed = []
+
 interval = [[min(dts), max(dts)]]
 if c["extent"]["temporal"]["interval"] != interval:
     c["extent"]["temporal"]["interval"] = interval
+    changed.append(f"temporal -> {interval}")
+
+# Spatial was never recomputed, so the collection could advertise an extent that
+# excluded its own items — a bbox-filtered search then silently misses them (#22).
+if bboxes:
+    bbox = [min(b[0] for b in bboxes), min(b[1] for b in bboxes),
+            max(b[2] for b in bboxes), max(b[3] for b in bboxes)]
+    if c["extent"]["spatial"]["bbox"] != [bbox]:
+        c["extent"]["spatial"]["bbox"] = [bbox]
+        changed.append(f"spatial -> {bbox}")
+
+if changed:
     pc.write_text(json.dumps(c, indent=2))
-    print("extent ->", interval)
+    for line in changed:
+        print("extent", line)
 else:
     print("extent unchanged")
 PYEOF

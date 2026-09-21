@@ -154,8 +154,10 @@ args |>
 ################################################################################################################
 # flown 20260714 at ~300m (parsnip trib chco) and ~250m (pine oxbow) AGL - higher/faster than previous flights
 
+# the parsnip dir was 1996663_... when this ran; renamed to 199663_... in v1.0.2 (#22)
+# after the id typo was confirmed against bcfishpass
 paths <- c(
-  "/Users/airvine/Projects/gis/uav_imagery/mackenzie/parsnip/2026/1996663_parsnip_trib_chco_11000",
+  "/Users/airvine/Projects/gis/uav_imagery/mackenzie/parsnip/2026/199663_parsnip_trib_chco_11000",
   "/Users/airvine/Projects/gis/uav_imagery/mackenzie/pine/2026/6971_pine_oxbox_hwy97S"
 )
 

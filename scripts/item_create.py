@@ -91,7 +91,10 @@ def build_item(path_item, base, s3_url, collection, registry):
     props = registry_props(row) if row else {}
     stream = props.get("nge:stream_name", parts[3])
     product = PRODUCT_LABEL.get(path_item.stem, path_item.stem)
-    props["title"] = f"{stream} — {parts[2]} {product}"
+    # Repeat flights of one site (e.g. a before/after culvert replacement) share
+    # stream name and year, so the alias is what separates their titles (#22).
+    alias = props.get("nge:alias", "")
+    props["title"] = f"{stream} ({alias}) — {parts[2]} {product}" if alias else f"{stream} — {parts[2]} {product}"
 
     item = rio_stac.stac.create_stac_item(
         str(path_item),
@@ -151,10 +154,15 @@ def main():
                 collection.add_item(item)
                 item.save_object(dest_href=str(t.parent / f"{item.id}.json"))
                 built += 1
+        # A full rebuild is the one place that holds every item, so recompute the
+        # extent here — nothing else did, and a collection can otherwise advertise
+        # an extent that excludes its own items (#22).
+        collection.update_extent_from_items()
         stamp_version(collection, args.version or git_version())
         collection.save_object(dest_href=str(base / "collection.json"))
+        bbox = collection.extent.spatial.bboxes[0]
         print(f"REBUILD: {built} items from {len(tifs)} tifs; collection v{collection.extra_fields['version']}, "
-              f"{len(collection.get_links('item'))} links")
+              f"{len(collection.get_links('item'))} links; bbox {[round(v, 5) for v in bbox]}")
         return
 
     existing = {l.href.rsplit("/", 1)[-1].removesuffix(".json") for l in collection.get_links("item")}

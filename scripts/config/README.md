@@ -52,6 +52,34 @@ The underlying single-purpose tools these orchestrate, for one-off use:
 - `conda run -n dff rio cogeo create <in> <out>` — COG conversion (see `scripts/cog_convert.R` for the batch-log history)
 - Dev tree/bucket retired 2026-07 — prod only
 
+### Repeat flights of one site (before/after a replacement)
+
+A site reflown after a culvert replacement produces two datasets that share a stream name **and** a
+year, so their titles collide — `item_create.py` builds `"<stream_name> — <year> <product>"`. The
+`alias` column is what separates them: set it on **both** rows (e.g. `moose pre-replacement` /
+`moose post-replacement`) and the title becomes `"<stream_name> (<alias>) — <year> <product>"`.
+Aliases are optional; a row without one titles exactly as before.
+
+Give the second flight its own `item` (a `_post_replacement` suffix on the first one's reads well),
+and cross-reference the pair in both rows' `notes` — nothing in the schema links them otherwise.
+
+### Renaming a published dataset
+
+A rename is a retraction + republish, since the item id is built from the directory path. Order
+matters, and two steps are easy to miss:
+
+1. Rename the dataset dir in **all three** trees — raw `uav_imagery/`, COG `imagery_uav_bc/`, prod
+   `stac/prod/imagery_uav_bc/`. `dataset_publish.sh` derives the prod path (and so the item id) from
+   the raw path, so a partial rename silently republishes under the old id.
+2. **Delete the old-id JSONs from the renamed prod dir.** `item_create.py --rebuild` writes
+   `<new-id>.json` beside each tif but never removes JSONs whose id no longer matches, so the stale
+   ones survive the rebuild and get pushed to S3 alongside the new ones.
+3. Update the row's `item` in `data/sites.csv` — the registry key is `(region, watershed, year, item)`.
+4. `item_unregister.sh` the old ids. The final `aws s3 sync --delete` clears the old S3 prefix on its
+   own (prod is authoritative for the bucket), but pgstac is not driven by the sync.
+
+Check for external dependents first, exactly as in the retraction recipe above.
+
 ### Large datasets (>~300 images)
 
 Single-pass ODM memory scales with the whole flight and the meshing stage can run 10+ hours or OOM (observed: 817 images → 20+ h, >70 GB RAM). Use split-merge instead:

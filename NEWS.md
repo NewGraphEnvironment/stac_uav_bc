@@ -1,5 +1,44 @@
 # stac_uav_bc
 
+## v1.0.2 (2026-09-20)
+
+Two new 2026 datasets, plus the catalogue's first before/after pair at one crossing (#22).
+
+- **New:** Pedley Creek (cottonwood 2026, PSCIS 198285) — first dataset in the Cottonwood River
+  watershed group (`COTR`), and the first to extend the collection bbox south
+- **New:** Tributary to Parsnip River post-replacement (parsnip 2026, PSCIS 199663) — reflown
+  2026-09-15 after the culvert replacement; pairs with the 2026-07-14 pre-replacement flight
+- Catalogue at 236 items
+
+**Two consumer-visible changes** — both affect existing saved queries:
+
+- `mackenzie/parsnip/2026/1996663_parsnip_trib_chco_11000` is now
+  `…/199663_parsnip_trib_chco_11000`. The old directory name carried an extra `6`; `199663` is the
+  real `aggregated_crossings_id` and `1996663` does not exist in bcfishpass. **The three old item
+  ids are retired and their URLs no longer resolve** — nothing external referenced them
+  (checked per #18 before retracting).
+- `nge:alias` on that dataset moves from `moose` to `moose pre-replacement`, and the new flight
+  carries `moose post-replacement`. **A saved `rstac`/QGIS filter on `nge:alias == 'moose'` will no
+  longer match.** The alias is now what distinguishes repeat flights of one site.
+
+Also in this release:
+
+- Item titles include the alias when a row has one: `"<stream> (<alias>) — <year> <product>"`.
+  Without it, the two parsnip flights would both read "Tributary to Parsnip River — 2026 orthophoto",
+  since they share a stream name and a year. Rows without an alias title exactly as before.
+- Collection `extent.spatial` is now recomputed on publish and on rebuild. It never was before, and
+  the advertised bbox had drifted badly: **21 items across 7 datasets already fell outside it**,
+  including everything in kootenay (Parker Creek at 49.21°N, Hadow Creek at 50.74°N) and four
+  mackenzie peace/pine datasets north of 55.6°N. A bbox-filtered `rstac` or QGIS search against the
+  collection extent silently missed all of them. The corrected bbox spans
+  `[-127.741, 49.209, -114.529, 56.078]`, up from `[-127.741, 53.830, -121.741, 55.314]`.
+- `catalogue_release.sh` asserts rather than announces: optional `EXPECT_ITEMS=<n>` checks the live
+  count, and every live item is checked for `nge:region` + `nge:stream_name` so a silent registry
+  miss — which titles an item from its directory name — fails the release instead of shipping.
+- Recipes for repeat flights and for renaming a published dataset added to `scripts/config/README.md`.
+  A prefix rename on S3 must be an `aws s3 mv`; left to `sync --delete` it re-uploads the whole
+  dataset (4.34 GB here) with no progress output.
+
 ## v1.0.1 (2026-08-05)
 
 - Retraction flow: `scripts/config/item_unregister.sh` (pgstac delete over SSH, idempotent) and the `published=false` lifecycle documented in the recipe (#18)
