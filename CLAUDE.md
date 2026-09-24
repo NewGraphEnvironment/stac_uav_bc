@@ -1015,6 +1015,43 @@ has exactly one `# ` heading.
 - Same family as "A value validated with one numeric grammar and consumed with another"
   above: normalise once rather than adding a predicate.
 
+### A failed `git fetch` leaves the comparison you make next reading stale refs
+
+`git fetch` and the check that follows it are two commands, and nothing links them.
+When the fetch fails — a dead `ssh-agent`, an expired token, no network — it prints to
+stderr and `refs/remotes/origin/*` keeps whatever it held last. The comparison then
+succeeds against a stale ref and reports **level with origin**:
+
+```bash
+git fetch -q origin                                   # Permission denied (publickey) -> stderr
+git log --oneline origin/main..HEAD                   # empty: "nothing unpushed"
+[ "$(git rev-list --count HEAD..@{u})" -eq 0 ] && …   # passes: "not behind"
+```
+
+Both readings are the *reassuring* answer, and `-q` silences only stdout, so the failure
+scrolls past above output that looks clean. Worse on a first-run clone, where the refs do
+not exist and `origin/main..HEAD` exits 128 with empty output — indistinguishable from
+"nothing to push" to anything reading the text rather than the status.
+
+**Test the fetch, and let the failure land in its own state.** Never let it fall into the
+pass:
+
+```bash
+if git fetch -q origin; then SYNC=ok; else SYNC=unknown; echo "fetch failed — sync state UNKNOWN, not clean" >&2; fi
+```
+
+Where the answer matters and the fetch is broken, ask GitHub instead of the local refs —
+`gh` uses a token and survives an SSH outage that kills `git`:
+
+```bash
+gh api "repos/$OWNER/$REPO/commits/main" -q .sha      # compare against git rev-parse HEAD
+```
+
+The same outage is the remedy for itself, since `https://` with the `osxkeychain` helper
+keeps working when `git@github.com` does not: `git pull --ff-only https://github.com/O/R.git main`.
+
+*11 lines of evidence for this rule are in `conventions/code-check-shell.md`, which `/code-check` reads in full.*
+
 
 # Code Check Conventions
 
@@ -1251,7 +1288,7 @@ reports itself. The tell that the predicate is narrower than the property: a mem
 the population the check already handles that the sweep cannot see — that member is the
 control, and it costs one query to look for.
 
-*17 recorded instances of this are in `conventions/code-check.md`, which `/code-check` reads in full.*
+*18 recorded instances of this are in `conventions/code-check.md`, which `/code-check` reads in full.*
 
 ### Verification that reads its own output
 
@@ -2886,7 +2923,7 @@ Sibling of *"An inventory is only complete relative to a boundary"* in `code-che
 step earlier: that one is about a search that was complete for the wrong scope, this is
 about never having searched the scope where the answer lived.
 
-*18 lines of evidence for this rule are in `conventions/karpathy.md`, which `/code-check` reads in full.*
+*25 lines of evidence for this rule are in `conventions/karpathy.md`, which `/code-check` reads in full.*
 
 #### The storage version: one store is not the world
 
