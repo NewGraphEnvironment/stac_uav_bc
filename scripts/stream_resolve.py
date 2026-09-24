@@ -38,9 +38,16 @@ def _dms(val, ref):
 
 
 def image_points(proj):
-    """(lon, lat, capture-time) for every image in proj/images that carries GPS."""
+    """(lon, lat, capture-time) for every image in proj/images that carries GPS.
+
+    Matches the extension case-insensitively: a flight typically holds .JPG but
+    a handful arrive .jpg, and a case-sensitive glob drops them silently — which
+    reads as a smaller flight rather than as a bug.
+    """
+    imgs = sorted(p for p in pathlib.Path(proj, "images").iterdir()
+                  if p.suffix.lower() in (".jpg", ".jpeg"))
     pts = []
-    for p in sorted(pathlib.Path(proj, "images").glob("*.JPG")):
+    for p in imgs:
         with Image.open(p) as im:
             ex = im.getexif()
             gps = ex.get_ifd(EXIF_TAG["GPSInfo"])
