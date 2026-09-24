@@ -48,7 +48,21 @@ for proj in "$@"; do
       mkdir -p "$(dirname "$out")"
       conda run -n dff rio cogeo create "$proj/$t" "$out"
     fi
-    conda run -n dff rio cogeo validate "$out" | tail -1
+    # This gate was `conda run … validate "$out" | tail -1` and was inert two ways
+    # over (#27). `conda run` captures its child's output and does not pass it
+    # through a pipe, so nothing was ever printed; and `rio cogeo validate` exits
+    # 0 whether the file is valid or not, so testing the status would not have
+    # worked either. Every publish ran an unvalidated COG step that looked gated.
+    #
+    # --no-capture-output restores the text, and the verdict IS the text, so match
+    # it — on the positive marker, since an unreadable file or a changed message
+    # must not read as a pass.
+    valid=$(conda run --no-capture-output -n dff rio cogeo validate "$out" 2>&1)
+    case "$valid" in
+      *"is a valid cloud optimized GeoTIFF"*) echo "    COG valid: $t" ;;
+      *) printf '%s\n' "$valid" >&2
+         echo "ERROR: $out is not a valid COG — not publishing" >&2; exit 1 ;;
+    esac
     mkdir -p "$PROD/$rel/$(dirname "$t")"
     cp -np "$out" "$PROD/$rel/$t"
     new_tifs+=("$rel/$t")
