@@ -37,6 +37,41 @@ for proj in "$@"; do
     continue
   fi
 
+  # ODM finds any video in images/ and extracts frames from it, then processes
+  # those frames as survey stills. They come off the drone at 1920x1080 beside
+  # 8064x6048 stills, and ODM computes GSD across every camera then clamps ortho
+  # AND dem resolution so neither is finer than that GSD — so one clip coarsens
+  # all three products. Measured on wedzin_gosnell_confluence (#27): 4 frames
+  # from a single .MP4 put ortho, DTM and DSM at 6.57 cm/px instead of 5.00.
+  # Nothing reports it — every frame reconstructs, the stats look clean, and the
+  # ortho is simply lower resolution than it should be.
+  #
+  # Move the clip aside rather than deleting it; the flight still owns it.
+  vids=$(find "$proj/images" -maxdepth 1 -type f \
+           \( -iname '*.mp4' -o -iname '*.mov' -o -iname '*.avi' -o -iname '*.mkv' \))
+  if [ -n "$vids" ]; then
+    mkdir -p "$proj/video"
+    printf '%s\n' "$vids" | while IFS= read -r v; do
+      mv -n "$v" "$proj/video/" && echo "    video moved out of images/: $(basename "$v")"
+    done
+    # .SRT telemetry and .LRF proxies belong with the clip, not the survey set
+    find "$proj/images" -maxdepth 1 -type f \( -iname '*.srt' -o -iname '*.lrf' \) \
+      -exec mv -n {} "$proj/video/" \;
+  fi
+
+  # frames.json is ODM's own manifest of what it extracted on a previous run;
+  # with the video gone those frames must go too or they are ingested again.
+  if [ -f "$proj/images/frames.json" ]; then
+    python3 -c '
+import json, pathlib, sys
+d = pathlib.Path(sys.argv[1])
+manifest = d / "frames.json"
+for name in json.loads(manifest.read_text()):
+    (d / name).unlink(missing_ok=True)
+manifest.unlink()
+' "$proj/images" && echo "    removed frames ODM had extracted from video"
+  fi
+
   # partial state from an interrupted run confuses ODM — start clean
   rm -rf "$proj"/opensfm "$proj"/odm_* "$proj"/benchmark.txt \
          "$proj"/images.json "$proj"/img_list.txt "$proj"/cameras.json
