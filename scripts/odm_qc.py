@@ -27,6 +27,8 @@ import json
 import pathlib
 import sys
 
+from PIL import Image
+
 # The recipe's stated tolerance, not a value derived from the data: it is the
 # contract this repo chose. For reference the observed max across those 76
 # datasets is 1.72 px, so this ceiling sits just above the population.
@@ -35,6 +37,27 @@ MAX_REPROJECTION_PX = 2.0
 # Calibrated on that population: 10% is well clear of p90 (4.2%) and flags the
 # three genuine outliers (24.8%, 17.6%, 11.9%) without firing on normal runs.
 NOTE_DROPPED_PCT = 10.0
+
+
+def image_resolutions(proj):
+    """{(w, h): count} over proj/images, or None when there is nothing to read.
+
+    Reads only the header of each file, so this is cheap even on a 300-image
+    flight.
+    """
+    d = pathlib.Path(proj, "images")
+    if not d.is_dir():
+        return None
+    sizes = {}
+    for p in d.iterdir():
+        if p.suffix.lower() not in (".jpg", ".jpeg"):
+            continue
+        try:
+            with Image.open(p) as im:
+                sizes[im.size] = sizes.get(im.size, 0) + 1
+        except Exception:
+            continue
+    return sizes or None
 
 
 def check(proj):
@@ -61,6 +84,29 @@ def check(proj):
     }
 
     fails, notes = [], []
+
+    # Mixed input resolutions coarsen every output and say so nowhere. ODM clamps
+    # ortho and DEM resolution so neither is finer than the computed GSD, and it
+    # computes that GSD across all cameras — so a handful of video frame grabs
+    # dropped in beside the survey stills drag it up and coarsen the ortho, DTM
+    # and DSM together. Invisible in stats.json (every image reconstructs, the
+    # reprojection error is fine) and invisible in the ortho, which just renders
+    # at a lower resolution. Caught on wedzin_gosnell_confluence, where 4 frames
+    # pulled from a .MP4 put all three products at 6.57 cm/px instead of 5 (#27).
+    sizes = image_resolutions(proj)
+    if sizes is None:
+        notes.append("no images/ to check — input resolution not verified")
+    elif len(sizes) > 1:
+        shape = ", ".join(f"{w}x{h} ({n})" for (w, h), n in
+                          sorted(sizes.items(), key=lambda kv: -kv[1]))
+        odd = min(sizes.items(), key=lambda kv: kv[1])
+        fails.append(f"mixed input resolutions: {shape} — the {odd[0][0]}x{odd[0][1]} "
+                     f"images coarsen the GSD and every output with it; move them out "
+                     f"of images/ and re-run")
+    else:
+        (w, h), n = next(iter(sizes.items()))
+        m["images"] = f"{n} @ {w}x{h}"
+
     if comp is None:
         fails.append("component count absent from stats.json")
     elif comp != 1:
@@ -94,7 +140,8 @@ def main(projs):
         gsd = f"{m['gsd_cm']:.1f}" if isinstance(m.get("gsd_cm"), float) else "?"
         print(f"{'FAIL' if fails else 'PASS'}  {name}")
         if m:
-            print(f"        shots {m['shots']}  dropped {m.get('dropped', '?')}  "
+            print(f"        images {m.get('images', '?')}  shots {m['shots']}  "
+                  f"dropped {m.get('dropped', '?')}  "
                   f"components {m['components']}  reproj {px} px  gsd {gsd} cm  "
                   f"runtime {m['runtime']}")
         for f in fails:
