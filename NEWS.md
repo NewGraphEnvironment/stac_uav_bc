@@ -1,5 +1,52 @@
 # stac_uav_bc
 
+## v1.0.3 (2026-09-24)
+
+Three new 2026 Wedzin Kwa (Morice River) reach surveys, and a stream-name correction across all
+seven of them (#27).
+
+- **New:** Pimpernel (morice 2026) — flown 2026-09-22
+- **New:** Gosnell confluence (morice 2026) — flown 2026-09-23; the Morice/Thautil/Gosnell
+  confluence, and the first dataset to carry all three `nge:stream_name` slots
+- **New:** Morice km 61 (morice 2026) — flown 2026-09-23
+- Catalogue at 245 items
+
+**One consumer-visible change:**
+
+- All seven `skeena/morice/2026/wedzin_*` datasets now carry `nge:stream_name = "Morice River"`.
+  The four flown in July were registered as `"Tributary to Morice River"` from a `guess_nearest_*`
+  lookup; they are mainstem reach surveys, and the Morice River is the only named FWA stream inside
+  any of their footprints. **A saved `rstac`/QGIS filter on
+  `nge:stream_name == 'Tributary to Morice River'` no longer matches them.** Item ids are built from
+  directory paths, so no URLs changed and nothing was retracted — only the title and the property.
+
+**Processing fixes — both affect what lands in the catalogue:**
+
+- **ODM was ingesting video frames as survey imagery.** It scans `images/` for video and extracts
+  frames from anything it finds; those arrive at 1920x1080 beside 8064x6048 stills. ODM computes GSD
+  across every camera and clamps ortho *and* DEM resolution so neither is finer than that GSD, so a
+  single clip coarsens all three products. On `wedzin_gosnell_confluence`, 4 frames from one `.MP4`
+  put the ortho, DTM and DSM at 6.57 cm/px instead of 5.72. Nothing reported it — every frame
+  reconstructed, one component, 1.34 px, and the ortho simply rendered at lower resolution.
+  `odm_process-batch.sh` now moves video to `<project>/video/` before stitching. Only that one
+  dataset was affected, and it was re-stitched before publication.
+- **The COG validation gate could not fail.** `dataset_publish.sh` piped `rio cogeo validate`
+  through `conda run`, which captures its child's output rather than passing it through a pipe — so
+  nothing was ever printed. And `rio cogeo validate` exits 0 even when it reports *NOT* a valid COG,
+  so checking the status would not have helped either. It now matches the verdict text and refuses
+  to publish on anything else. All nine COGs in this release were verified against the fixed
+  predicate. `item_validate.py` had the same class latent and now refuses an empty result instead of
+  reporting `valid: 0` and exiting 0.
+
+**New tooling:**
+
+- `scripts/stream_resolve.py` — reads a flight's image EXIF GPS and asks the public fwapg REST API
+  which named FWA streams sit in its footprint. No SSH tunnel and no local Postgres, so it runs
+  while ODM has the machine. It resolved all seven rows above.
+- `scripts/odm_qc.py` — the recipe's QC step as a gate: fails on a split reconstruction, an
+  unfinished run, mixed input resolutions, or reprojection error past 2 px, and notes a dropped-shot
+  rate high against the catalogue. Thresholds calibrated on the 76 datasets carrying a `stats.json`.
+
 ## v1.0.2 (2026-09-20)
 
 Two new 2026 datasets, plus the catalogue's first before/after pair at one crossing (#22).
