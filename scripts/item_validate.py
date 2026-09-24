@@ -32,6 +32,13 @@ def main():
             failed.append((path.relative_to(base), str(e).splitlines()[0][:100]))
 
     print(f"valid: {ok}")
+    # Validating nothing is not passing. A wrong --base, or a tree that never got
+    # written, otherwise reports "valid: 0" and exits 0 — a release gate that
+    # cannot fail because it found nothing to check (#27).
+    if not ok:
+        print(f"FAILED: no items or collection found under {base} — "
+              "wrong --base, or the prod tree is empty", file=sys.stderr)
+        sys.exit(1)
     if failed:
         print(f"FAILED: {len(failed)}", file=sys.stderr)
         for rel, err in failed:
