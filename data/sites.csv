@@ -74,10 +74,13 @@ skeena,morice,MORR,2023,198936_morice_trib,198936,Tributary to Morice River,,,,,
 skeena,morice,MORR,2023,198940_knapper_trib,198940,Tributary to Knapper Creek,,,,,true,pscis,
 skeena,morice,MORR,2023,198942_houston_tommy_trib,198942,Tributary to Houston Tommy Creek,,,,,true,pscis,
 skeena,morice,MORR,2025,197962_peacock_morice,197962,Peacock Creek,,,,,true,bcfishpass_gnis,dir name suggests Morice River confluence - add stream_name_02 if in frame
-skeena,morice,MORR,2026,wedzin_braid_001,,Tributary to Morice River,,,,,true,guess_nearest_216m,
-skeena,morice,MORR,2026,wedzin_canyon_km25,,Tributary to Morice River,,,,,true,guess_nearest_224m,
-skeena,morice,MORR,2026,wedzin_cedric,,Tributary to Morice River,,,,,true,guess_nearest_201m,
-skeena,morice,MORR,2026,wedzin_lwd001,,Tributary to Morice River,,,,,true,guess_nearest_106m,
+skeena,morice,MORR,2026,wedzin_braid_001,,Morice River,,,,,true,fwa_bbox,mainstem Wedzin Kwa reach survey; stream_name corrected in v1.0.3 - see NEWS
+skeena,morice,MORR,2026,wedzin_canyon_km25,,Morice River,,,,,true,fwa_bbox,mainstem Wedzin Kwa reach survey; stream_name corrected in v1.0.3 - see NEWS
+skeena,morice,MORR,2026,wedzin_cedric,,Morice River,,,,,true,fwa_bbox,mainstem Wedzin Kwa reach survey; stream_name corrected in v1.0.3 - see NEWS
+skeena,morice,MORR,2026,wedzin_gosnell_confluence,,Morice River,Thautil River,Gosnell Creek,,,true,fwa_bbox,flown 2026-09-23; Morice/Thautil/Gosnell confluence - all three named streams confirmed in the flight footprint
+skeena,morice,MORR,2026,wedzin_lwd001,,Morice River,,,,,true,fwa_bbox,mainstem Wedzin Kwa reach survey; stream_name corrected in v1.0.3 - see NEWS
+skeena,morice,MORR,2026,wedzin_morice_km61,,Morice River,,,,,true,fwa_bbox,flown 2026-09-23; mainstem Wedzin Kwa reach survey at Morice River km 61
+skeena,morice,MORR,2026,wedzin_pimpernel,,Morice River,,,,,true,fwa_bbox,flown 2026-09-22; mainstem Wedzin Kwa reach survey
 skeena,zymoetz,ZYMO,2023,8478_mcdonell_trib,8478,Copper,,,,,true,pscis,
 skeena,zymoetz,ZYMO,2023,8525_coal_trib,8525,Copper,,,,,true,pscis,
 skeena,zymoetz,ZYMO,2024,8530_sandstone_mcdonell,8530,Sandstone Creek,,,,,true,bcfishpass_gnis,
