@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+authors:
+  - family-names: Irvine
+    given-names: Allan
+    email: al@newgraphenvironment.com
+    orcid: "https://orcid.org/0000-0002-3495-2128"
+title: "stac_uav_bc: STAC catalog of UAV imagery collected in British Columbia"
+abstract: "STAC catalog serving UAV imagery collected in British Columbia, organized by region, watershed group and year. Queryable via rstac, QGIS 3.42+, or any STAC client."
+version: "1.0.3"
+date-released: "2026-09-24"
+url: "https://www.newgraphenvironment.com/stac_uav_bc"
+repository-code: "https://github.com/NewGraphEnvironment/stac_uav_bc"
+license: MIT
+keywords:
+  - STAC
+  - UAV
+  - imagery
+  - British Columbia
