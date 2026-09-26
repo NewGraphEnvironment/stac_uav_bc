@@ -47,6 +47,14 @@ An interrupted ODM run resumes by re-running the identical `docker run` command 
 
 **How to apply:** Before restarting anything ODM-related, check `docker ps` and the project dir's stage outputs; resume in place with the same args.
 
+### ODM ingests video from `images/` — it extracts frames and treats them as survey stills
+
+ODM scans `images/` for video and extracts frames from anything it finds. They arrive at 1920x1080 beside 8064x6048 stills, and ODM computes GSD across every camera then clamps ortho **and** dem resolution so neither is finer than that GSD — so one clip coarsens the orthophoto, DTM and DSM together.
+
+**Why:** Nothing reports it. Every frame reconstructs, the component count is 1, the reprojection error is normal, and the ortho renders correctly at the lower resolution — it is only out of line with its siblings. Four frames from one `.MP4` put `wedzin_gosnell_confluence` at 6.57 cm/px where 5.72 was available (#27).
+
+**How to apply:** `odm_process-batch.sh` now relocates video to `<project>/video/` before stitching, so the batch path is covered. A **hand-run `docker run`** — which the resume rule above tells you to use — is not: check `images/` holds one image resolution first. `scripts/odm_qc.py` fails on mixed resolutions after the fact. Moving the extracted `.jpg` frames out does not work; ODM regenerates them from the video still sitting there.
+
 ### Shell scripts are the operational pipeline; R wrappers are for interactive use
 
 The `scripts/*.sh` + `*.py` files are the canonical pipeline. R package wrappers around the same commands serve interactive sessions — don't round-trip shell→R just to assemble an argument string.
