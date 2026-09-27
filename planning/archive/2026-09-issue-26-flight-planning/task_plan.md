@@ -61,6 +61,6 @@ Immediate driver: three batteries from a launch point at the **Peacock Creek con
 - [x] Splitting: catches all three over-budget fixtures, leaves the in-budget one alone
 - [x] End-to-end: generated waypoints for the `lwd001` block fall within the actual image GPS spread
       of `wedzin_lwd001`
-- [ ] `/code-check` clean on each commit
-- [ ] PWF checkboxes match landed work
+- [x] `/code-check` clean on each commit
+- [x] PWF checkboxes match landed work
 - [ ] `/planning-archive` on completion
