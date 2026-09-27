@@ -35,8 +35,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
 import geopandas as gpd
 from shapely import affinity
-from shapely.geometry import LineString, Point, box
-from shapely.ops import unary_union
+from shapely.geometry import Point, box
 
 import flight_budget as budget
 import flight_coverage as cov
@@ -62,6 +61,30 @@ FIXTURE_PATHS_M = {
 }
 FIXTURE_FITS = {"myKMZ-3", "20220722_morr_braid04-2"}
 FIXTURE_HEIGHT_M = 300.0
+
+
+def _flatten(geom):
+    """Every leaf geometry inside `geom`, whatever containers it arrived in."""
+    if geom.is_empty:
+        return []
+    if hasattr(geom, "geoms"):
+        out = []
+        for g in geom.geoms:
+            out.extend(_flatten(g))
+        return out
+    return [geom]
+
+
+def _polygons(geom):
+    """Every Polygon inside `geom`, whatever container it arrived in.
+
+    A GeometryCollection is a real result of intersecting a floodplain with a
+    radius disc when a component is tangent to the circle, and it is the shape
+    that defeated the first accounting invariant.
+    """
+    if geom.is_empty:
+        return []
+    return [g for g in _flatten(geom) if g.geom_type == "Polygon"]
 
 
 def _max_transit_m(height_m, min_block_ha=None):
@@ -144,26 +167,26 @@ def _equal_area_strips(poly, n):
     return out
 
 
-def split_to_budget(polygon, height_m, launch_pt, min_block_ha=MIN_BLOCK_HA):
-    """(blocks, accounting) — every input component lands in exactly one bucket.
+def split_to_budget(polygon, height_m, launch_pt, min_block_ha=MIN_BLOCK_HA,
+                    max_depth=8, commanded_ms=10.0):
+    """(blocks, accounting) — every hectare of input lands in exactly one bucket.
 
-    Round 1 and round 2 of review both found the same mechanism here: a degenerate
-    result carried through the arithmetic as an ordinary small number rather than
-    branched on as a third state. `path_m == 0` read as "fits"; `budget_path <= 0`
-    read as "nothing here"; and after that was guarded, a `budget_path` small but
-    POSITIVE lost a whole component into no counter at all. Patching each site
-    moved the defect one axis over every time.
+    Three rounds of review found one mechanism here: a degenerate or awkward result
+    carried through the arithmetic instead of being disposed of as its own state.
+    First `path_m == 0` read as "fits"; then a small-but-positive `budget_path` lost
+    a component into no counter; then an all-or-nothing fit test over a whole
+    component sent 173 flyable hectares to `unsplittable` because one far strip did
+    not fit.
 
-    So the disposition is explicit and total. Each component is classified once,
-    the areas are accumulated per bucket, and `accounting["area_in_ha"]` must equal
-    the sum of the buckets — asserted below. A component cannot go missing without
-    the arithmetic saying so.
+    So disposition is per PIECE and recursive, not per component and all-or-nothing.
+    A piece that fits is planned and is not cut further, which is what keeps blocks
+    full; a piece that does not is halved and its halves disposed of independently.
+    Every piece ends in exactly one bucket, and `area_in_ha` must equal their sum.
     """
     def transit(poly):
         return launch_pt.distance(poly) if launch_pt is not None else 0.0
 
     def survey(poly):
-        """(path_m, n_stations). n_stations == 0 means UNFLYABLE, not free."""
         if poly.is_empty or poly.area <= 0:
             return 0.0, 0
         stations, _, meta = cov.plan_transects(poly, height_m)
@@ -171,63 +194,66 @@ def split_to_budget(polygon, height_m, launch_pt, min_block_ha=MIN_BLOCK_HA):
 
     def flyable_and_fits(poly):
         path, n = survey(poly)
-        return n > 0 and budget.fits(path, height_m, transit_m=transit(poly))[0]
+        return n > 0 and budget.fits(
+            path, height_m, transit_m=transit(poly),
+            speed_ms=budget.effective_speed_for(commanded_ms))[0]
 
-    parts = list(polygon.geoms) if polygon.geom_type.startswith("Multi") else [polygon]
-    parts = [p for p in parts if p.geom_type == "Polygon" and not p.is_empty]
+    # area_in is the WHOLE input, before any filtering. Computing it from the
+    # filtered parts made the invariant balance against an already-reduced total,
+    # so a GeometryCollection could lose its polygon and still report 0.00.
+    area_in = polygon.area / 1e4
+    buckets = {k: [] for k in ("planned", "sliver", "unreachable",
+                               "unsplittable", "nonpolygon")}
 
-    buckets = {k: [] for k in ("planned", "sliver", "unreachable", "unsplittable")}
-    area_in = sum(p.area for p in parts) / 1e4
+    # Non-polygonal input, bucketed by area so the invariant sees it. Lines and
+    # points have zero area and contribute nothing, which is correct.
+    for g in _flatten(polygon):
+        if g.geom_type != "Polygon":
+            buckets["nonpolygon"].append(g)
 
-    for comp in parts:
-        if comp.area / 1e4 < min_block_ha:
-            # Raster-derived delineations carry a tail of sub-hectare fragments --
-            # Peacock Creek ff04 is 187.3 ha in 25 parts, 23 of them 0.09 ha.
-            buckets["sliver"].append(comp)
-            continue
+    def dispose(poly, depth):
+        if poly.is_empty or poly.area / 1e4 < min_block_ha:
+            if not poly.is_empty:
+                buckets["sliver"].append(poly)
+            return
+        if flyable_and_fits(poly):
+            buckets["planned"].append(poly)
+            return
+        if depth >= max_depth:
+            # Bounded: an unbounded search over O(n) geometry ops per level took a
+            # 100 ha component past five minutes without finishing.
+            buckets["unsplittable"].append(poly)
+            return
+        halves = [h for h in _equal_area_strips(poly, 2) if not h.is_empty]
+        if len(halves) < 2:
+            buckets["unsplittable"].append(poly)
+            return
+        for h in halves:
+            for g in _polygons(h):
+                dispose(g, depth + 1)
 
-        budget_path = budget.max_path_m(height_m, transit_m=transit(comp))
-        # An n beyond this leaves every strip under min_block_ha, so the search
-        # cannot succeed there. Bounding it is not an optimisation: unbounded, a
-        # 100 ha component at 4180 m transit drove `lower` to 128 and the loop to
-        # 256, ~32k plan_transects calls, and did not finish in five minutes. A
-        # planner that hangs looks like a slow query, not a bad input.
-        n_max = int(comp.area / 1e4 / min_block_ha)
-        chosen = None
-        if budget_path > 0 and n_max >= 1:
-            for n in range(1, n_max + 1):
-                strips = [x for x in _equal_area_strips(comp, n)
-                          if x.area / 1e4 >= min_block_ha]
-                # Every strip must survive the min-area filter, or this n is
-                # quietly discarding area -- which is exactly how the previous
-                # version lost 10 ha with no counter.
-                if len(strips) == n and all(flyable_and_fits(x) for x in strips):
-                    chosen = strips
-                    break
-
-        if chosen is None:
-            # No split works: either the transit exhausts the battery, or the
-            # component cannot be cut into pieces that are both flyable and big
-            # enough. Both are recorded; neither is silently dropped.
-            if budget_path <= 0 or not flyable_and_fits(comp):
-                buckets["unreachable" if budget_path <= 0 else "unsplittable"].append(comp)
-            else:
-                buckets["planned"].append(comp)
-            continue
-        # A strip is kept whole even when the cut leaves it multipart: one mission
-        # can cover disjoint pieces, and the transect generator handles it.
-        buckets["planned"].extend(chosen)
+    # Clip to what the battery can reach BEFORE disposing. transit() measures to a
+    # piece's nearest point, so a component straddling the reach boundary would
+    # otherwise never be cut successfully and would land entirely in unsplittable,
+    # with unreachable reading 0.0 -- four lines under the note promising
+    # out-of-reach area would be reported there.
+    disc = launch_pt.buffer(_max_transit_m(height_m, min_block_ha)) if launch_pt else None
+    for comp in _polygons(polygon):
+        if disc is not None:
+            outside = comp.difference(disc)
+            if not outside.is_empty:
+                buckets["unreachable"].extend(_polygons(outside))
+            inside = _polygons(comp.intersection(disc))
+            for g in inside:
+                dispose(g, 0)
+        else:
+            dispose(comp, 0)
 
     blocks = sorted(buckets["planned"], key=transit)
-
     acc = {"area_in_ha": area_in}
     for k, v in buckets.items():
         acc[k] = len(v)
         acc[f"{k}_ha"] = sum(g.area for g in v) / 1e4
-    # The invariant that makes this terminal: nothing may vanish between the input
-    # and the buckets. Cutting loses a little area to the min-area filter inside a
-    # chosen split, so allow a small tolerance and report the residue rather than
-    # hiding it.
     acc["unaccounted_ha"] = area_in - sum(acc[f"{k}_ha"] for k in buckets)
     return blocks, acc
 
@@ -312,6 +338,21 @@ def main():
     if not (args.stream and args.launch and args.out):
         ap.error("need --stream, --launch and --out (or --validate-fixtures)")
 
+    # Validate before anything is computed. Unvalidated, --speed nan wrote
+    # "<wpml:waypointSpeed>nan</wpml:waypointSpeed>" into a mission and reported
+    # PLAN COMPLETE at exit 0; --height 0 was a ZeroDivisionError traceback and
+    # --height -350 reported a LARGER battery reach than the real one.
+    def _finite_positive(name, v):
+        if not (v > 0) or v != v or v == float("inf"):
+            ap.error(f"{name} must be positive and finite, got {v}")
+    _finite_positive("--height", args.height)
+    _finite_positive("--speed", args.speed)
+    _finite_positive("--radius", args.radius)
+    if args.batteries < 1:
+        ap.error(f"--batteries must be at least 1, got {args.batteries}")
+    if not (-180.0 <= args.launch[0] <= 180.0 and -90.0 <= args.launch[1] <= 90.0):
+        ap.error(f"--launch is not a lon/lat pair: {args.launch}")
+
     launch_wgs = Point(args.launch[0], args.launch[1])
     launch = gpd.GeoSeries([launch_wgs], crs=CRS_WGS84).to_crs(CRS_METRIC).iloc[0]
 
@@ -335,7 +376,8 @@ def main():
     print(f"=== {args.height:.0f} m AGL: gsd {cov.gsd(args.height)*100:.2f} cm/px, "
           f"transect {t_sp:.1f} m, photo {p_sp:.1f} m")
 
-    blocks, split_meta = split_to_budget(working, args.height, launch)
+    blocks, split_meta = split_to_budget(working, args.height, launch,
+                                        commanded_ms=args.speed)
     print(f"=== split into {len(blocks)} block(s) that each fit one battery")
     # Full accounting, always printed: every hectare of input lands in one bucket
     # and the buckets are shown whether or not they are zero, so area cannot go
@@ -346,9 +388,17 @@ def main():
           f"+ slivers {split_meta['sliver_ha']:.2f} ({split_meta['sliver']}) "
           f"+ unreachable {split_meta['unreachable_ha']:.1f} ({split_meta['unreachable']}) "
           f"+ unsplittable {split_meta['unsplittable_ha']:.1f} ({split_meta['unsplittable']}) "
+          f"+ non-polygon {split_meta['nonpolygon_ha']:.2f} ({split_meta['nonpolygon']}) "
           f"+ unaccounted {split_meta['unaccounted_ha']:.2f}")
 
     out = pathlib.Path(args.out)
+    # Clear this plan's own previous output. The header claims idempotency, and
+    # --out is the directory that gets loaded into the controller: a 2-battery
+    # re-run that left the 3-battery run's _03.kmz behind would be flown.
+    stem = args.stream.lower().replace(" ", "_")
+    if out.is_dir():
+        for stale in sorted(out.glob(f"{stem}_[0-9][0-9].kmz")):
+            stale.unlink()
     written, total_ha, bad_written = [], 0.0, 0
     layers = {"blocks": ([], []), "transects": ([], []), "stations": ([], [])}
     # Iterate until `--batteries` missions are WRITTEN. Slicing the block list
@@ -367,7 +417,8 @@ def main():
             print(f"  SKIP {name}: no stations (block too small for one transect)")
             continue
         transit_m = launch.distance(b)
-        ok, est, usable = budget.fits(meta["path_m"], args.height, transit_m=transit_m)
+        ok, est, usable = budget.fits(meta["path_m"], args.height, transit_m=transit_m,
+                                      speed_ms=budget.effective_speed_for(args.speed))
         path = write_kmz(mission, out / f"{name}.kmz")
         written.append(path)
         total_ha += meta["area_ha"]

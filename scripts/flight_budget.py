@@ -57,6 +57,11 @@ CALIBRATION_SET = IMAGERY_ROOT / "skeena/morice/2026"
 # not symmetric: sizing a block too small costs a second battery, sizing it too
 # large truncates the flight and leaves a hole in the survey. wedzin_lwd001 is the
 # recorded instance -- its mission planned 165 photo stations and 97 were taken.
+# The speed the seven calibration flights were COMMANDED at. The effective speeds
+# above are what that produced on the ground, so they are not speed-independent --
+# a mission commanded at a different speed has to scale off this.
+CALIBRATED_COMMANDED_MS = 10.0
+
 EFFECTIVE_SPEED_MS = 6.21      # slowest of the seven; the conservative choice
 EFFECTIVE_SPEED_MEDIAN_MS = 7.50
 EFFECTIVE_SPEED_RANGE_MS = (6.21, 10.52)
@@ -71,6 +76,9 @@ OBSERVED_MAX_PHOTO_TIME_S = 1308.0
 # How many flights the constants above were fitted to. Asserted, so a dataset
 # appearing or disappearing is a loud failure rather than a quietly narrower fit.
 CALIBRATION_N_FLIGHTS = 7
+
+# Every calibration mission specifies executeHeight 300.0.
+CALIBRATION_HEIGHT_M = 300.0
 
 # Climb and descent to survey height. NOT measured -- EXIF starts at the first
 # photo, by which time the aircraft is already up. #26 flags this as the open
@@ -97,6 +105,20 @@ DESCENT_RATE_MS = 5.0
 # battery is a parameter rather than an edit.
 AIRBORNE_BUDGET_S = 1800.0   # 30 min
 RESERVE_S = 300.0            # 5 min
+
+
+def effective_speed_for(commanded_ms):
+    """Effective speed to budget with, for a mission commanded at `commanded_ms`.
+
+    Scaled linearly off the calibration, which is an ASSUMPTION and the weakest
+    link in this model: the aircraft stops at every photo station, so some of the
+    loss is per-station and does not scale with cruise speed at all. Linear is the
+    conservative direction for a slower command and optimistic for a faster one --
+    prefer re-calibrating over trusting this far from 10 m/s.
+    """
+    if not (commanded_ms > 0) or commanded_ms != commanded_ms:
+        raise ValueError(f"commanded speed must be positive and finite, got {commanded_ms}")
+    return EFFECTIVE_SPEED_MS * (commanded_ms / CALIBRATED_COMMANDED_MS)
 
 
 def climb_descent_s(height_m):
@@ -224,7 +246,10 @@ def _selftest():
     # two different constants and fail on the fast flights for the wrong reason.
     usable = AIRBORNE_BUDGET_S - RESERVE_S
     for r in rows:
-        airborne = r["elapsed_s"] + climb_descent_s(300.0)
+        # 300 m is the height every calibration flight was PLANNED at (all five
+        # mission files say executeHeight 300.0); it is named rather than inlined
+        # so a future set flown at another height does not silently reuse it.
+        airborne = r["elapsed_s"] + climb_descent_s(CALIBRATION_HEIGHT_M)
         if airborne > usable:
             fails.append(f"{r['dataset']}: was airborne at least {airborne:.0f} s "
                          f"({r['elapsed_s']:.0f} s of photos + climb/descent) but the "

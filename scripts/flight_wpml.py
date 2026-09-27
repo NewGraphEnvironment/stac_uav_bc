@@ -273,7 +273,7 @@ def _roundtrip(paths):
             with zipfile.ZipFile(p) as z:
                 original = z.read("wpmz/waylines.wpml").decode("utf-8")
                 original_tpl = z.read("wpmz/template.kml").decode("utf-8")
-        except (zipfile.BadZipFile, KeyError) as e:
+        except (zipfile.BadZipFile, KeyError, FileNotFoundError, IsADirectoryError) as e:
             print(f"FAIL  {p.name}: not a WPML kmz ({e})")
             failed += 1
             continue

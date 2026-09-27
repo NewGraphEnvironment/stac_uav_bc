@@ -71,7 +71,22 @@ def footprint(height_m):
 
 def spacing(height_m, side_overlap=DEFAULT_SIDE_OVERLAP,
             forward_overlap=DEFAULT_FORWARD_OVERLAP):
-    """(transect_spacing_m, photo_spacing_m) for the given height and overlaps."""
+    """(transect_spacing_m, photo_spacing_m) for the given height and overlaps.
+
+    Both outputs are guarded HERE, where they are produced. Guarding only the
+    transect spacing at its consumer left the photo spacing -- the other output of
+    this same call, reached through the same parameter -- to divide by zero in
+    stations_along(). An overlap above 1.0 is worse than an error: it gives a
+    NEGATIVE spacing, which silently under-samples (forward_overlap=1.5 produced
+    30 stations where 150 were needed) and hands the budget a short path it
+    approves.
+    """
+    for name, v in (("side_overlap", side_overlap), ("forward_overlap", forward_overlap)):
+        if not (0.0 <= v < 1.0):
+            raise ValueError(f"{name} must be in [0, 1), got {v}; "
+                             f"1.0 gives zero spacing and above 1.0 gives negative")
+    if not (height_m > 0) or height_m != height_m:   # also rejects NaN
+        raise ValueError(f"height must be positive and finite, got {height_m}")
     across, along = footprint(height_m)
     return across * (1.0 - side_overlap), along * (1.0 - forward_overlap)
 
