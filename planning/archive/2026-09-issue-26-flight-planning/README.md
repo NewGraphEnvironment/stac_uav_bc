@@ -5,7 +5,7 @@
 Four scripts under `scripts/` turn a floodplain polygon and a launch point into DJI WPML
 `.kmz` missions sized to one battery each: `flight_wpml.py` (read/write), `flight_coverage.py`
 (footprint, spacing, serpentine transects), `flight_budget.py` (endurance) and `flight_plan.py`
-(the driver). Shipped in PR #33.
+(the driver). Shipped in PR #34.
 
 Delivered for the immediate driver: **three missions over Peacock Creek, 143.2 ha**, at 350 m
 AGL and 10 m/s from the confluence launch point, plus a `plan.gpkg` for review in QGIS.
