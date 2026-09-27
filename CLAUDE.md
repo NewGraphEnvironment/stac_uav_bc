@@ -12,7 +12,9 @@ STAC catalog for UAV imagery in British Columbia, organized by watershed. Served
 The catalogue is a versioned build artifact of (`data/sites.csv`, COGs on S3) — see `scripts/config/README.md` for the add-imagery, release, and retraction recipes, and `NEWS.md` + git tags for release history (STAC Version Extension stamps the live collection).
 
 - `data/sites.csv` - registry: source of truth for stream names, watershed group codes, crossing ids, aliases, `published` flag
-- `scripts/odm_process-batch.sh` - batch ODM stitching (resume-safe; `--split N` for >~300-image flights)
+- `scripts/odm_process-batch.sh` - batch ODM stitching (resume-safe; `--split N` for >~300-image flights; relocates video out of `images/` first)
+- `scripts/odm_qc.py` - QC gate on a finished run (mixed input resolutions, split reconstruction, reprojection, dropped shots) - run before `dataset_publish.sh`
+- `scripts/stream_resolve.py` - candidate FWA stream names for a flight, from image EXIF GPS via the public fwapg REST API (no tunnel, no local Postgres) - fills `data/sites.csv`
 - `scripts/dataset_publish.sh` - post-QC publish per dataset (COG → items → S3 → register → verify)
 - `scripts/catalogue_release.sh` - one-command release: rebuild all items from the registry → validate → sync → register → verify
 - `scripts/item_create.py` - item builder (registry properties, gdal_footprint geometries, `--rebuild` mode)
