@@ -88,7 +88,7 @@ def _polygons(geom):
     return [g for g in _flatten(geom) if g.geom_type == "Polygon"]
 
 
-def _max_transit_m(height_m, min_block_ha=None, speed_ms=None):
+def _max_transit_m(height_m, speed_ms, min_block_ha=None):
     """Transit beyond which one battery cannot fly a USEFUL survey.
 
     Defined against a minimum worthwhile block rather than against a zero-metre
@@ -103,8 +103,6 @@ def _max_transit_m(height_m, min_block_ha=None, speed_ms=None):
     t_sp, _ = cov.spacing(height_m)
     n_t = max(1.0, side / t_sp)
     need = side * n_t + t_sp * (n_t - 1.0)
-    if speed_ms is None:
-        speed_ms = budget.EFFECTIVE_SPEED_MS
     lo, hi = 0.0, 50000.0
     for _ in range(40):
         mid = (lo + hi) / 2.0
@@ -171,7 +169,7 @@ def _equal_area_strips(poly, n):
 
 
 def split_to_budget(polygon, height_m, launch_pt, min_block_ha=MIN_BLOCK_HA,
-                    max_depth=8, commanded_ms=10.0):
+                    max_depth=8, commanded_ms=10.0, input_is_whole=True):
     """(blocks, accounting) — every hectare of input lands in exactly one bucket.
 
     Three rounds of review found one mechanism here: a degenerate or awkward result
@@ -214,16 +212,17 @@ def split_to_budget(polygon, height_m, launch_pt, min_block_ha=MIN_BLOCK_HA,
         if g.geom_type != "Polygon":
             buckets["nonpolygon"].append(g)
 
-    def dispose(poly, depth):
+    def dispose(poly, depth, native):
         if poly.is_empty:
             return
         if poly.area / 1e4 < min_block_ha:
             # WHY it is small matters. A piece that arrived small is a native
-            # sliver of the delineation and is expected; a piece the recursion
-            # drove small is area this planner failed to use, and filing it under
-            # the reassuring label is how 11.89 ha of a 40 m arm reported as
-            # "slivers" at exit 0.
-            buckets["sliver" if depth == 0 else "undersized_after_split"].append(poly)
+            # sliver of the delineation and is expected; a piece any cut drove
+            # small is area this planner failed to use. `native` is CARRIED from
+            # the caller rather than inferred from recursion depth -- depth only
+            # knows about _equal_area_strips, and the reach disc and --radius both
+            # cut before it ever runs.
+            buckets["sliver" if native else "undersized_after_split"].append(poly)
             return
         path, n = survey(poly)
         if n == 0:
@@ -246,7 +245,7 @@ def split_to_budget(polygon, height_m, launch_pt, min_block_ha=MIN_BLOCK_HA,
             return
         for h in halves:
             for g in _polygons(h):
-                dispose(g, depth + 1)
+                dispose(g, depth + 1, False)
 
     # Clip to what the battery can reach BEFORE disposing. transit() measures to a
     # piece's nearest point, so a component straddling the reach boundary would
@@ -258,17 +257,23 @@ def split_to_budget(polygon, height_m, launch_pt, min_block_ha=MIN_BLOCK_HA,
     # small, both proven end to end. Round 3 threaded the scaled speed through two
     # of the three budget consumers and this was the third.
     disc = launch_pt.buffer(
-        _max_transit_m(height_m, min_block_ha, speed_ms=eff)) if launch_pt else None
+        _max_transit_m(height_m, eff, min_block_ha)) if launch_pt else None
+    # `input_is_whole` is False when main() already clipped to --radius, so a
+    # piece the radius trimmed is not reported as native either.
+    native = input_is_whole
     for comp in _polygons(polygon):
         if disc is not None:
             outside = comp.difference(disc)
             if not outside.is_empty:
                 buckets["unreachable"].extend(_polygons(outside))
             inside = _polygons(comp.intersection(disc))
+            # Clipping to the disc IS a cut: a piece the disc trimmed did not
+            # arrive small, so it is not a native sliver.
+            clipped = len(inside) != 1 or not inside[0].equals(comp)
             for g in inside:
-                dispose(g, 0)
+                dispose(g, 0, native and not clipped)
         else:
-            dispose(comp, 0)
+            dispose(comp, 0, native)
 
     blocks = sorted(buckets["planned"], key=transit)
     acc = {"area_in_ha": area_in}
@@ -387,8 +392,7 @@ def main():
     # The radius is the user's search window; the battery sets the real one. Say so
     # up front rather than silently dropping everything between the two -- at 350 m
     # the reachable transit is 4223 m while --radius defaults to 5000.
-    reach_m = _max_transit_m(args.height,
-                             speed_ms=budget.effective_speed_for(args.speed))
+    reach_m = _max_transit_m(args.height, budget.effective_speed_for(args.speed))
     if args.radius > reach_m:
         print(f"    note: at {args.height:.0f} m one battery reaches about "
               f"{reach_m:.0f} m of transit, less than --radius {args.radius:.0f} m; "
@@ -399,7 +403,8 @@ def main():
           f"transect {t_sp:.1f} m, photo {p_sp:.1f} m")
 
     blocks, split_meta = split_to_budget(working, args.height, launch,
-                                        commanded_ms=args.speed)
+                                        commanded_ms=args.speed,
+                                        input_is_whole=(working.equals(reach)))
     print(f"=== split into {len(blocks)} block(s) that each fit one battery")
     # Full accounting, always printed: every hectare of input lands in one bucket
     # and the buckets are shown whether or not they are zero, so area cannot go
@@ -465,7 +470,13 @@ def main():
 
     if args.review_layers and written:
         # Review before flying. One file, five layers, opens straight in QGIS.
+        # Removed first: geopandas appends with mode="a", so re-running into the
+        # same --out accumulated layers and the file drew missions that had just
+        # been deleted as stale. A review artifact that disagrees with the missions
+        # beside it is worse than none.
         gpkg = out / "plan.gpkg"
+        if gpkg.exists():
+            gpkg.unlink()
         gpd.GeoDataFrame({"name": [args.stream]}, geometry=[reach],
                          crs=CRS_METRIC).to_file(gpkg, layer="floodplain", driver="GPKG")
         gpd.GeoDataFrame({"name": ["launch"]}, geometry=[launch],
@@ -481,15 +492,10 @@ def main():
     # a destructive-then-rebuild sequence whose failure leaves nothing to fly.
     if written:
         keep = {p.name for p in written}
-        for stale in sorted(out.glob(f"{stem}_[0-9][0-9].kmz")):
+        for stale in sorted(out.glob(f"{stem}_[0-9]*.kmz")):
             if stale.name not in keep:
                 stale.unlink()
                 print(f"  removed stale mission from a previous run: {stale.name}")
-        if not args.review_layers:
-            gp = out / "plan.gpkg"
-            if gp.exists():
-                gp.unlink()
-                print(f"  removed stale plan.gpkg from a previous run")
 
     print()
     sys.stdout.flush()
@@ -509,6 +515,20 @@ def main():
     if bad_written:
         problems.append(f"{bad_written} written mission(s) over budget — these will "
                         f"truncate in the air")
+    # Area the planner FAILED to use, as opposed to area it was never asked about.
+    # Native slivers and unreachable ground are expected consequences of the
+    # delineation and the flags; these three are not. Gated at 5% of input rather
+    # than at zero because a few cut-born fragments are normal on a sinuous
+    # floodplain -- the honest Peacock run leaves 0.33 ha, 0.2%.
+    wasted = (split_meta["unsurveyable_ha"] + split_meta["undersized_after_split_ha"]
+              + split_meta["unsplittable_ha"])
+    if split_meta["area_in_ha"] > 0 and wasted / split_meta["area_in_ha"] > 0.05:
+        problems.append(
+            f"{wasted:.1f} ha ({wasted / split_meta['area_in_ha'] * 100:.0f}% of input) "
+            f"could not be planned — unsurveyable "
+            f"{split_meta['unsurveyable_ha']:.1f}, undersized after split "
+            f"{split_meta['undersized_after_split_ha']:.1f}, unsplittable "
+            f"{split_meta['unsplittable_ha']:.1f}")
     if abs(split_meta["unaccounted_ha"]) > 0.5:
         problems.append(f"{split_meta['unaccounted_ha']:.1f} ha unaccounted for between "
                         f"input and blocks — the split lost area")

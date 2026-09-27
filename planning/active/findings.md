@@ -99,3 +99,33 @@ right 200 ha, not covering the group.
 | Error | Resolution |
 |-------|------------|
 | Round-trip failed on all 5 with no diff shown | Files end at `</kml>` with no trailing newline; `splitlines()` hid it. Fixed the renderer and added a trailing-bytes arm to the reporter |
+
+## Review: five rounds, and what closed it
+
+| round | findings | inside the previous fix? |
+|---|---|---|
+| 1 | 4 bugs, 6 fragile | — |
+| 2 | 3 bugs, 3 fragile | yes |
+| 3 | 5 bugs, 2 fragile + 62-row enumeration | yes |
+| 4 | 3 bugs, 2 fragile + enumeration re-walk (no handling lost) | yes |
+| 5 | 2 bugs, 1 gap, 1 fragile + three enumerations | yes |
+
+Every round found its best defect inside the previous round's fix. Round 5 named the
+shape behind all five: **a state known at the point of production, carried onward as a
+number and re-derived downstream** — `path_m == 0` read as "fits", a lost `budget_path`,
+an all-or-nothing fit test, a speed re-derived from a default, a provenance re-derived
+from recursion depth.
+
+What closed it is not another reading round. Parsing `split_to_budget` with `ast` and
+listing every name bound inside it shows **one producer each** for `eff`, `area_in`,
+`disc`, `native`, `path`, `n`, `clipped`, `halves`, `inside`, `outside`, `blocks`,
+`buckets` and `polygon`; the only multiply-bound names are the accumulator dict `acc`
+and its comprehension variable `k`. Nothing in the splitter is derived twice and able to
+disagree with itself. That is a count, not an opinion.
+
+Three supporting enumerations from round 5, all produced by parsing rather than reading:
+7/7 buckets present in dict, summary and accounting in both directions with no orphans;
+6/6 budget consumers, 5 threaded and 1 deliberately defaulted, disc-vs-reach ratio 1.00
+at five speeds with a positive control that fires; 7/7 `dispose()` exit paths reaching
+exactly one bucket or a provable zero-area none, over 72 runs at 0.000000000 ha
+unaccounted.
