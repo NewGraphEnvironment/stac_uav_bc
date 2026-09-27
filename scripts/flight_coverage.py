@@ -127,7 +127,10 @@ def transect_lines(polygon, transect_spacing_m, bearing_deg=None):
     while x < maxx:
         cut = LineString([(x, miny - 1.0), (x, maxy + 1.0)]).intersection(rot)
         if not cut.is_empty:
-            parts = [cut] if cut.geom_type == "LineString" else list(cut.geoms)
+            # A cut can graze a vertex and come back a bare Point, which has no
+            # .geoms -- that raised AttributeError rather than yielding nothing.
+            # Ask for the attribute rather than enumerating the types that have it.
+            parts = list(cut.geoms) if hasattr(cut, "geoms") else [cut]
             segs = [p for p in parts if p.geom_type == "LineString" and p.length > 0]
             if segs:
                 cuts.append((k, sorted(segs, key=lambda s: s.centroid.y)))

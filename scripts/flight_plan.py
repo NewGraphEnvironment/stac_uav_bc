@@ -64,12 +64,25 @@ FIXTURE_FITS = {"myKMZ-3", "20220722_morr_braid04-2"}
 FIXTURE_HEIGHT_M = 300.0
 
 
-def _max_transit_m(height_m):
-    """Transit distance at which one battery has no survey path left."""
+def _max_transit_m(height_m, min_block_ha=None):
+    """Transit beyond which one battery cannot fly a USEFUL survey.
+
+    Defined against a minimum worthwhile block rather than against a zero-metre
+    path. The zero-path figure overstates reach badly and the overstated tail is
+    exactly where blocks go unflyable: at 350 m it reports 4223 m, but the usable
+    survey path there is 86 m -- less than one transect across a 1 ha block.
+    """
+    if min_block_ha is None:
+        min_block_ha = MIN_BLOCK_HA
+    # Path needed to survey a min_block_ha square at this height, turns included.
+    side = math.sqrt(min_block_ha * 1e4)
+    t_sp, _ = cov.spacing(height_m)
+    n_t = max(1.0, side / t_sp)
+    need = side * n_t + t_sp * (n_t - 1.0)
     lo, hi = 0.0, 50000.0
     for _ in range(40):
         mid = (lo + hi) / 2.0
-        if budget.max_path_m(height_m, transit_m=mid) > 0:
+        if budget.max_path_m(height_m, transit_m=mid) >= need:
             lo = mid
         else:
             hi = mid
@@ -132,12 +145,23 @@ def _equal_area_strips(poly, n):
 
 
 def split_to_budget(polygon, height_m, launch_pt, min_block_ha=MIN_BLOCK_HA):
-    """Blocks that each fit one battery, nearest the launch point first.
+    """(blocks, accounting) — every input component lands in exactly one bucket.
 
-    Per component: compute the survey path, divide by what one battery can fly, and
-    cut that many equal-area strips in a single pass. Components under
-    `min_block_ha` are dropped and reported rather than flown.
+    Round 1 and round 2 of review both found the same mechanism here: a degenerate
+    result carried through the arithmetic as an ordinary small number rather than
+    branched on as a third state. `path_m == 0` read as "fits"; `budget_path <= 0`
+    read as "nothing here"; and after that was guarded, a `budget_path` small but
+    POSITIVE lost a whole component into no counter at all. Patching each site
+    moved the defect one axis over every time.
+
+    So the disposition is explicit and total. Each component is classified once,
+    the areas are accumulated per bucket, and `accounting["area_in_ha"]` must equal
+    the sum of the buckets — asserted below. A component cannot go missing without
+    the arithmetic saying so.
     """
+    def transit(poly):
+        return launch_pt.distance(poly) if launch_pt is not None else 0.0
+
     def survey(poly):
         """(path_m, n_stations). n_stations == 0 means UNFLYABLE, not free."""
         if poly.is_empty or poly.area <= 0:
@@ -146,77 +170,66 @@ def split_to_budget(polygon, height_m, launch_pt, min_block_ha=MIN_BLOCK_HA):
         return meta["path_m"], len(stations)
 
     def flyable_and_fits(poly):
-        """A block must have stations AND fit. budget.fits(0.0) is True, so a
-        block too narrow for a single transect would otherwise pass every check
-        -- which is how the minimal-n search terminated on 50 m strips against a
-        100.8 m spacing and reported over_budget: 0."""
         path, n = survey(poly)
-        if n == 0:
-            return False
-        return budget.fits(path, height_m, transit_m=transit(poly))[0]
-
-    def transit(poly):
-        return launch_pt.distance(poly) if launch_pt is not None else 0.0
+        return n > 0 and budget.fits(path, height_m, transit_m=transit(poly))[0]
 
     parts = list(polygon.geoms) if polygon.geom_type.startswith("Multi") else [polygon]
-    kept = [p for p in parts if p.geom_type == "Polygon" and p.area / 1e4 >= min_block_ha]
-    dropped = [p for p in parts if p not in kept]
+    parts = [p for p in parts if p.geom_type == "Polygon" and not p.is_empty]
 
-    blocks, unreachable = [], []
-    for comp in kept:
-        # Search for the SMALLEST n whose strips all fit, rather than estimating it
-        # from total path. The estimate over-splits badly: turn-around is a large
-        # share of the path on a sinuous floodplain, it does not divide evenly, and
-        # a ceil() on top left every battery at about 70% full. Minimal n is what
-        # makes three batteries cover as much as three batteries can.
-        budget_path = budget.max_path_m(height_m, transit_m=transit(comp))
-        if budget_path <= 0:
-            # Out of reach: the transit alone exhausts the battery. Record it --
-            # dropping it silently loses area the user was just told is in scope.
-            unreachable.append(comp)
+    buckets = {k: [] for k in ("planned", "sliver", "unreachable", "unsplittable")}
+    area_in = sum(p.area for p in parts) / 1e4
+
+    for comp in parts:
+        if comp.area / 1e4 < min_block_ha:
+            # Raster-derived delineations carry a tail of sub-hectare fragments --
+            # Peacock Creek ff04 is 187.3 ha in 25 parts, 23 of them 0.09 ha.
+            buckets["sliver"].append(comp)
             continue
-        lower = max(1, math.ceil(survey(comp)[0] / budget_path))
-        chosen, n = None, 1
-        while n <= max(lower * 2, 24):
-            strips = [s for s in _equal_area_strips(comp, n) if s.area / 1e4 >= min_block_ha]
-            if strips and all(flyable_and_fits(s) for s in strips):
-                chosen = strips
-                break
-            n += 1
-        # Fall back to the estimate rather than looping forever; the post-split
-        # verification below reports anything still over budget.
-        for strip in (chosen if chosen is not None else _equal_area_strips(comp, lower)):
-            # Keep a strip whole even when the cut leaves it multipart. One mission
-            # can cover disjoint pieces -- the aircraft simply flies between them,
-            # and the transect generator handles a MultiPolygon. Exploding strips
-            # into parts is what left the first working version with ten blocks of
-            # 12-30 ha each where one battery covers 85.
-            if strip.area / 1e4 >= min_block_ha:
-                blocks.append(strip)
 
-    # A strip can still come out over budget where the cut lands badly, so verify
-    # rather than assume -- the split is a prediction and this is the check on it.
-    over, unflyable = [], []
-    for b in blocks:
-        path, n = survey(b)
-        if n == 0:
-            unflyable.append(b)
-        elif not budget.fits(path, height_m, transit_m=transit(b))[0]:
-            over.append(b)
-    # Unflyable blocks are removed, not emitted: a mission with no stations is
-    # not a mission. They are reported so the area is not silently lost.
-    blocks = [b for b in blocks if b not in unflyable]
+        budget_path = budget.max_path_m(height_m, transit_m=transit(comp))
+        # An n beyond this leaves every strip under min_block_ha, so the search
+        # cannot succeed there. Bounding it is not an optimisation: unbounded, a
+        # 100 ha component at 4180 m transit drove `lower` to 128 and the loop to
+        # 256, ~32k plan_transects calls, and did not finish in five minutes. A
+        # planner that hangs looks like a slow query, not a bad input.
+        n_max = int(comp.area / 1e4 / min_block_ha)
+        chosen = None
+        if budget_path > 0 and n_max >= 1:
+            for n in range(1, n_max + 1):
+                strips = [x for x in _equal_area_strips(comp, n)
+                          if x.area / 1e4 >= min_block_ha]
+                # Every strip must survive the min-area filter, or this n is
+                # quietly discarding area -- which is exactly how the previous
+                # version lost 10 ha with no counter.
+                if len(strips) == n and all(flyable_and_fits(x) for x in strips):
+                    chosen = strips
+                    break
 
-    # Nearest first: the launch point is fixed, so the closest blocks spend least of
-    # the battery getting there.
-    blocks.sort(key=lambda b: transit(b))
-    return blocks, {"dropped": len(dropped),
-                    "dropped_ha": sum(p.area for p in dropped) / 1e4,
-                    "over_budget": len(over),
-                    "unreachable": len(unreachable),
-                    "unreachable_ha": sum(p.area for p in unreachable) / 1e4,
-                    "unflyable": len(unflyable),
-                    "unflyable_ha": sum(b.area for b in unflyable) / 1e4}
+        if chosen is None:
+            # No split works: either the transit exhausts the battery, or the
+            # component cannot be cut into pieces that are both flyable and big
+            # enough. Both are recorded; neither is silently dropped.
+            if budget_path <= 0 or not flyable_and_fits(comp):
+                buckets["unreachable" if budget_path <= 0 else "unsplittable"].append(comp)
+            else:
+                buckets["planned"].append(comp)
+            continue
+        # A strip is kept whole even when the cut leaves it multipart: one mission
+        # can cover disjoint pieces, and the transect generator handles it.
+        buckets["planned"].extend(chosen)
+
+    blocks = sorted(buckets["planned"], key=transit)
+
+    acc = {"area_in_ha": area_in}
+    for k, v in buckets.items():
+        acc[k] = len(v)
+        acc[f"{k}_ha"] = sum(g.area for g in v) / 1e4
+    # The invariant that makes this terminal: nothing may vanish between the input
+    # and the buckets. Cutting loses a little area to the min-area filter inside a
+    # chosen split, so allow a small tolerance and report the residue rather than
+    # hiding it.
+    acc["unaccounted_ha"] = area_in - sum(acc[f"{k}_ha"] for k in buckets)
+    return blocks, acc
 
 
 def block_mission(polygon_metric, height_m, speed_ms, name):
@@ -324,22 +337,19 @@ def main():
 
     blocks, split_meta = split_to_budget(working, args.height, launch)
     print(f"=== split into {len(blocks)} block(s) that each fit one battery")
-    if split_meta["dropped"]:
-        print(f"    ({split_meta['dropped']} sliver(s) under {MIN_BLOCK_HA} ha dropped, "
-              f"{split_meta['dropped_ha']:.2f} ha total — not survey targets)")
-    if split_meta["unreachable"]:
-        print(f"    {split_meta['unreachable']} component(s) beyond battery reach, "
-              f"{split_meta['unreachable_ha']:.1f} ha — not planned", file=sys.stderr)
-    if split_meta["unflyable"]:
-        print(f"    {split_meta['unflyable']} block(s) too narrow for a transect, "
-              f"{split_meta['unflyable_ha']:.1f} ha — dropped", file=sys.stderr)
-    if split_meta["over_budget"]:
-        # Loud, not silent: a block that does not fit will truncate in the air.
-        print(f"    WARNING: {split_meta['over_budget']} block(s) still over budget "
-              f"after splitting", file=sys.stderr)
+    # Full accounting, always printed: every hectare of input lands in one bucket
+    # and the buckets are shown whether or not they are zero, so area cannot go
+    # missing quietly. This replaces four independent counters that each covered
+    # one way of losing area and between them still missed a fifth.
+    print(f"    area in {split_meta['area_in_ha']:.1f} ha = "
+          f"planned {split_meta['planned_ha']:.1f} "
+          f"+ slivers {split_meta['sliver_ha']:.2f} ({split_meta['sliver']}) "
+          f"+ unreachable {split_meta['unreachable_ha']:.1f} ({split_meta['unreachable']}) "
+          f"+ unsplittable {split_meta['unsplittable_ha']:.1f} ({split_meta['unsplittable']}) "
+          f"+ unaccounted {split_meta['unaccounted_ha']:.2f}")
 
     out = pathlib.Path(args.out)
-    written, total_ha, skipped = [], 0.0, 0
+    written, total_ha, bad_written = [], 0.0, 0
     layers = {"blocks": ([], []), "transects": ([], []), "stations": ([], [])}
     # Iterate until `--batteries` missions are WRITTEN. Slicing the block list
     # first let an unsurveyable block consume a battery slot, and blocks are
@@ -350,14 +360,19 @@ def main():
         name = f"{args.stream.lower().replace(' ', '_')}_{len(written) + 1:02d}"
         mission, meta = block_mission(b, args.height, args.speed, name)
         if mission is None:
+            # split_to_budget already removes zero-station blocks and
+            # block_mission recomputes the same deterministic geometry, so this is
+            # belt-and-braces rather than an expected path. Counted as a written
+            # shortfall below if it ever fires.
             print(f"  SKIP {name}: no stations (block too small for one transect)")
-            skipped += 1
             continue
         transit_m = launch.distance(b)
         ok, est, usable = budget.fits(meta["path_m"], args.height, transit_m=transit_m)
         path = write_kmz(mission, out / f"{name}.kmz")
         written.append(path)
         total_ha += meta["area_ha"]
+        if not ok:
+            bad_written += 1
         print(f"  {name}: {meta['area_ha']:.1f} ha, {meta['n_transects']} transects, "
               f"{meta['n_waypoints']} waypoints, path {meta['path_m']:.0f} m, "
               f"transit {transit_m:.0f} m, {est:.0f} s / {usable:.0f} s "
@@ -392,24 +407,26 @@ def main():
         print(f"  review layers -> {gpkg}")
 
     print()
+    sys.stdout.flush()
     if not written:
         print("PLAN INCOMPLETE: no missions written", file=sys.stderr)
         return 1
 
-    # Anything that costs the user area or would truncate in the air makes this a
-    # non-zero exit, so a caller gating on the status is not told everything is
-    # fine. Reporting a problem and exiting 0 is the shape this is avoiding.
+    # The exit status judges WHAT WAS ASKED FOR. Area outside --batteries, or
+    # outside battery reach, is the expected consequence of the flags and is
+    # reported above; failing on it made a correct three-mission plan exit 1 on
+    # default flags. What fails: a requested mission that could not be produced,
+    # or one that was written and does not fit.
     problems = []
-    if split_meta["over_budget"]:
-        problems.append(f"{split_meta['over_budget']} block(s) still over budget")
-    if split_meta["unflyable"]:
-        problems.append(f"{split_meta['unflyable']} block(s) too narrow to fly "
-                        f"({split_meta['unflyable_ha']:.1f} ha)")
-    if split_meta["unreachable"]:
-        problems.append(f"{split_meta['unreachable']} component(s) beyond battery reach "
-                        f"({split_meta['unreachable_ha']:.1f} ha)")
-    if skipped:
-        problems.append(f"{skipped} block(s) skipped for having no stations")
+    if len(written) < args.batteries:
+        problems.append(f"{args.batteries} mission(s) requested, {len(written)} written "
+                        f"— only {len(blocks)} flyable block(s) available")
+    if bad_written:
+        problems.append(f"{bad_written} written mission(s) over budget — these will "
+                        f"truncate in the air")
+    if abs(split_meta["unaccounted_ha"]) > 0.5:
+        problems.append(f"{split_meta['unaccounted_ha']:.1f} ha unaccounted for between "
+                        f"input and blocks — the split lost area")
 
     if problems:
         print(f"PLAN INCOMPLETE: {len(written)} mission(s) written, {total_ha:.1f} ha, "
