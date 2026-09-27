@@ -52,11 +52,6 @@ FOCAL_MM = 6.72
 DEFAULT_SIDE_OVERLAP = 0.80     # across track -> transect spacing
 DEFAULT_FORWARD_OVERLAP = 0.80  # along track  -> photo spacing
 
-# Metric CRS for every distance and area operation here.
-CRS_METRIC = "EPSG:3005"  # BC Albers
-CRS_WGS84 = "EPSG:4326"
-
-
 def gsd(height_m):
     """Ground sample distance in metres per pixel at `height_m` above terrain."""
     pitch_m = (SENSOR_W_MM / PIXELS_W) / 1000.0
@@ -85,7 +80,7 @@ def spacing(height_m, side_overlap=DEFAULT_SIDE_OVERLAP,
         if not (0.0 <= v < 1.0):
             raise ValueError(f"{name} must be in [0, 1), got {v}; "
                              f"1.0 gives zero spacing and above 1.0 gives negative")
-    if not (height_m > 0) or height_m != height_m:   # also rejects NaN
+    if not math.isfinite(height_m) or height_m <= 0:
         raise ValueError(f"height must be positive and finite, got {height_m}")
     across, along = footprint(height_m)
     return across * (1.0 - side_overlap), along * (1.0 - forward_overlap)

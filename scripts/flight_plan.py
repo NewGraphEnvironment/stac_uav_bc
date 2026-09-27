@@ -36,6 +36,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import geopandas as gpd
 from shapely import affinity
 from shapely.geometry import Point, box
+from shapely.validation import make_valid
 
 import flight_budget as budget
 import flight_coverage as cov
@@ -87,7 +88,7 @@ def _polygons(geom):
     return [g for g in _flatten(geom) if g.geom_type == "Polygon"]
 
 
-def _max_transit_m(height_m, min_block_ha=None):
+def _max_transit_m(height_m, min_block_ha=None, speed_ms=None):
     """Transit beyond which one battery cannot fly a USEFUL survey.
 
     Defined against a minimum worthwhile block rather than against a zero-metre
@@ -102,10 +103,12 @@ def _max_transit_m(height_m, min_block_ha=None):
     t_sp, _ = cov.spacing(height_m)
     n_t = max(1.0, side / t_sp)
     need = side * n_t + t_sp * (n_t - 1.0)
+    if speed_ms is None:
+        speed_ms = budget.EFFECTIVE_SPEED_MS
     lo, hi = 0.0, 50000.0
     for _ in range(40):
         mid = (lo + hi) / 2.0
-        if budget.max_path_m(height_m, transit_m=mid) >= need:
+        if budget.max_path_m(height_m, transit_m=mid, speed_ms=speed_ms) >= need:
             lo = mid
         else:
             hi = mid
@@ -192,18 +195,18 @@ def split_to_budget(polygon, height_m, launch_pt, min_block_ha=MIN_BLOCK_HA,
         stations, _, meta = cov.plan_transects(poly, height_m)
         return meta["path_m"], len(stations)
 
-    def flyable_and_fits(poly):
-        path, n = survey(poly)
-        return n > 0 and budget.fits(
-            path, height_m, transit_m=transit(poly),
-            speed_ms=budget.effective_speed_for(commanded_ms))[0]
-
     # area_in is the WHOLE input, before any filtering. Computing it from the
     # filtered parts made the invariant balance against an already-reduced total,
     # so a GeometryCollection could lose its polygon and still report 0.00.
+    eff = budget.effective_speed_for(commanded_ms)
+    if not polygon.is_valid:
+        # A self-intersecting ring makes difference()/intersection() raise
+        # GEOSException("side location conflict") from inside shapely. Repair it
+        # once, here, rather than letting every geometry call be a trap.
+        polygon = make_valid(polygon)
     area_in = polygon.area / 1e4
-    buckets = {k: [] for k in ("planned", "sliver", "unreachable",
-                               "unsplittable", "nonpolygon")}
+    buckets = {k: [] for k in ("planned", "sliver", "unreachable", "unsurveyable",
+                               "undersized_after_split", "unsplittable", "nonpolygon")}
 
     # Non-polygonal input, bucketed by area so the invariant sees it. Lines and
     # points have zero area and contribute nothing, which is correct.
@@ -212,11 +215,24 @@ def split_to_budget(polygon, height_m, launch_pt, min_block_ha=MIN_BLOCK_HA,
             buckets["nonpolygon"].append(g)
 
     def dispose(poly, depth):
-        if poly.is_empty or poly.area / 1e4 < min_block_ha:
-            if not poly.is_empty:
-                buckets["sliver"].append(poly)
+        if poly.is_empty:
             return
-        if flyable_and_fits(poly):
+        if poly.area / 1e4 < min_block_ha:
+            # WHY it is small matters. A piece that arrived small is a native
+            # sliver of the delineation and is expected; a piece the recursion
+            # drove small is area this planner failed to use, and filing it under
+            # the reassuring label is how 11.89 ha of a 40 m arm reported as
+            # "slivers" at exit 0.
+            buckets["sliver" if depth == 0 else "undersized_after_split"].append(poly)
+            return
+        path, n = survey(poly)
+        if n == 0:
+            # No stations at this height's transect spacing. Halving CANNOT help --
+            # the pieces only get narrower -- so recursing is wasted work and the
+            # wrong verdict. Distinct from over-budget, where halving is the remedy.
+            buckets["unsurveyable"].append(poly)
+            return
+        if budget.fits(path, height_m, transit_m=transit(poly), speed_ms=eff)[0]:
             buckets["planned"].append(poly)
             return
         if depth >= max_depth:
@@ -237,7 +253,12 @@ def split_to_budget(polygon, height_m, launch_pt, min_block_ha=MIN_BLOCK_HA,
     # otherwise never be cut successfully and would land entirely in unsplittable,
     # with unreachable reading 0.0 -- four lines under the note promising
     # out-of-reach area would be reported there.
-    disc = launch_pt.buffer(_max_transit_m(height_m, min_block_ha)) if launch_pt else None
+    # Same speed as flyable_and_fits, or the disc and the fit test disagree: at
+    # --speed 2 the disc was 5.25x too large and at --speed 26 it was 2.6x too
+    # small, both proven end to end. Round 3 threaded the scaled speed through two
+    # of the three budget consumers and this was the third.
+    disc = launch_pt.buffer(
+        _max_transit_m(height_m, min_block_ha, speed_ms=eff)) if launch_pt else None
     for comp in _polygons(polygon):
         if disc is not None:
             outside = comp.difference(disc)
@@ -343,7 +364,7 @@ def main():
     # PLAN COMPLETE at exit 0; --height 0 was a ZeroDivisionError traceback and
     # --height -350 reported a LARGER battery reach than the real one.
     def _finite_positive(name, v):
-        if not (v > 0) or v != v or v == float("inf"):
+        if not math.isfinite(v) or v <= 0:
             ap.error(f"{name} must be positive and finite, got {v}")
     _finite_positive("--height", args.height)
     _finite_positive("--speed", args.speed)
@@ -366,7 +387,8 @@ def main():
     # The radius is the user's search window; the battery sets the real one. Say so
     # up front rather than silently dropping everything between the two -- at 350 m
     # the reachable transit is 4223 m while --radius defaults to 5000.
-    reach_m = _max_transit_m(args.height)
+    reach_m = _max_transit_m(args.height,
+                             speed_ms=budget.effective_speed_for(args.speed))
     if args.radius > reach_m:
         print(f"    note: at {args.height:.0f} m one battery reaches about "
               f"{reach_m:.0f} m of transit, less than --radius {args.radius:.0f} m; "
@@ -387,18 +409,15 @@ def main():
           f"planned {split_meta['planned_ha']:.1f} "
           f"+ slivers {split_meta['sliver_ha']:.2f} ({split_meta['sliver']}) "
           f"+ unreachable {split_meta['unreachable_ha']:.1f} ({split_meta['unreachable']}) "
+          f"+ unsurveyable {split_meta['unsurveyable_ha']:.1f} ({split_meta['unsurveyable']}) "
+          f"+ undersized-after-split {split_meta['undersized_after_split_ha']:.2f} "
+          f"({split_meta['undersized_after_split']}) "
           f"+ unsplittable {split_meta['unsplittable_ha']:.1f} ({split_meta['unsplittable']}) "
           f"+ non-polygon {split_meta['nonpolygon_ha']:.2f} ({split_meta['nonpolygon']}) "
           f"+ unaccounted {split_meta['unaccounted_ha']:.2f}")
 
     out = pathlib.Path(args.out)
-    # Clear this plan's own previous output. The header claims idempotency, and
-    # --out is the directory that gets loaded into the controller: a 2-battery
-    # re-run that left the 3-battery run's _03.kmz behind would be flown.
     stem = args.stream.lower().replace(" ", "_")
-    if out.is_dir():
-        for stale in sorted(out.glob(f"{stem}_[0-9][0-9].kmz")):
-            stale.unlink()
     written, total_ha, bad_written = [], 0.0, 0
     layers = {"blocks": ([], []), "transects": ([], []), "stations": ([], [])}
     # Iterate until `--batteries` missions are WRITTEN. Slicing the block list
@@ -456,6 +475,21 @@ def main():
                 gpd.GeoDataFrame(rows, geometry=geoms, crs=CRS_METRIC).to_file(
                     gpkg, layer=lname, driver="GPKG", mode="a")
         print(f"  review layers -> {gpkg}")
+
+    # Now that this run's missions exist, remove the ones a LARGER previous run
+    # left behind. Deleting first made a zero-block re-run empty the directory --
+    # a destructive-then-rebuild sequence whose failure leaves nothing to fly.
+    if written:
+        keep = {p.name for p in written}
+        for stale in sorted(out.glob(f"{stem}_[0-9][0-9].kmz")):
+            if stale.name not in keep:
+                stale.unlink()
+                print(f"  removed stale mission from a previous run: {stale.name}")
+        if not args.review_layers:
+            gp = out / "plan.gpkg"
+            if gp.exists():
+                gp.unlink()
+                print(f"  removed stale plan.gpkg from a previous run")
 
     print()
     sys.stdout.flush()

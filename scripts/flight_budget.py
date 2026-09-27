@@ -116,7 +116,7 @@ def effective_speed_for(commanded_ms):
     conservative direction for a slower command and optimistic for a faster one --
     prefer re-calibrating over trusting this far from 10 m/s.
     """
-    if not (commanded_ms > 0) or commanded_ms != commanded_ms:
+    if not math.isfinite(commanded_ms) or commanded_ms <= 0:
         raise ValueError(f"commanded speed must be positive and finite, got {commanded_ms}")
     return EFFECTIVE_SPEED_MS * (commanded_ms / CALIBRATED_COMMANDED_MS)
 
