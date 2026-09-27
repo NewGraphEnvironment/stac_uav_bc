@@ -36,16 +36,16 @@ Immediate driver: three batteries from a launch point at the **Peacock Creek con
 
 ## Phase 4: Block splitting
 
-- [ ] Split a polygon until each block fits one battery at the configured height/speed
-- [ ] Must flag all three known over-budget missions (myKMZ-1, myKMZ-2, morr_jet_lwd01)
-- [ ] Must leave myKMZ-3 (25 ha) unsplit
-- [ ] Block naming `<stream>_<feature><NN>`, `_p1`/`_p2` when split
+- [x] Split a polygon until each block fits one battery at the configured height/speed
+- [x] Must flag all three known over-budget missions (myKMZ-1, myKMZ-2, morr_jet_lwd01)
+- [x] Must leave myKMZ-3 (25 ha) unsplit
+- [x] Block naming `<stream>_<feature><NN>`, `_p1`/`_p2` when split
 
 ## Phase 5: Peacock Creek set
 
-- [ ] `scripts/flight_plan.py` — read `floodplain.gpkg` over `/vsicurl/`, select ff04 by gnis name,
+- [x] `scripts/flight_plan.py` — read `floodplain.gpkg` over `/vsicurl/`, select ff04 by gnis name,
       clip to a radius of the launch point, split, order, write KMZs
-- [ ] Produce the three-battery set from the Peacock Creek launch point
+- [x] Produce the three-battery set from the Peacock Creek launch point
 - [ ] Review in QGIS against the ortho before anything flies
 
 ## Phase 6: Does DJI Fly import it (field, not code)
@@ -58,8 +58,8 @@ Immediate driver: three batteries from a launch point at the **Peacock Creek con
 - [x] Round-trip: all five fixture KMZs re-emit equal
 - [x] Spacing: 300 m predicts 64.8 m against the measured 64.9 m
 - [x] Budget: reproduces each paired flight's EXIF elapsed time within tolerance
-- [ ] Splitting: catches all three over-budget fixtures, leaves the in-budget one alone
-- [ ] End-to-end: generated waypoints for the `lwd001` block fall within the actual image GPS spread
+- [x] Splitting: catches all three over-budget fixtures, leaves the in-budget one alone
+- [x] End-to-end: generated waypoints for the `lwd001` block fall within the actual image GPS spread
       of `wedzin_lwd001`
 - [ ] `/code-check` clean on each commit
 - [ ] PWF checkboxes match landed work

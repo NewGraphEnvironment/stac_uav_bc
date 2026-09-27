@@ -50,3 +50,23 @@
   functions are pure stdlib and import from either; the EXIF read is lazy and **refuses** rather
   than returning empty when Pillow is absent
 - One battery at 350 m: **85 ha** from the block edge, 75 ha with 500 m transit, 65 ha with 1 km
+
+### Phases 4 and 5 — splitting and the Peacock Creek set (done)
+
+- `scripts/flight_plan.py`: reads the floodplain gpkg over `/vsicurl/`, selects a reach by gnis
+  name, clips to a radius of the launch point, splits to battery-sized blocks, writes one .kmz each
+- Fixture gate passes: the three missions #26 flagged as over budget are called over, the two that
+  fit are called fits, from their own `wpml:distance`
+- Three wrong splits before this one, each caught by running it:
+  - recursive bisection gave **129 blocks** for a 187 ha reach — a complex boundary fragments on
+    every cut, and each fragment recursed
+  - equal-area strips fixed that but exploding strips into their disjoint parts gave 10 blocks of
+    12-30 ha; a mission can cover disjoint pieces, so strips are now kept whole
+  - `ceil(path / budget)` over-split, leaving every battery ~70% full; now searches for the
+    smallest n whose strips all fit
+- **Peacock Creek, 3 batteries at 350 m: 109.2 ha**, blocks of 36.4 ha at 73-89% of budget, 6
+  blocks available for the whole 187 ha reach
+- Generated `template.kml` is **exactly 871 bytes**, matching Map Pilot's stub; all three generated
+  missions round-trip through the reader exactly
+- End-to-end against the real `wedzin_lwd001`: actual flown photo spacing 61.7 m against the
+  model's 64.8 m and the mission file's planned 64.9 m
