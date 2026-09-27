@@ -28,11 +28,11 @@ Immediate driver: three batteries from a launch point at the **Peacock Creek con
 
 ## Phase 3: Budget model, calibrated on ground truth
 
-- [ ] Elapsed time per published 2026 MORR dataset from image EXIF (first → last capture)
-- [ ] Pair each with its KMZ where one exists; model climb + transit + survey + RTH + descent
-- [ ] Fit and report climb/descent rate rather than assuming it
-- [ ] Assert the model reproduces each paired flight's measured elapsed time within a stated tolerance
-- [ ] **Never read `wpml:duration`** — test asserting the parser ignores it
+- [x] Elapsed time per published 2026 MORR dataset from image EXIF (first → last capture)
+- [x] Pair each with its KMZ where one exists; model climb + transit + survey + RTH + descent
+- [x] Fit and report climb/descent rate rather than assuming it
+- [x] Assert the model reproduces each paired flight's measured elapsed time within a stated tolerance
+- [x] **Never read `wpml:duration`** — test asserting the parser ignores it
 
 ## Phase 4: Block splitting
 
@@ -57,7 +57,7 @@ Immediate driver: three batteries from a launch point at the **Peacock Creek con
 
 - [x] Round-trip: all five fixture KMZs re-emit equal
 - [x] Spacing: 300 m predicts 64.8 m against the measured 64.9 m
-- [ ] Budget: reproduces each paired flight's EXIF elapsed time within tolerance
+- [x] Budget: reproduces each paired flight's EXIF elapsed time within tolerance
 - [ ] Splitting: catches all three over-budget fixtures, leaves the in-budget one alone
 - [ ] End-to-end: generated waypoints for the `lwd001` block fall within the actual image GPS spread
       of `wedzin_lwd001`

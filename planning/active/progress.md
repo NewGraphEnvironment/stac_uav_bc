@@ -34,3 +34,19 @@
   (the hop between transects is a turn, not a transit), and 100% footprint coverage of the block
 - Guard proven: substituting the wrong 10.08 mm sensor width (the rounded-24mm-equivalent
   derivation) fails both spacing checks at 67.50 / 90.00 m
+
+### Phase 3 — Budget model (done)
+
+- `scripts/flight_budget.py`, calibrated on all seven published 2026 MORR flights from image EXIF
+- **Commanding 10 m/s yields 6.2-10.5 m/s effective (median 7.5).** Every mission sets
+  `toPointAndStopWithDiscontinuityCurvature`, so the aircraft stops at each photo station. A budget
+  at the commanded speed over-promises coverage by about a third
+- Sizing uses the **slowest** observed speed, not the median: too-small costs a battery, too-large
+  truncates the flight. `wedzin_lwd001` is the recorded instance — 165 stations planned, 97 taken
+- The gate caught my own budget constant: 18 min airborne (#26's figure) and my first 25 min both
+  refuse `wedzin_cedric`, which spent 1308 s photographing and so was airborne ≥ 23.8 min. Budget
+  is now 30 min with a 5 min reserve, bounded below by a flight that demonstrably happened
+- Env split, deliberate: Pillow is only in system python3, the spatial stack only in `dff`. Model
+  functions are pure stdlib and import from either; the EXIF read is lazy and **refuses** rather
+  than returning empty when Pillow is absent
+- One battery at 350 m: **85 ha** from the block edge, 75 ha with 500 m transit, 65 ha with 1 km
