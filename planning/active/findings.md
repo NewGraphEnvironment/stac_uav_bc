@@ -98,3 +98,4 @@ right 200 ha, not covering the group.
 
 | Error | Resolution |
 |-------|------------|
+| Round-trip failed on all 5 with no diff shown | Files end at `</kml>` with no trailing newline; `splitlines()` hid it. Fixed the renderer and added a trailing-bytes arm to the reporter |

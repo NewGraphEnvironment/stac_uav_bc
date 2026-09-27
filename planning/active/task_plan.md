@@ -10,14 +10,14 @@ Immediate driver: three batteries from a launch point at the **Peacock Creek con
 
 ## Phase 1: WPML writer
 
-- [ ] `scripts/flight_wpml.py` — waypoints + params → `wpmz/template.kml` + `wpmz/waylines.wpml` → `.kmz`
-- [ ] Emit the 871-byte `template.kml` stub verbatim; it is constant across all five exports
-- [ ] Pin every field observed constant in the fixtures: `executeHeightMode=relativeToStartPoint`,
+- [x] `scripts/flight_wpml.py` — waypoints + params → `wpmz/template.kml` + `wpmz/waylines.wpml` → `.kmz`
+- [x] Emit the 871-byte `template.kml` stub verbatim; it is constant across all five exports
+- [x] Pin every field observed constant in the fixtures: `executeHeightMode=relativeToStartPoint`,
       `finishAction=goHome`, `gimbalPitchRotateAngle=-85`, `globalTransitionalSpeed=9.5`,
       `waypointHeadingMode=followWayline`, `useStraightLine=1`
-- [ ] Round-trip test: parse each of the five real KMZs, re-emit, assert equal ignoring
+- [x] Round-trip test: parse each of the five real KMZs, re-emit, assert equal ignoring
       `createTime`/`updateTime` — proves the writer reproduces known-good files before it invents any
-- [ ] Record `droneEnumValue 68` as observed-not-understood (#26 open question); do not silently change it
+- [x] Record `droneEnumValue 68` as observed-not-understood (#26 open question); do not silently change it
 
 ## Phase 2: Footprint and spacing
 
@@ -55,7 +55,7 @@ Immediate driver: three batteries from a launch point at the **Peacock Creek con
 
 ## Validation
 
-- [ ] Round-trip: all five fixture KMZs re-emit equal
+- [x] Round-trip: all five fixture KMZs re-emit equal
 - [ ] Spacing: 300 m predicts 64.8 m against the measured 64.9 m
 - [ ] Budget: reproduces each paired flight's EXIF elapsed time within tolerance
 - [ ] Splitting: catches all three over-budget fixtures, leaves the in-budget one alone

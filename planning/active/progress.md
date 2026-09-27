@@ -13,3 +13,14 @@
 - Phases approved by user
 - Created branch `26-generate-flight-plans-from-boundaries-we` off main
 - Next: Phase 1, the WPML writer
+
+### Phase 1 — WPML writer (done)
+
+- `scripts/flight_wpml.py`: reader + writer, action groups preserved verbatim on read
+- All five fixtures re-emit **byte-for-byte exactly** (628 waypoints total)
+- Found and fixed: Map Pilot's files end at `</kml>` with **no trailing newline**
+- Found and fixed a defect in the gate itself: `splitlines()` discards the trailing-newline
+  difference, so the detector fired while the explainer printed nothing. Added an arm that
+  reports the trailing bytes when every line matches
+- Gate proven both directions: trailing-byte difference caught and explained; a 1 m coordinate
+  mutation caught at the exact line
