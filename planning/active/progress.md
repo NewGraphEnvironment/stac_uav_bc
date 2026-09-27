@@ -24,3 +24,13 @@
   reports the trailing bytes when every line matches
 - Gate proven both directions: trailing-byte difference caught and explained; a 1 m coordinate
   mutation caught at the exact line
+
+### Phase 2 — Footprint and spacing (done)
+
+- `scripts/flight_coverage.py`: gsd, footprint, spacing, long-axis bearing, serpentine transects,
+  photo stations. Camera constants in one block, marked for supersession by fly#70
+- Gate: at 300 m the model gives transect 86.4 m / photo 64.8 m against measured 86.0 / 64.9
+- Also asserts spacing is linear in height, transect count over a 1 km square, serpentine ordering
+  (the hop between transects is a turn, not a transit), and 100% footprint coverage of the block
+- Guard proven: substituting the wrong 10.08 mm sensor width (the rounded-24mm-equivalent
+  derivation) fails both spacing checks at 67.50 / 90.00 m

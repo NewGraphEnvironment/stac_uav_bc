@@ -21,10 +21,10 @@ Immediate driver: three batteries from a launch point at the **Peacock Creek con
 
 ## Phase 2: Footprint and spacing
 
-- [ ] `scripts/flight_coverage.py` — camera + height + overlap → footprint, transect spacing, photo spacing
-- [ ] Constants from fly#70, with the derivation in a comment; **assert 300 m → 64.8 m** against the
+- [x] `scripts/flight_coverage.py` — camera + height + overlap → footprint, transect spacing, photo spacing
+- [x] Constants from fly#70, with the derivation in a comment; **assert 300 m → 64.8 m** against the
       measured 64.9 m as a regression test
-- [ ] Serpentine transect generation over a polygon, with bearing chosen along the polygon's long axis
+- [x] Serpentine transect generation over a polygon, with bearing chosen along the polygon's long axis
 
 ## Phase 3: Budget model, calibrated on ground truth
 
@@ -56,7 +56,7 @@ Immediate driver: three batteries from a launch point at the **Peacock Creek con
 ## Validation
 
 - [x] Round-trip: all five fixture KMZs re-emit equal
-- [ ] Spacing: 300 m predicts 64.8 m against the measured 64.9 m
+- [x] Spacing: 300 m predicts 64.8 m against the measured 64.9 m
 - [ ] Budget: reproduces each paired flight's EXIF elapsed time within tolerance
 - [ ] Splitting: catches all three over-budget fixtures, leaves the in-budget one alone
 - [ ] End-to-end: generated waypoints for the `lwd001` block fall within the actual image GPS spread
