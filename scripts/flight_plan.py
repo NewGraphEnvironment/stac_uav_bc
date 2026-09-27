@@ -20,8 +20,12 @@
 #     --stream "Peacock Creek" --launch -126.79270 54.36067 \
 #     --height 350 --batteries 3 --out /tmp/peacock
 #
-# --validate-fixtures checks the splitter against the five Map Pilot missions,
-# whose own path lengths say which of them fit a battery and which do not.
+# --validate-fixtures checks the BUDGET VERDICT against the five Map Pilot
+# missions, using each mission's own wpml:distance. It does not exercise the
+# splitter, and it is a coarse check: the fixture path lengths sit far either side
+# of the cutoff, so any sizing speed in roughly 2.3-8.8 m/s passes it. The speed
+# constant itself is pinned in flight_budget.py --selftest, against the measured
+# per-flight minimum.
 import argparse
 import math
 import pathlib
@@ -58,6 +62,18 @@ FIXTURE_PATHS_M = {
 }
 FIXTURE_FITS = {"myKMZ-3", "20220722_morr_braid04-2"}
 FIXTURE_HEIGHT_M = 300.0
+
+
+def _max_transit_m(height_m):
+    """Transit distance at which one battery has no survey path left."""
+    lo, hi = 0.0, 50000.0
+    for _ in range(40):
+        mid = (lo + hi) / 2.0
+        if budget.max_path_m(height_m, transit_m=mid) > 0:
+            lo = mid
+        else:
+            hi = mid
+    return lo
 
 
 def load_reach(stream, gpkg=FLOODPLAIN_GPKG, layer=DEFAULT_LAYER):
@@ -122,11 +138,22 @@ def split_to_budget(polygon, height_m, launch_pt, min_block_ha=MIN_BLOCK_HA):
     cut that many equal-area strips in a single pass. Components under
     `min_block_ha` are dropped and reported rather than flown.
     """
-    def path_len(poly):
+    def survey(poly):
+        """(path_m, n_stations). n_stations == 0 means UNFLYABLE, not free."""
         if poly.is_empty or poly.area <= 0:
-            return 0.0
-        _, _, meta = cov.plan_transects(poly, height_m)
-        return meta["path_m"]
+            return 0.0, 0
+        stations, _, meta = cov.plan_transects(poly, height_m)
+        return meta["path_m"], len(stations)
+
+    def flyable_and_fits(poly):
+        """A block must have stations AND fit. budget.fits(0.0) is True, so a
+        block too narrow for a single transect would otherwise pass every check
+        -- which is how the minimal-n search terminated on 50 m strips against a
+        100.8 m spacing and reported over_budget: 0."""
+        path, n = survey(poly)
+        if n == 0:
+            return False
+        return budget.fits(path, height_m, transit_m=transit(poly))[0]
 
     def transit(poly):
         return launch_pt.distance(poly) if launch_pt is not None else 0.0
@@ -135,7 +162,7 @@ def split_to_budget(polygon, height_m, launch_pt, min_block_ha=MIN_BLOCK_HA):
     kept = [p for p in parts if p.geom_type == "Polygon" and p.area / 1e4 >= min_block_ha]
     dropped = [p for p in parts if p not in kept]
 
-    blocks = []
+    blocks, unreachable = [], []
     for comp in kept:
         # Search for the SMALLEST n whose strips all fit, rather than estimating it
         # from total path. The estimate over-splits badly: turn-around is a large
@@ -144,13 +171,15 @@ def split_to_budget(polygon, height_m, launch_pt, min_block_ha=MIN_BLOCK_HA):
         # makes three batteries cover as much as three batteries can.
         budget_path = budget.max_path_m(height_m, transit_m=transit(comp))
         if budget_path <= 0:
+            # Out of reach: the transit alone exhausts the battery. Record it --
+            # dropping it silently loses area the user was just told is in scope.
+            unreachable.append(comp)
             continue
-        lower = max(1, math.ceil(path_len(comp) / budget_path))
+        lower = max(1, math.ceil(survey(comp)[0] / budget_path))
         chosen, n = None, 1
         while n <= max(lower * 2, 24):
             strips = [s for s in _equal_area_strips(comp, n) if s.area / 1e4 >= min_block_ha]
-            if strips and all(budget.fits(path_len(s), height_m, transit_m=transit(s))[0]
-                              for s in strips):
+            if strips and all(flyable_and_fits(s) for s in strips):
                 chosen = strips
                 break
             n += 1
@@ -167,18 +196,27 @@ def split_to_budget(polygon, height_m, launch_pt, min_block_ha=MIN_BLOCK_HA):
 
     # A strip can still come out over budget where the cut lands badly, so verify
     # rather than assume -- the split is a prediction and this is the check on it.
-    over = []
+    over, unflyable = [], []
     for b in blocks:
-        ok, _, _ = budget.fits(path_len(b), height_m, transit_m=transit(b))
-        if not ok:
+        path, n = survey(b)
+        if n == 0:
+            unflyable.append(b)
+        elif not budget.fits(path, height_m, transit_m=transit(b))[0]:
             over.append(b)
+    # Unflyable blocks are removed, not emitted: a mission with no stations is
+    # not a mission. They are reported so the area is not silently lost.
+    blocks = [b for b in blocks if b not in unflyable]
 
     # Nearest first: the launch point is fixed, so the closest blocks spend least of
     # the battery getting there.
     blocks.sort(key=lambda b: transit(b))
     return blocks, {"dropped": len(dropped),
                     "dropped_ha": sum(p.area for p in dropped) / 1e4,
-                    "over_budget": len(over)}
+                    "over_budget": len(over),
+                    "unreachable": len(unreachable),
+                    "unreachable_ha": sum(p.area for p in unreachable) / 1e4,
+                    "unflyable": len(unflyable),
+                    "unflyable_ha": sum(b.area for b in unflyable) / 1e4}
 
 
 def block_mission(polygon_metric, height_m, speed_ms, name):
@@ -189,12 +227,18 @@ def block_mission(polygon_metric, height_m, speed_ms, name):
     pts = gpd.GeoSeries(stations, crs=CRS_METRIC).to_crs(CRS_WGS84)
 
     waypoints = []
+    last = len(pts) - 1
     for i, p in enumerate(pts):
+        # Match the real exports exactly: every waypoint carries its OWN groups,
+        # with the id incrementing, the gimbal spanning i..i+1 and the photo at
+        # i..i. Measured on myKMZ-3 -- 37 waypoints, 36 gimbal groups (the last
+        # has no i+1 to span), ids 0..35. Emitting id 0 everywhere is what the
+        # first version did, and the round-trip gate cannot see it because the
+        # reader replays action groups as raw text.
         actions = []
-        if i == 0:
-            # Gimbal is set once at the head of the wayline, as Map Pilot does.
-            actions.append(gimbal_action(group_id=0, start=0, end=len(pts) - 1))
-        actions.append(photo_action(group_id=0, index=i))
+        if i < last:
+            actions.append(gimbal_action(group_id=i, start=i, end=i + 1))
+        actions.append(photo_action(group_id=i, index=i))
         waypoints.append(Waypoint(lon=p.x, lat=p.y, height=height_m,
                                   speed=speed_ms, action_xml=actions))
 
@@ -243,6 +287,9 @@ def main():
     ap.add_argument("--layer", default=DEFAULT_LAYER)
     ap.add_argument("--gpkg", default=FLOODPLAIN_GPKG)
     ap.add_argument("--out", help="directory for the .kmz files")
+    ap.add_argument("--review-layers", action="store_true",
+                    help="also write plan.gpkg beside the missions (floodplain, launch, "
+                         "blocks, transects, stations) for review in QGIS before flying")
     ap.add_argument("--validate-fixtures", action="store_true",
                     help="check the budget verdict against the five real missions (gate)")
     args = ap.parse_args()
@@ -262,6 +309,14 @@ def main():
                          f"of the launch point")
     print(f"=== {args.stream}: {reach.area/1e4:.1f} ha total, "
           f"{working.area/1e4:.1f} ha within {args.radius:.0f} m of launch")
+    # The radius is the user's search window; the battery sets the real one. Say so
+    # up front rather than silently dropping everything between the two -- at 350 m
+    # the reachable transit is 4223 m while --radius defaults to 5000.
+    reach_m = _max_transit_m(args.height)
+    if args.radius > reach_m:
+        print(f"    note: at {args.height:.0f} m one battery reaches about "
+              f"{reach_m:.0f} m of transit, less than --radius {args.radius:.0f} m; "
+              f"anything beyond that is reported as unreachable")
 
     t_sp, p_sp = cov.spacing(args.height)
     print(f"=== {args.height:.0f} m AGL: gsd {cov.gsd(args.height)*100:.2f} cm/px, "
@@ -272,18 +327,31 @@ def main():
     if split_meta["dropped"]:
         print(f"    ({split_meta['dropped']} sliver(s) under {MIN_BLOCK_HA} ha dropped, "
               f"{split_meta['dropped_ha']:.2f} ha total — not survey targets)")
+    if split_meta["unreachable"]:
+        print(f"    {split_meta['unreachable']} component(s) beyond battery reach, "
+              f"{split_meta['unreachable_ha']:.1f} ha — not planned", file=sys.stderr)
+    if split_meta["unflyable"]:
+        print(f"    {split_meta['unflyable']} block(s) too narrow for a transect, "
+              f"{split_meta['unflyable_ha']:.1f} ha — dropped", file=sys.stderr)
     if split_meta["over_budget"]:
         # Loud, not silent: a block that does not fit will truncate in the air.
         print(f"    WARNING: {split_meta['over_budget']} block(s) still over budget "
               f"after splitting", file=sys.stderr)
 
     out = pathlib.Path(args.out)
-    written, total_ha = [], 0.0
-    for i, b in enumerate(blocks[:args.batteries], 1):
-        name = f"{args.stream.lower().replace(' ', '_')}_{i:02d}"
+    written, total_ha, skipped = [], 0.0, 0
+    layers = {"blocks": ([], []), "transects": ([], []), "stations": ([], [])}
+    # Iterate until `--batteries` missions are WRITTEN. Slicing the block list
+    # first let an unsurveyable block consume a battery slot, and blocks are
+    # sorted nearest-first, so those slots were the ones being eaten.
+    for b in blocks:
+        if len(written) >= args.batteries:
+            break
+        name = f"{args.stream.lower().replace(' ', '_')}_{len(written) + 1:02d}"
         mission, meta = block_mission(b, args.height, args.speed, name)
         if mission is None:
             print(f"  SKIP {name}: no stations (block too small for one transect)")
+            skipped += 1
             continue
         transit_m = launch.distance(b)
         ok, est, usable = budget.fits(meta["path_m"], args.height, transit_m=transit_m)
@@ -295,15 +363,64 @@ def main():
               f"transit {transit_m:.0f} m, {est:.0f} s / {usable:.0f} s "
               f"{'OK' if ok else 'OVER BUDGET'}")
         print(f"      -> {path}")
+        if args.review_layers:
+            stations, lines, _ = cov.plan_transects(b, args.height)
+            layers["blocks"][0].append(
+                {"block": name, "area_ha": round(meta["area_ha"], 1),
+                 "transects": meta["n_transects"], "stations": len(stations),
+                 "path_m": round(meta["path_m"]), "transit_m": round(transit_m),
+                 "est_s": round(est), "budget_s": round(usable), "fits": bool(ok)})
+            layers["blocks"][1].append(b)
+            for j, ln in enumerate(lines):
+                layers["transects"][0].append({"block": name, "transect": j})
+                layers["transects"][1].append(ln)
+            for j, st in enumerate(stations):
+                layers["stations"][0].append({"block": name, "station": j})
+                layers["stations"][1].append(st)
+
+    if args.review_layers and written:
+        # Review before flying. One file, five layers, opens straight in QGIS.
+        gpkg = out / "plan.gpkg"
+        gpd.GeoDataFrame({"name": [args.stream]}, geometry=[reach],
+                         crs=CRS_METRIC).to_file(gpkg, layer="floodplain", driver="GPKG")
+        gpd.GeoDataFrame({"name": ["launch"]}, geometry=[launch],
+                         crs=CRS_METRIC).to_file(gpkg, layer="launch", driver="GPKG", mode="a")
+        for lname, (rows, geoms) in layers.items():
+            if geoms:
+                gpd.GeoDataFrame(rows, geometry=geoms, crs=CRS_METRIC).to_file(
+                    gpkg, layer=lname, driver="GPKG", mode="a")
+        print(f"  review layers -> {gpkg}")
 
     print()
     if not written:
         print("PLAN INCOMPLETE: no missions written", file=sys.stderr)
         return 1
+
+    # Anything that costs the user area or would truncate in the air makes this a
+    # non-zero exit, so a caller gating on the status is not told everything is
+    # fine. Reporting a problem and exiting 0 is the shape this is avoiding.
+    problems = []
+    if split_meta["over_budget"]:
+        problems.append(f"{split_meta['over_budget']} block(s) still over budget")
+    if split_meta["unflyable"]:
+        problems.append(f"{split_meta['unflyable']} block(s) too narrow to fly "
+                        f"({split_meta['unflyable_ha']:.1f} ha)")
+    if split_meta["unreachable"]:
+        problems.append(f"{split_meta['unreachable']} component(s) beyond battery reach "
+                        f"({split_meta['unreachable_ha']:.1f} ha)")
+    if skipped:
+        problems.append(f"{skipped} block(s) skipped for having no stations")
+
+    if problems:
+        print(f"PLAN INCOMPLETE: {len(written)} mission(s) written, {total_ha:.1f} ha, "
+              f"but:", file=sys.stderr)
+        for pr in problems:
+            print(f"  - {pr}", file=sys.stderr)
+        return 1
     print(f"PLAN COMPLETE: {len(written)} mission(s), {total_ha:.1f} ha, "
           f"{len(blocks)} block(s) available")
-    if len(blocks) > args.batteries:
-        print(f"  ({len(blocks) - args.batteries} further block(s) not written — "
+    if len(blocks) > len(written):
+        print(f"  ({len(blocks) - len(written)} further block(s) not written — "
               f"raise --batteries to include them)")
     return 0
 

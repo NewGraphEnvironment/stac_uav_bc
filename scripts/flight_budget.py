@@ -68,6 +68,10 @@ EFFECTIVE_SPEED_RANGE_MS = (6.21, 10.52)
 # consistent with a flight that spent 21.8 min taking photographs.
 OBSERVED_MAX_PHOTO_TIME_S = 1308.0
 
+# How many flights the constants above were fitted to. Asserted, so a dataset
+# appearing or disappearing is a loud failure rather than a quietly narrower fit.
+CALIBRATION_N_FLIGHTS = 7
+
 # Climb and descent to survey height. NOT measured -- EXIF starts at the first
 # photo, by which time the aircraft is already up. #26 flags this as the open
 # question that decides the per-battery ceiling, and it still is. These are the
@@ -188,6 +192,15 @@ def _selftest():
 
     sp = sorted(r["speed_ms"] for r in rows)
     print(f"  {len(rows)} flights: effective speed {sp[0]:.2f}-{sp[-1]:.2f} m/s")
+
+    # Assert the POPULATION, not just the extremes. Both numeric guards below are
+    # owned by one dataset each, so losing five of seven imagery dirs leaves them
+    # satisfied and the gate prints "consistent with 2 flown missions" — an
+    # expectation derived from the artifact goes empty alongside it.
+    if len(rows) != CALIBRATION_N_FLIGHTS:
+        fails.append(f"calibrated on {CALIBRATION_N_FLIGHTS} flights but found "
+                     f"{len(rows)} — datasets added or missing; re-run --calibrate "
+                     f"and update the constants")
 
     # The constants must still describe the imagery they were fitted to. If a
     # dataset is added or re-stitched, this is what notices.

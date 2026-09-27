@@ -272,11 +272,26 @@ def _roundtrip(paths):
         try:
             with zipfile.ZipFile(p) as z:
                 original = z.read("wpmz/waylines.wpml").decode("utf-8")
+                original_tpl = z.read("wpmz/template.kml").decode("utf-8")
         except (zipfile.BadZipFile, KeyError) as e:
             print(f"FAIL  {p.name}: not a WPML kmz ({e})")
             failed += 1
             continue
-        emitted = render_waylines(read_kmz(p))
+        mission = read_kmz(p)
+        emitted = render_waylines(mission)
+        # write_kmz emits BOTH files, so both must be checked. Gating only the
+        # waylines left half of what is written unverified.
+        emitted_tpl = render_template_kml(mission)
+        if emitted_tpl != original_tpl:
+            failed += 1
+            print(f"FAIL  {p.name}: template.kml differs "
+                  f"({len(original_tpl)} chars original, {len(emitted_tpl)} emitted)")
+            for n, (a, b) in enumerate(zip(original_tpl.splitlines(),
+                                           emitted_tpl.splitlines()), 1):
+                if a != b:
+                    print(f"        line {n}:\n          orig: {a!r}\n          emit: {b!r}")
+                    break
+            continue
         if emitted == original:
             print(f"PASS  {p.name}  ({original.count('<Placemark>')} waypoints, exact)")
             continue
