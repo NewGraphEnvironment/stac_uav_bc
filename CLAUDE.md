@@ -302,6 +302,63 @@ Sum a range directly (segment tree, per-range `sum()`, or grouped sums) rather t
 ### A `pkg::` call in a test passes `devtools::test()` and fails `R CMD check` if `pkg` is undeclared
 `R CMD check` warns "'::' or ':::' import not declared from" for any package a test reaches with `::` that `DESCRIPTION` does not list, and under `error-on: "warning"` that reddens every runner.
 
+### Inside a dplyr verb, a column named like a local variable wins
+Inject a local value into a data-masked verb with `!!x` or `.env$x`, never a bare `x`: `transmute(d, aoi_id = id)` inside `for (id in ids)` reads the frame's own `id` column whenever one exists, with no warning, and the result is well-typed and plausible.
+
+### `earthdatalogin`'s search and download calls overwrite the netrc when they find no Earthdata entry
+Call NASA's CMR search with `curl` and download with `curl` given the netrc directly (`netrc = 1, netrc_file = <path>, cookiefile = ""` follows the URS redirect), or check `earthdatalogin:::has_edl_netrc()` yourself first.
+
+### A fetcher's test helper must make the network fail, not just mock the reader
+When a test mocks a downloader's reader and supplies fixture files, also mock the search and download functions to `stop()` by default, and re-mock them only in the tests that exercise that path.
+
+### testthat 3e `expect_message()` returns the condition, not the expression's value
+Assign inside the call, `expect_message(h <- f(x), "msg")`, never `h <- expect_message(f(x), "msg")`.
+
+### `c()` dispatches on its first argument, so `c(NULL, <Date>)` is a plain number
+Put a Date first when `c()` combines an optional piece with Dates: `c(NULL, <Date>)` takes the default method and returns a bare day count.
+
+### `bind_rows()` of all-`NULL` is a 0 x 0 tibble, and a typed template must take its types from the rows' source
+Bind per-group results under a zero-row template so an all-dropped result keeps its columns, and build that template's key columns from the same object the rows are built from (`combos$variable[0]`, not `character()`).
+
+### `sample.int(prob =)` without replacement is not a probability-proportional draw, so weighting its result again double-counts
+Draw a subsample to be design-weighted **uniformly** (`sample.int(n, k)`), or keep every unit.
+
+### `system2(stdout = TRUE)` warns on a non-zero exit instead of raising, so a `tryCatch(error =)` around it never fires
+Read the exit status off the result: `st <- attr(out, "status")`, which is `NULL` on success.
+
+### Forked `parallel::mclapply()` workers segfault in `glm.fit` under macOS Accelerate BLAS
+Fit models in parallel on socket workers (`parallel::makeCluster()` with `parLapply()`), not forks: with R linked to Accelerate's vecLib, `mclapply` children segfault inside `glm.fit` (`address 0x110, cause 'invalid permissions'`), and `mclapply` returns try-errors with a warning rather than stopping.
+
+### `c(name = x)` keeps `x`'s own name, so a value from a named vector becomes `name.X`
+Strip the name before you label it: `c(axis = unname(v[1]))` or `c(axis = v[[1]])`.
+
+### `trace(exit =)` also fires when the function raises, and `returnValue()` then has no value
+Give `returnValue()` a default and check its length: `trace(f, exit = quote(rec(returnValue(NULL))))`, then treat anything not length 1 as "no value".
+
+### `Rscript -e` supplies `--args` itself, so adding your own shifts every argument by one
+Write `Rscript -e 'expr' a b`, not `Rscript -e 'expr' --args a b`.
+
+### `read.delim()` quotes by default, so a `"` in a field silently swallows rows
+Read a TSV you wrote unquoted with `quote = "", na.strings = character(), comment.char = ""`.
+
+### duckdb in R: the query that autoloads `icu` binds unreliably, so `LOAD icu` before it
+Run `LOAD icu` on the connection before any query that needs it (`epoch()`, `year()`, a cast to `DATE` on a `TIMESTAMPTZ`), or use a function that needs no extension (`epoch_ms()`).
+
+### `fs::path()` collapses the `//` after a URL scheme, so it cannot build URLs
+Join a URL with `paste(base, key, sep = "/")` or `file.path()`, never `fs::path()`: `fs::path("https://x.ca/b", "k.tif")` is `"https:/x.ca/b/k.tif"`, because fs normalises the doubled separator, and the result is not a valid URL.
+
+### R's default curl user-agent fails on canada.ca, and the error names HTTP/2, not the agent
+Set a user-agent on every R fetch of a `canada.ca` page, because R's default fails there with an HTTP/2 error that never mentions the agent.
+
+### `climr::downscale()` returns its reference-period row even with `return_refperiod = FALSE`
+Keep only the observed series (`DATASET == "<obs_ts_dataset>"`, four-digit `PERIOD`) before averaging climr output over years.
+
+### A `function(...)` mock hides arguments the real callee no longer accepts
+Stubbing a callee with `function(...) invisible("mock")` accepts any argument name, so a wrapper still passing a parameter the callee dropped stays green while every real call errors with `unused argument`.
+
+### `expect_message(regexp = "...$")` never matches, because `message()` appends `"\n"`
+The condition message carries the trailing newline, so an end anchor fails and the test reports "did not throw a message" even though the message printed.
+
 # Code Check — Shell
 Tool-level traps in bash, sed, git and `gh`, and in the host toolchain those commands depend on.
 
@@ -330,6 +387,9 @@ Use three-dot `git diff a...b` for what a branch changed; two-dot compares the t
 
 ### Heredoc precedence in pipelines
 - `cmd1 | cmd2 <<EOF` — the heredoc binds to `cmd2` (the rightmost simple command).
+
+### A heredoc whose body contains its own delimiter ends early, and the rest runs as shell
+Give an outer heredoc a delimiter its body cannot contain, or run the script from a file.
 
 ### Paths
 - Hardcoded absolute paths (`/Users/airvine/...`) break for other users
@@ -447,6 +507,12 @@ Supply a default ssh command only when `GIT_SSH_COMMAND`, `core.sshCommand` and 
 
 ### `conda run` captures its child's output, so a pipe gets nothing
 `conda run -n env cmd` buffers the child's stdout and re-emits it, and that re-emission does not reach a pipe.
+
+### `exit` inside a loop condition ends the shell, not the test
+Count instead: `while :; do left=0; for i in $ids; do done_yet "$i" || left=$((left+1)); done; [ "$left" -eq 0 ] && break; sleep 90; done`.
+
+### A failed `cd` lets every later command run in the directory you were already in
+Write `cd "$D" || exit 1` (or `cd "$D" && …`), never `cd "$D"; …`: without the guard, a missing directory prints one error and the rest of the line runs wherever the shell stood, including its file writes.
 
 # Code Check — Spatial
 terra, sf, bcdata, GDAL/OGR CLIs.
@@ -596,6 +662,72 @@ Do the hex swap in **one** helper and omit `<Icon><href>` entirely.
 
 ### `rio cogeo validate` exits 0 when the file is NOT a valid COG
 It reports the verdict in text and returns success either way, so the exit status carries no information at all:
+
+### `terra::rast()` on a SpatRaster returns an empty template, not a copy
+Pass a SpatRaster through as is (`if (inherits(x, "SpatRaster")) x else terra::rast(x)`): `rast(x)` on one builds a new raster with the same geometry and **no values**, so a function that normalises its input with `terra::rast()` silently receives an all-empty grid when handed an object rather …
+
+### `terra::rasterize(filename = , datatype = <integer>)` writes the background as 0, not NA
+Rasterise in memory and then `writeRaster(datatype = …)`: written directly through `filename` with an integer `datatype` (INT1U, INT2S), cells no polygon covers come out as 0, while the file's NoData is 255, so they read back as data (terra 1.9.46 and 1.9.50; rspatial/terra#2195).
+
+### GDAL's `average` warp across a rotated CRS weights the wrong pixels; average in the target CRS instead
+To take class fractions or means from a fine grid in one CRS onto a coarse grid in another, resample nearest onto a grid aligned with the target and `fact` times finer (`terra::disagg(terra::rast(target), fact)`), then `terra::aggregate(fact, mean)`.
+
+### `terra::densify()` on lon/lat follows great circles, so a raster extent's parallel edges bow poleward
+Pass `flat = TRUE` (with the interval in degrees) when densifying a lon/lat extent before projecting it.
+
+### Planetary Computer STAC: a floodplain-scale read hits three limits a reach never does
+Query a large AOI by its convex hull, re-sign items before each tile, and give `datetime` explicit times (`…T00:00:00Z/…T23:59:59Z`).
+
+### gdalcubes reports failed chunk reads only on stderr, so a partial cube passes as complete
+Do not guard on it by capturing output.
+
+### terra reads a multi-variable gdalcubes NetCDF with its variables in alphabetical order
+Select layers by name after `terra::rast()` of a `gdalcubes::write_ncdf()` output, never by position.
+
+### terra's COG writer emits a `.aux.json` sidecar when the raster carries a time
+Strip `time` (and `units`, `varnames`, `longnames`, `metags`, `scoff`) before `writeRaster(filetype = "COG")`, or have the publisher move `<file>.aux.json` with the raster.
+
+### `sf::st_read()` promotes a mixed POLYGON/MULTIPOLYGON layer to all-MULTIPOLYGON
+Read with `promote_to_multi = FALSE` whenever a layer will be written back.
+
+### `sf::st_make_valid()` rewrites geometry that was already valid
+Run it on the invalid rows only (`!st_is_valid(x)`), or keep the original geometry and use the made-valid copy just for the computation.
+
+### terra: `unique()` and `freq()` on a factor return its labels, not its codes
+Read a factor raster's codes from a copy with its levels stripped (`levels(y) <- NULL`, or `set.cats(y, layer = 1, value = NULL)` on a copy you own), never from `terra::unique(x)[, 1]` or `terra::freq(x)$value`: on a factor both return the active category's labels, so matching …
+
+### A GDAL failure partway through `sf::st_read()` returns the rows read so far, with only a warning
+Treat any warning during a read whose completeness matters as a failed read: wrap it in `withCallingHandlers(st_read(...), warning = function(w) stop(...))`, retry, then stop.
+
+### `terra::project()` over a remote strip-organised TIFF issues a range request per strip, so download it first
+Check `gdalinfo` for `Block=<width>x1` before reading a remote raster through `/vsicurl/`, and where it is strip-organised (one row per block, no overviews) download the whole file to a tempfile and read that.
+
+### LidarBC tiles can carry an undeclared nodata of -3.4e38, which a mean takes as data
+Clamp a LidarBC DEM or DSM to plausible elevations before any aggregate: `terra::clamp(r, -100, 5000, values = FALSE)`.
+
+### bcdata returns a column whose values are all missing as character, not numeric
+Coerce every field you do arithmetic on (`as.numeric(v$PROJ_AGE_1)`) right after `bcdata::collect()`.
+
+### The BC WFS caps an un-paged `GetFeature` at 10,000 features and still answers HTTP 200
+Hold any raw WFS read to the server's own count.
+
+### bcdata's error text does not carry a WFS failure's cause, so read it from the response
+To tell a throttle from any other bcdata failure, record the status off the request itself (wrap `crul:::crul_fetch`), not from the message.
+
+### sf and terra can link different GDALs, so a probe through one says nothing about the other
+Check `sf::sf_extSoftVersion()[["GDAL"]]` and `terra::gdal()` before concluding that "GDAL" cannot read something: one R session can hold two GDALs (a CRAN binary of sf bundles its own, terra built against Homebrew links another), and a driver or codec missing from one may be present in the …
+
+### `atan2(0, 0)` is 0, so two points at one place have a bearing of due north
+Treat a zero-length step as having no heading: test the step length before taking its azimuth, and return `NA` rather than a bearing when it is 0, because `atan2(0, 0)` returns 0 with no warning, and that reads as north.
+
+### gdalwarp writes INTO an existing destination and keeps its grid
+Delete the output before re-warping to the same path (`unlink(out)` before `sf::gdal_utils("warp", ...)`, or pass `-overwrite`).
+
+### GDAL caches a failed `/vsicurl/` open, so an in-process retry sends no request
+Before retrying a `/vsicurl/` read in the same process, set `CPL_VSIL_CURL_NON_CACHED` to the URL's prefix.
+
+### THREDDS NCSS returns one time step unless the request says `temporal=all`
+Add `&temporal=all` (or an explicit `time_start`/`time_end`) to every NetCDF Subset Service grid request: without it NCSS answers with a single time step (the one nearest "now"), a valid NetCDF that passes a signature check, so assert the layer count after reading.
 
 # Code Check Conventions
 Structured checklist for reviewing diffs before commit.
@@ -1272,6 +1404,8 @@ would, X is not evidence.
 When the user pushes back on an inference, re-derive rather than defend. The
 conclusion often survives; the reasoning that reaches it is usually different.
 
+*9 lines of evidence for this rule are in `conventions/karpathy.md`, which `/code-check` reads in full.*
+
 ### Documents that share an ancestor corroborate nothing
 
 Sibling of the rule above, one level out: there a *fact* was consistent with the
@@ -1311,7 +1445,7 @@ Five habits:
   sits in three documents is not fixed by repairing the one that was quoted; the other two
   still read as authoritative.
 
-*31 lines of evidence for this rule are in `conventions/karpathy.md`, which `/code-check` reads in full.*
+*39 lines of evidence for this rule are in `conventions/karpathy.md`, which `/code-check` reads in full.*
 
 ### "It can only be answered by testing" is a claim with an author
 
@@ -1327,6 +1461,8 @@ The claim is usually made by someone who knows the domain, at a moment before th
 looked. Not wrong so much as **unexamined**, which is what lets it survive into the
 plan. Then **bound what the probe closed**: reading a desktop plugin says nothing
 about the mobile app. An over-claimed probe is worse than none.
+
+*6 lines of evidence for this rule are in `conventions/karpathy.md`, which `/code-check` reads in full.*
 
 ### A real bug is not necessarily the reported bug
 
@@ -1453,7 +1589,7 @@ Sibling of *"An inventory is only complete relative to a boundary"* in `code-che
 step earlier: that one is about a search that was complete for the wrong scope, this is
 about never having searched the scope where the answer lived.
 
-*25 lines of evidence for this rule are in `conventions/karpathy.md`, which `/code-check` reads in full.*
+*26 lines of evidence for this rule are in `conventions/karpathy.md`, which `/code-check` reads in full.*
 
 #### The storage version: one store is not the world
 
