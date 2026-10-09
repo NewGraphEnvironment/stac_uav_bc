@@ -78,6 +78,20 @@ done
 echo "=== create items"
 conda run -n titiler python "$REPO/scripts/item_create.py" "${new_tifs[@]}"
 
+# item_create.py SKIPs a dataset whose sites.csv row is published=false, and
+# stacs verify checks only what collection.json links, so without this a
+# retracted dataset would end in PUBLISH COMPLETE with no item. Before upload.
+python3 - "$PROD/collection.json" "${rels[@]}" <<'PYEOF'
+import json, sys
+c = json.load(open(sys.argv[1]))
+hrefs = [l["href"] for l in c["links"] if l["rel"] == "item"]
+unlinked = [r for r in sys.argv[2:] if not any(f"/{r}/" in h for h in hrefs)]
+if unlinked:
+    print("ERROR: no item in collection.json for: " + ", ".join(unlinked)
+          + " (published=false in data/sites.csv?) -- not publishing", file=sys.stderr)
+    sys.exit(1)
+PYEOF
+
 echo "=== upload (per-dataset sync: durable + skips what is already up)"
 for rel in "${rels[@]}"; do
   aws s3 sync "$PROD/$rel" "$BUCKET/$rel" --profile "$PROFILE" --only-show-errors
