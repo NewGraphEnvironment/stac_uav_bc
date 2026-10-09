@@ -1,6 +1,6 @@
 # stac_uav_bc
 
-## Unreleased
+## v1.0.4 (2026-10-09)
 
 Registration and verification move to [`stacs`](https://github.com/NewGraphEnvironment/stacs), and
 the static catalogue's item links are fixed (#35). No item content changes.
