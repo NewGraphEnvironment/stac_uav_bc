@@ -16,7 +16,20 @@ Containers on the droplet (`root@146.190.12.8`, hostname `geopro`):
 | `geoserv-titiler` | titiler | 8001 | `titiler.a11s.one` |
 | `geoserv-caddy` | caddy | 80/443 | TLS + reverse proxy |
 
-The public API is **read-only**: the transactions extension is off, so POST/PUT/DELETE return 405. That is deliberate — writes go through pypgstac on the droplet host (installed by the server build at `/opt/geoserv/scripts` via `uv`).
+The public API is **read-only**: the transactions extension is off, so POST/PUT/DELETE return 405. That is deliberate — writes go through pypgstac on the droplet host (installed by the server build at `/opt/geoserv/scripts` via `uv`), driven over ssh by [`stacs`](https://github.com/NewGraphEnvironment/stacs) (#35).
+
+## Registration and verification: stacs
+
+`scripts/stacs.sh` runs the `stacs` CLI at the tag pinned on its one `STACS_REF` line (through `uvx`; no env to install). `stacs.toml` at the repo root declares this catalogue — API, collection id, bucket, the `image` asset every item must carry, and the transport to the droplet. No setting is a secret: the database password stays on the host and is named (`password_env`), never passed.
+
+```bash
+scripts/stacs.sh verify   --config stacs.toml --out-dir /tmp/verify   # changes nothing
+scripts/stacs.sh register --config stacs.toml --mode drift             # what the API lacks or serves stale
+```
+
+Both read the **published** catalogue (`collection.json` on the bucket and the item links in it), so they run after the S3 sync, never before. `verify` compares id sets in both directions and every body by digest, and exits 1 on any drift, writing `missing.txt`, `changed.txt` and `orphaned.txt` to `--out-dir`. `register` is upsert-only, writes the collection before items, and checks that the API serves what it sent. `catalogue_release.sh` and `dataset_publish.sh` run both, so you need them by hand only for a one-off check.
+
+The item links have only been correct since #35. Before that, every `rel: item` href was `<bucket>/<id>/<id>.json`, a key S3 never held, because `Collection.add_item()` re-homed each item under pystac's default layout. `item_create.py` now keeps the tree path and refuses to save a `collection.json` whose item links name no file in the prod tree. An additive `item_create.py` run (inside `dataset_publish.sh`) refuses until one `--rebuild` has rewritten the old links, so the first release after #35 has to come before the next publish.
 
 ## The Registry: data/sites.csv
 
@@ -26,14 +39,14 @@ The public API is **read-only**: the transactions extension is off, so POST/PUT/
 
 1. Edit `data/sites.csv`; add a `NEWS.md` entry; commit
 2. `git tag vX.Y.Z`
-3. `scripts/catalogue_release.sh` — rebuilds all items, validates, syncs, registers, verifies (~5 min, idempotent)
+3. `scripts/catalogue_release.sh` — rebuilds all items, validates + audits (`--expect` is the collection's link count, so a stray item JSON fails here), syncs, `stacs register --mode drift`, `stacs verify`, then checks the version stamp and registry coverage (~5 min, idempotent)
 
 **Retracting a dataset** (#18 — check nothing external links the URLs first, e.g. published reports):
 
 1. Flip its `data/sites.csv` row to `published=false` with a dated note
 2. Remove the dataset dir from the prod tree and the `imagery_uav_bc` COG tree
 3. `aws s3 rm s3://imagery-uav-bc/<region>/<wsg>/<year>/<item> --recursive --profile airvine`
-4. `scripts/config/item_unregister.sh <item-id>...` (idempotent; API 404s confirm)
+4. `scripts/config/item_unregister.sh <item-id>...` (idempotent; API 404s confirm). Skip it and the release's `stacs verify` fails, reporting the id as orphaned: registered but no longer published
 5. Release as usual (NEWS + tag + `catalogue_release.sh`) — the rebuild drops the collection links
 
 ## Adding New Imagery — the Recipe
@@ -42,13 +55,14 @@ Two commands with a human QC gate between them:
 
 1. Stitch — `caffeinate -s scripts/odm_process-batch.sh <project-dir>...` (skips already-processed dirs; resume-safe after interruption)
 2. QC the ortho — check `odm_report/stats.json` (all images reconstructed? reprojection error ~1-2 px?) and eyeball a preview
-3. Publish — `scripts/dataset_publish.sh <project-dir>...` (COG convert + validate → prod tree → items with flight datetimes → durable S3 upload → register items + collection extent → verify via API; idempotent, safe to re-run)
+3. Publish — `scripts/dataset_publish.sh <project-dir>...` (COG convert + validate → prod tree → items with flight datetimes → durable S3 upload → collection extent → `stacs register --mode drift` → `stacs verify`; idempotent, safe to re-run)
 
 The underlying single-purpose tools these orchestrate, for one-off use:
 
 - `scripts/item_create.py <tifs relative to prod tree>` — items + collection.json (conda env `titiler`)
-- `scripts/config/item_register.sh <item jsons>` — upsert items into the API db
-- `scripts/config/collection_register.sh <collection.json>` — upsert the collection doc
+- `scripts/stacs.sh register --config stacs.toml --mode drift` — upsert the collection, then every item the API lacks or serves stale (reads the published catalogue: sync first)
+- `scripts/stacs.sh verify --config stacs.toml --out-dir <dir>` — what the API serves against what is published
+- `find <prod tree> -name '*.json' ! -name collection.json | scripts/stacs.sh validate` (or `audit --config stacs.toml`) — pystac validation / collection + asset audit; `--dir` does not recurse, so pass paths on stdin
 - `conda run -n dff rio cogeo create <in> <out>` — COG conversion (see `scripts/cog_convert.R` for the batch-log history)
 - Dev tree/bucket retired 2026-07 — prod only
 
@@ -76,7 +90,9 @@ matters, and two steps are easy to miss:
    ones survive the rebuild and get pushed to S3 alongside the new ones.
 3. Update the row's `item` in `data/sites.csv` — the registry key is `(region, watershed, year, item)`.
 4. `item_unregister.sh` the old ids. The final `aws s3 sync --delete` clears the old S3 prefix on its
-   own (prod is authoritative for the bucket), but pgstac is not driven by the sync.
+   own (prod is authoritative for the bucket), but pgstac is not driven by the sync — and stacs is
+   upsert-only, so `stacs verify` reports the old ids as orphaned until they are unregistered.
+   Skipping step 2 is caught too: the release audit refuses an item JSON the collection does not link.
 
 Check for external dependents first, exactly as in the retraction recipe above.
 

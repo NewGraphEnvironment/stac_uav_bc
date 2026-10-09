@@ -53,12 +53,12 @@ Decisions: pin stacs `v0.1.0` (issue; matches stac_dem_bc), run via `uvx`; host 
 - [x] `item_create.py` header and the "register with:" hint point at `stacs`
 
 ## Phase 4: Docs
-- [ ] `scripts/config/README.md`:
+- [x] `scripts/config/README.md`:
   - release, retraction, rename and add-imagery recipes
   - the single-purpose tools list now names `scripts/stacs.sh verify|register|load`
   - a note on the link fix
-- [ ] `README.md` / `README.Rmd` scripts table row; `CLAUDE.md` architecture bullets (the stacs launcher, `stacs.toml`, the deleted scripts)
-- [ ] `NEWS.md` Unreleased entry: stacs adoption, the broken-links fix (consumer-visible for anyone walking the static catalogue), the deleted scripts. The version is left to `/gh-pr-merge`
+- [x] `README.md` / `README.Rmd` scripts table row; `CLAUDE.md` architecture bullets (the stacs launcher, `stacs.toml`, the deleted scripts)
+- [x] `NEWS.md` Unreleased entry: stacs adoption, the broken-links fix (consumer-visible for anyone walking the static catalogue), the deleted scripts. The version is left to `/gh-pr-merge`
 
 ## Phase 5: Live check (read-only)
 - [ ] Serve the rebuilt local `collection.json` on loopback, then run `scripts/stacs.sh verify --config stacs.toml --bucket-url http://127.0.0.1:<port>`. The fixed links fetch the real published bodies from S3, which are compared by digest with the live API. Expect IN SYNC 245/245 with the collection `same` (links are excluded from digests). Logged.
