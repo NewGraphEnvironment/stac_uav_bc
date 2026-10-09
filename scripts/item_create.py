@@ -14,8 +14,8 @@
 # Run inside the titiler conda env (pystac + rio_stac + rasterio):
 #   conda run -n titiler python scripts/item_create.py --rebuild
 #
-# After building: item_validate.py → S3 sync → config/item_register.sh →
-# config/collection_register.sh (or just scripts/catalogue_release.sh).
+# After building: stacs validate/audit → S3 sync → stacs register → stacs verify,
+# via scripts/stacs.sh with stacs.toml (or just scripts/catalogue_release.sh).
 import argparse
 import csv
 import datetime
@@ -215,8 +215,8 @@ def main():
     print(f"collection saved ({len(collection.get_links('item'))} item links)")
     links_check(base, args.s3_url)
     if made:
-        print("\nafter uploading to S3, register with:")
-        print("  scripts/config/item_register.sh \\\n    " + " \\\n    ".join(made))
+        print("\nafter syncing the prod tree to S3, register with:")
+        print("  scripts/stacs.sh register --config stacs.toml --mode drift")
 
 if __name__ == "__main__":
     main()

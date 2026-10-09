@@ -3,9 +3,9 @@
 #
 # Per project: COG convert + validate → prod tree → create items (flight
 # datetimes) → S3 upload; then once per invocation: refresh the collection
-# temporal extent, final sync, register items + collection, verify via the API.
-# Orchestrates the existing tools (item_create.py, item_register.sh,
-# collection_register.sh); see scripts/config/README.md for the recipe.
+# temporal extent, final sync, register + verify with stacs (#35).
+# Orchestrates the existing tools (item_create.py, scripts/stacs.sh with
+# stacs.toml); see scripts/config/README.md for the recipe.
 #
 # Idempotent: existing COGs, items, uploads, and registrations are skipped or
 # upserted, so re-running after an interruption is safe and cheap.
@@ -21,8 +21,9 @@ COG_TREE=$ROOT/imagery_uav_bc
 PROD=$ROOT/stac/prod/imagery_uav_bc
 BUCKET=s3://imagery-uav-bc
 PROFILE=airvine
-API=https://images.a11s.one/collections/imagery-uav-bc-prod
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
+STACS="$REPO/scripts/stacs.sh"
+CONFIG="$REPO/stacs.toml"
 
 TIFS="odm_orthophoto/odm_orthophoto.tif odm_dem/dtm.tif odm_dem/dsm.tif"
 
@@ -121,28 +122,12 @@ PYEOF
 echo "=== final sync (item JSONs + collection.json)"
 aws s3 sync "$PROD" "$BUCKET" --delete --exclude "*/.*" --exclude ".*" --profile "$PROFILE" --only-show-errors
 
-echo "=== register items"
-jsons=()
-for rel in "${rels[@]}"; do
-  while IFS= read -r j; do jsons+=("$j"); done < <(find "$PROD/$rel" -name "*.json" | sort)
-done
-"$REPO/scripts/config/item_register.sh" "${jsons[@]}"
+echo "=== register (stacs: collection first, then whatever the API lacks or serves stale)"
+# Drift registers from the published catalogue, so it picks up these datasets,
+# the refreshed extent, and anything an earlier interrupted run left behind.
+"$STACS" register --config "$CONFIG" --mode drift
 
-echo "=== register collection"
-"$REPO/scripts/config/collection_register.sh" "$PROD/collection.json"
-
-echo "=== verify via API"
-fail=0
-for j in "${jsons[@]}"; do
-  id=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["id"])' "$j")
-  code=$(curl -s -o /dev/null -w "%{http_code}" "$API/items/$id")
-  if [ "$code" != "200" ]; then
-    fail=$((fail+1)); echo "  MISSING ($code): $id"
-  fi
-done
-if [ "$fail" -eq 0 ]; then
-  echo "PUBLISH COMPLETE: ${#jsons[@]} items live across ${#rels[@]} dataset(s)"
-else
-  echo "PUBLISH INCOMPLETE: $fail item(s) not reachable via API" >&2
-  exit 1
-fi
+echo "=== verify (stacs: id sets both ways, every body by digest)"
+VERIFY_DIR=$(mktemp -d "${TMPDIR:-/tmp}/stacs_verify.XXXXXX")
+"$STACS" verify --config "$CONFIG" --out-dir "$VERIFY_DIR"
+echo "PUBLISH COMPLETE: ${#rels[@]} dataset(s) live"

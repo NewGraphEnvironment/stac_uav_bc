@@ -40,17 +40,17 @@ Decisions: pin stacs `v0.1.0` (issue; matches stac_dem_bc), run via `uvx`; host 
 - [x] `config/item_unregister.sh` reads `host` and `db` from `stacs.toml` (python3 `tomllib`) instead of its own literals, so the delete path cannot drift from the write path
 
 ## Phase 3: Switch the callers, delete the old layer
-- [ ] `catalogue_release.sh`:
+- [x] `catalogue_release.sh`:
   - validate gate becomes `find … ! -name collection.json | scripts/stacs.sh validate`, plus a one-line pystac validation of `collection.json` (stacs validates items only), plus `stacs audit --config stacs.toml --expect <n item links>`
   - register becomes `scripts/stacs.sh register --config stacs.toml --mode drift` (collection first, then items, then read-back)
   - then `stacs verify`
   - keep the repo-specific version, `EXPECT_ITEMS` and `nge:` coverage checks
-- [ ] `dataset_publish.sh`:
+- [x] `dataset_publish.sh`:
   - item and collection registration becomes `stacs register --mode drift`
   - the per-item curl 200 loop becomes `stacs verify` (body digests, both directions)
   - drop `API` if it becomes unused
-- [ ] Delete `config/item_register.sh`, `config/collection_register.sh`, `scripts/item_validate.py`. Keep `item_unregister.sh` (stacs is upsert-only)
-- [ ] `item_create.py` header and the "register with:" hint point at `stacs`
+- [x] Delete `config/item_register.sh`, `config/collection_register.sh`, `scripts/item_validate.py`. Keep `item_unregister.sh` (stacs is upsert-only)
+- [x] `item_create.py` header and the "register with:" hint point at `stacs`
 
 ## Phase 4: Docs
 - [ ] `scripts/config/README.md`:

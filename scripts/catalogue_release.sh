@@ -1,6 +1,7 @@
 #!/bin/bash
 # Release the catalogue: full rebuild from data/sites.csv -> validate -> S3 ->
 # register -> verify. One command per release; idempotent end to end (#16).
+# Registration and verification are stacs, configured by stacs.toml (#35).
 #
 # Usage:
 #   scripts/catalogue_release.sh [version]
@@ -14,6 +15,8 @@ PROD=/Users/airvine/Projects/gis/uav_imagery/stac/prod/imagery_uav_bc
 BUCKET=s3://imagery-uav-bc
 PROFILE=airvine
 API=https://images.a11s.one/collections/imagery-uav-bc-prod
+STACS="$REPO/scripts/stacs.sh"
+CONFIG="$REPO/stacs.toml"
 
 VERSION="${1:-$(git -C "$REPO" describe --tags --abbrev=0 | sed 's/^v//')}"
 echo "=== catalogue release v$VERSION"
@@ -21,20 +24,32 @@ echo "=== catalogue release v$VERSION"
 echo "=== rebuild items from sites.csv"
 conda run -n titiler python "$REPO/scripts/item_create.py" --rebuild --version "$VERSION"
 
-echo "=== validate (gate)"
-conda run -n titiler python "$REPO/scripts/item_validate.py"
+echo "=== validate + audit (gate)"
+# stacs validate checks items as written; it does not read collection.json, so
+# the collection gets its own pystac check. Paths go on stdin because --dir does
+# not recurse and the prod tree is nested.
+find "$PROD" -name "*.json" -not -name "collection.json" | sort | "$STACS" validate
+conda run -n titiler python -c \
+  'import sys, pystac; pystac.Collection.from_file(sys.argv[1]).validate(); print("collection valid")' \
+  "$PROD/collection.json"
+# --expect is the collection's own link count, so an item JSON the rebuild did not
+# link (the old-id file a rename leaves behind) fails here instead of being synced.
+n_links=$(python3 -c 'import json,sys; print(sum(l["rel"] == "item" for l in json.load(open(sys.argv[1]))["links"]))' "$PROD/collection.json")
+find "$PROD" -name "*.json" -not -name "collection.json" | sort \
+  | "$STACS" audit --config "$CONFIG" --expect "$n_links"
 
 echo "=== sync JSONs to S3"
 aws s3 sync "$PROD" "$BUCKET" --delete --exclude "*/.*" --exclude ".*" --profile "$PROFILE" --only-show-errors
 echo "    sync OK"
 
-echo "=== register items (bulk upsert)"
-find "$PROD" -name "*.json" -not -name "collection.json" | sort | xargs "$REPO/scripts/config/item_register.sh"
+echo "=== register (stacs: collection first, then whatever the API lacks or serves stale)"
+"$STACS" register --config "$CONFIG" --mode drift
 
-echo "=== register collection"
-"$REPO/scripts/config/collection_register.sh" "$PROD/collection.json"
+echo "=== verify (stacs: id sets both ways, every body by digest)"
+VERIFY_DIR=$(mktemp -d "${TMPDIR:-/tmp}/stacs_verify.XXXXXX")
+"$STACS" verify --config "$CONFIG" --out-dir "$VERIFY_DIR"
 
-echo "=== verify"
+echo "=== verify (this catalogue: version stamp, registry coverage)"
 live_version=$(curl -s "$API" | python3 -c "import json,sys; print(json.load(sys.stdin).get('version','MISSING'))")
 n_items=$(curl -s -X POST "https://images.a11s.one/search" -H "Content-Type: application/json" \
   -d '{"collections":["imagery-uav-bc-prod"],"limit":1000}' | python3 -c "import json,sys; print(len(json.load(sys.stdin)['features']))")

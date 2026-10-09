@@ -73,6 +73,18 @@ The API is unaffected (pgstac rewrites links); anything walking the static catal
 - `item_unregister.sh` now resolves `root@146.190.12.8` / `stac` from `stacs.toml`; with the
   toml absent it exits 1 before doing anything.
 
+## Phase 3 measurements (2026-10-09)
+
+- `catalogue_release.sh`'s validate + audit block, extracted and run alone against the prod tree:
+  245 valid, collection valid, audit OK, exit 0.
+- Same block over a JSON-only copy with one extra `old-id-odm_dem-dtm.json` (the stale file a rename
+  leaves; `item_create.py --rebuild` never deletes it): `FAIL: 1 id(s) appear more than once` and
+  `expected 245 item(s), audited 246`, exit 1. `--expect` = the collection's own link count is what
+  turns the README's rename gotcha into a gate.
+- `dataset_publish.sh` now ends `stacs register --mode drift` → `stacs verify`. Its additive
+  `item_create.py` run will refuse (links gate) until the v1.0.4 rebuild has replaced the old links,
+  so the release goes first.
+
 ## Errors Encountered
 
 | Error | Resolution |

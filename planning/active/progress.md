@@ -8,3 +8,4 @@
 - Next: start Phase 1
 - Phase 1: link fix + gate in item_create.py; prod tree rebuilt (links only, 245/245 resolve on S3)
 - Phase 2: scripts/stacs.sh (v0.1.0 via uvx), stacs.toml, wiring proven by mutation; item_unregister.sh reads host/db from stacs.toml
+- Phase 3: release/publish scripts on stacs; item_register.sh, collection_register.sh, item_validate.py deleted
