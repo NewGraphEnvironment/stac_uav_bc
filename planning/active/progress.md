@@ -10,3 +10,4 @@
 - Phase 2: scripts/stacs.sh (v0.1.0 via uvx), stacs.toml, wiring proven by mutation; item_unregister.sh reads host/db from stacs.toml
 - Phase 3: release/publish scripts on stacs; item_register.sh, collection_register.sh, item_validate.py deleted
 - Phase 4: docs — config README (stacs section, recipes), README table, CLAUDE.md, NEWS Unreleased
+- Phase 5: loopback verify IN SYNC 245/245, drift dryrun 0, positive control, ssh probe; plan review (11 findings) folded in — review-plan.md

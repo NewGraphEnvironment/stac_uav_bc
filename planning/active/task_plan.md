@@ -61,12 +61,18 @@ Decisions: pin stacs `v0.1.0` (issue; matches stac_dem_bc), run via `uvx`; host 
 - [x] `NEWS.md` Unreleased entry: stacs adoption, the broken-links fix (consumer-visible for anyone walking the static catalogue), the deleted scripts. The version is left to `/gh-pr-merge`
 
 ## Phase 5: Live check (read-only)
-- [ ] Serve the rebuilt local `collection.json` on loopback, then run `scripts/stacs.sh verify --config stacs.toml --bucket-url http://127.0.0.1:<port>`. The fixed links fetch the real published bodies from S3, which are compared by digest with the live API. Expect IN SYNC 245/245 with the collection `same` (links are excluded from digests). Logged.
-- [ ] `register --mode drift` cannot run before the release: the S3 `collection.json` still carries the broken links. Record that the first live write is the v1.0.4 `catalogue_release.sh` run after merge
-- [ ] Findings: timings, results, what was not exercised
+- [x] Serve the rebuilt local `collection.json` on loopback, then run `scripts/stacs.sh verify --config stacs.toml --bucket-url http://127.0.0.1:<port>`. The fixed links fetch the real published bodies from S3, which are compared by digest with the live API. Expect IN SYNC 245/245 with the collection `same` (links are excluded from digests). Logged.
+- [x] `register --mode drift` cannot run before the release: the S3 `collection.json` still carries the broken links. Record that the first live write is the v1.0.4 `catalogue_release.sh` run after merge
+- [x] Findings: timings, results, what was not exercised
+
+## Plan review fixes (review-plan.md)
+- [x] `item_create.py`: `collection.set_root(collection)` (no S3 read); additive mode checks links before writing
+- [x] Release gate: collection.json validated by `stacs validate` via stdin; conda one-liner dropped
+- [x] `catalogue_release.sh` reads API + collection id from `stacs.toml`
+- [x] `dataset_publish.sh` header: verify is catalogue-wide; rename recipe: unregister before publish/release
 
 ## Validation
-- [ ] Tests pass (item_create gate, stacs audit wiring, live verify)
+- [x] Tests pass (item_create gate, stacs audit wiring, live verify)
 - [ ] `/code-check` clean on each commit
 - [ ] PWF checkboxes match landed work
 - [ ] `/planning-archive` on completion

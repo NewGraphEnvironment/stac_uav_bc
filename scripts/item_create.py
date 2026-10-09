@@ -172,6 +172,11 @@ def main():
     registry = load_registry(args.sites)
     collection = pystac.Collection.from_file(str(base / "collection.json"))
     collection.set_self_href(f"{args.s3_url}collection.json")
+    # The file's root link is the published S3 URL, so without this add_item()
+    # downloads the bucket's collection.json and makes THAT the root of the
+    # collection and every item: a network dependency, and the published copy's
+    # fields in place of the one being built (#35).
+    collection.set_root(collection)
 
     if args.rebuild:
         tifs = sorted(t for t in base.rglob("*.tif") if not t.name.endswith(".original.tif"))
@@ -195,6 +200,9 @@ def main():
         links_check(base, args.s3_url)
         return
 
+    # Refuse before writing anything: the links already in collection.json have to
+    # resolve too, and only a rebuild rewrites them.
+    links_check(base, args.s3_url)
     existing = {l.href.rsplit("/", 1)[-1].removesuffix(".json") for l in collection.get_links("item")}
     made = []
     for rel in args.tifs:

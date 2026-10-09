@@ -85,8 +85,31 @@ The API is unaffected (pgstac rewrites links); anything walking the static catal
   `item_create.py` run will refuse (links gate) until the v1.0.4 rebuild has replaced the old links,
   so the release goes first.
 
+## Phase 5 live check (read-only, 2026-10-09 14:50 UTC)
+
+Local `collection.json` (fixed links) served on loopback from one Python process
+(`scratchpad/p5/drive.py`); item bodies fetched from S3 at the fixed tree paths; API live.
+
+| command | result | wall |
+|---|---|---|
+| `scripts/stacs.sh verify --config stacs.toml --bucket-url http://127.0.0.1:<port> --out-dir …` | **IN SYNC** — 245 published, 245 registered, 0 missing / 0 orphaned / 0 changed, collection `same`; 245/245 fetched | 4 s |
+| `scripts/stacs.sh register --config stacs.toml --mode drift --dryrun --bucket-url …` | `to register: 0`, `would upsert 0 item(s) (collection: same)` | 4 s |
+| positive control: one item link pointed at a loopback copy with `title` edited | exit 1, `changed: 1`, `changed.txt` = exactly that id | — |
+| `ssh -o BatchMode=yes root@146.190.12.8 'test -f /opt/geoserv/.env && test -d /opt/geoserv/scripts'` | `host-ok` | — |
+| release gate + API checks (`catalogue_release.sh` blocks, `VERSION=1.0.3 EXPECT_ITEMS=245`) | 246 valid, audit OK, `live 1.0.3`, count 245, coverage 245/245, exit 0; `VERSION=9.9.9` → `RELEASE INCOMPLETE`, exit 1 | — |
+
+**Not exercised:** the remote load (`env_file`, `uv run pypgstac`, `STACS_LOADED`). Drift cannot write
+before the release (S3 `collection.json` still has the broken links), and after it the v1.0.4 drift
+loads only the collection, because links are outside the digest. The first stacs **item** upsert is
+the next `dataset_publish.sh`, or `--mode ids` on one id after the release.
+
+Loopback note: a backgrounded `python3 -m http.server` + `sleep 1` probe raced the server's start and
+read as "blocked"; serving from a thread in the driving process worked first time (unsandboxed).
+
 ## Errors Encountered
 
 | Error | Resolution |
 |-------|------------|
+| `S=… && … && server &` — `&` backgrounded the whole list, `$S` empty in the parent | Assign on its own line, background only the server |
+| `diff -rq` printed git-diff usage — `diff` is a shell wrapper for `git diff` here | Compare in Python (or `command diff`) |
 | Mutation fixture picked `\x1b[00m…json` — `ls` is a colour alias in this shell, so the mutated copies were never written and the audit passed | `command ls`; check the fixture was mutated before reading a pass |

@@ -89,7 +89,8 @@ matters, and two steps are easy to miss:
    `<new-id>.json` beside each tif but never removes JSONs whose id no longer matches, so the stale
    ones survive the rebuild and get pushed to S3 alongside the new ones.
 3. Update the row's `item` in `data/sites.csv` — the registry key is `(region, watershed, year, item)`.
-4. `item_unregister.sh` the old ids. The final `aws s3 sync --delete` clears the old S3 prefix on its
+4. `item_unregister.sh` the old ids **before** the publish or release, whose closing `stacs verify`
+   otherwise fails on them. The final `aws s3 sync --delete` clears the old S3 prefix on its
    own (prod is authoritative for the bucket), but pgstac is not driven by the sync — and stacs is
    upsert-only, so `stacs verify` reports the old ids as orphaned until they are unregistered.
    Skipping step 2 is caught too: the release audit refuses an item JSON the collection does not link.

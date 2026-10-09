@@ -7,6 +7,10 @@
 # Orchestrates the existing tools (item_create.py, scripts/stacs.sh with
 # stacs.toml); see scripts/config/README.md for the recipe.
 #
+# The closing stacs verify covers the WHOLE catalogue, not just these datasets:
+# an orphan or stale body anywhere (an old id not yet unregistered after a
+# rename) fails the publish. Resolve it there, then re-run; nothing is lost.
+#
 # Idempotent: existing COGs, items, uploads, and registrations are skipped or
 # upserted, so re-running after an interruption is safe and cheap.
 #

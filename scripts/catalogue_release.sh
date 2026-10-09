@@ -14,9 +14,10 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 PROD=/Users/airvine/Projects/gis/uav_imagery/stac/prod/imagery_uav_bc
 BUCKET=s3://imagery-uav-bc
 PROFILE=airvine
-API=https://images.a11s.one/collections/imagery-uav-bc-prod
 STACS="$REPO/scripts/stacs.sh"
 CONFIG="$REPO/stacs.toml"
+# The checks below read the same API and collection stacs does.
+API=$(python3 -c 'import sys, tomllib; c = tomllib.load(open(sys.argv[1], "rb"))["catalogue"]; print(c["api"].rstrip("/") + "/collections/" + c["collection_id"])' "$CONFIG")
 
 VERSION="${1:-$(git -C "$REPO" describe --tags --abbrev=0 | sed 's/^v//')}"
 echo "=== catalogue release v$VERSION"
@@ -25,13 +26,9 @@ echo "=== rebuild items from sites.csv"
 conda run -n titiler python "$REPO/scripts/item_create.py" --rebuild --version "$VERSION"
 
 echo "=== validate + audit (gate)"
-# stacs validate checks items as written; it does not read collection.json, so
-# the collection gets its own pystac check. Paths go on stdin because --dir does
-# not recurse and the prod tree is nested.
-find "$PROD" -name "*.json" -not -name "collection.json" | sort | "$STACS" validate
-conda run -n titiler python -c \
-  'import sys, pystac; pystac.Collection.from_file(sys.argv[1]).validate(); print("collection valid")' \
-  "$PROD/collection.json"
+# Paths on stdin, because --dir does not recurse and the prod tree is nested. Given
+# on stdin, collection.json is validated too (--dir would skip it).
+find "$PROD" -name "*.json" | sort | "$STACS" validate
 # --expect is the collection's own link count, so an item JSON the rebuild did not
 # link (the old-id file a rename leaves behind) fails here instead of being synced.
 n_links=$(python3 -c 'import json,sys; print(sum(l["rel"] == "item" for l in json.load(open(sys.argv[1]))["links"]))' "$PROD/collection.json")
@@ -51,8 +48,8 @@ VERIFY_DIR=$(mktemp -d "${TMPDIR:-/tmp}/stacs_verify.XXXXXX")
 
 echo "=== verify (this catalogue: version stamp, registry coverage)"
 live_version=$(curl -s "$API" | python3 -c "import json,sys; print(json.load(sys.stdin).get('version','MISSING'))")
-n_items=$(curl -s -X POST "https://images.a11s.one/search" -H "Content-Type: application/json" \
-  -d '{"collections":["imagery-uav-bc-prod"],"limit":1000}' | python3 -c "import json,sys; print(len(json.load(sys.stdin)['features']))")
+n_items=$(curl -s -X POST "${API%/collections/*}/search" -H "Content-Type: application/json" \
+  -d "{\"collections\":[\"${API##*/}\"],\"limit\":1000}" | python3 -c "import json,sys; print(len(json.load(sys.stdin)['features']))")
 echo "live collection version: $live_version | items: $n_items"
 [ "$live_version" = "$VERSION" ] || { echo "RELEASE INCOMPLETE: live version != $VERSION" >&2; exit 1; }
 
@@ -73,8 +70,8 @@ fi
 # stream_name still titles from the directory name while carrying nge:region.
 # stream_name is the property the title actually reads, so it is the one that
 # has to be present.
-curl -s -X POST "https://images.a11s.one/search" -H "Content-Type: application/json" \
-  -d '{"collections":["imagery-uav-bc-prod"],"limit":1000}' | python3 -c "
+curl -s -X POST "${API%/collections/*}/search" -H "Content-Type: application/json" \
+  -d "{\"collections\":[\"${API##*/}\"],\"limit\":1000}" | python3 -c "
 import json, sys
 feats = json.load(sys.stdin)['features']
 need = {'nge:region', 'nge:stream_name'}
