@@ -134,6 +134,12 @@ def links_check(base, s3_url):
               if not h.startswith(s3_url) or not (base / unquote(h[len(s3_url):])).is_file()]
     if not hrefs:
         sys.exit("LINKS FAILED: collection.json has no item links")
+    # stacs refuses an id linked twice, but only after the sync has published it,
+    # and additive mode never rewrites an existing link: refuse it here instead.
+    ids = [unquote(h.rsplit("/", 1)[-1]).removesuffix(".json") for h in hrefs]
+    repeated = sorted({i for i in ids if ids.count(i) > 1})
+    if repeated:
+        sys.exit(f"LINKS FAILED: {len(repeated)} id(s) linked more than once, e.g. {repeated[:3]}")
     if broken:
         print(f"LINKS FAILED: {len(broken)}/{len(hrefs)} item link(s) name no file under {base}:",
               file=sys.stderr)
@@ -218,6 +224,9 @@ def main():
             collection_add(collection, item)
             item.save_object(dest_href=str(path_item.parent / f"{item_id}.json"))
             made.append(str(path_item.parent / f"{item_id}.json"))
+            # The same tif given twice (`dir` and `dir/`, an overlapping glob) would
+            # otherwise be built and linked twice.
+            existing.add(item_id)
             print(f"CREATED: {item_id}")
     collection.save_object(dest_href=str(base / "collection.json"))
     print(f"collection saved ({len(collection.get_links('item'))} item links)")

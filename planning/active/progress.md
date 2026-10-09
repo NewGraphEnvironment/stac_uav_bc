@@ -11,3 +11,4 @@
 - Phase 3: release/publish scripts on stacs; item_register.sh, collection_register.sh, item_validate.py deleted
 - Phase 4: docs — config README (stacs section, recipes), README table, CLAUDE.md, NEWS Unreleased
 - Phase 5: loopback verify IN SYNC 245/245, drift dryrun 0, positive control, ssh probe; plan review (11 findings) folded in — review-plan.md
+- /code-check branch: 3 rounds (round 2 + 3 each one fix), terminated by enumeration of stacs' 11 content refusals

@@ -113,3 +113,32 @@ read as "blocked"; serving from a thread in the driving process worked first tim
 | `S=… && … && server &` — `&` backgrounded the whole list, `$S` empty in the parent | Assign on its own line, background only the server |
 | `diff -rq` printed git-diff usage — `diff` is a shell wrapper for `git diff` here | Compare in Python (or `command diff`) |
 | Mutation fixture picked `\x1b[00m…json` — `ls` is a colour alias in this shell, so the mutated copies were never written and the audit passed | `command ls`; check the fixture was mutated before reading a pass |
+
+## /code-check branch — how the loop ended (2026-10-09)
+
+Round 1 clean (+ a usability note applied). Round 2: one defect created by this branch's own Phase 3
+change (dropped curl loop → a `published=false` dataset reported PUBLISH COMPLETE), fixed b0676ed.
+Round 3 named the mechanism (checks that read the catalogue's own record cannot see where it
+departs from the operator's request or the disk), enumerated all six removed/replaced checks, and
+found one defect at the links gate this branch added: a dataset passed twice links its id twice,
+which stacs refuses only **after** the sync, permanently until a rebuild. Fixed: `existing` is
+updated per created id, and `links_check` refuses an id linked more than once. Tested: `T T` → one
+link; an injected duplicate link → `LINKS FAILED: 1 id(s) linked more than once`, exit 1.
+
+Terminated by enumeration, not a further round. Every refusal stacs v0.1.0 can raise from the
+**content** of the published catalogue (`grep 'raise\|failures.append'` over `catalogue.py`,
+`register.py`, `validate.py` at v0.1.0; 11 sites), and what stops each one before `aws s3 sync`:
+
+| stacs refusal | stopped before sync by |
+|---|---|
+| catalogue.py:40 link not `.json` | construction (`item_create` writes `<id>.json`) + `links_check` file exists |
+| :70 child link | construction (pystac `add_item` only) |
+| :77 / :186 / register.py:421 id or href linked twice | `links_check` repeated-id gate (new, both modes) |
+| :81 no item links | `links_check` |
+| :194 body not JSON | written by pystac; release also `stacs validate` |
+| :197 body names another id | construction (link and file name both `item.id`); release `audit` |
+| register.py:392 collection id mismatch | the file is read and re-saved, id never set; release `audit` on items |
+| register.py:448 body unreadable | `links_check` (file exists → synced to that key) |
+| register.py:522 audit refused | release: same `stacs audit` before sync; publish: construction (`collection=collection.id`, `asset_name="image"`) |
+
+The rest are config, transport or API-state errors (no catalogue content reaches them).

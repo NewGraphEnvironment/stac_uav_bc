@@ -73,8 +73,8 @@ Decisions: pin stacs `v0.1.0` (issue; matches stac_dem_bc), run via `uvx`; host 
 
 ## Validation
 - [x] Tests pass (item_create gate, stacs audit wiring, live verify)
-- [ ] `/code-check` clean on each commit
-- [ ] PWF checkboxes match landed work
+- [x] `/code-check` clean on each commit
+- [x] PWF checkboxes match landed work
 - [ ] `/planning-archive` on completion
 
 ## After merge (outside the PR mandate)
