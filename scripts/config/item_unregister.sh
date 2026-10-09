@@ -1,7 +1,7 @@
 #!/bin/bash
 # Unregister (delete) STAC items from the API database (pgstac) on the geoserv
-# droplet. Sibling to item_register.sh — same SSH transport, but deletion has no
-# pypgstac verb so it goes through pgstac SQL (delete_item).
+# droplet. Registration is stacs (scripts/stacs.sh), which is upsert-only, so
+# deletion stays here and goes through pgstac SQL (delete_item).
 #
 # Usage:
 #   scripts/config/item_unregister.sh <item-id> [<item-id>...]
@@ -11,8 +11,17 @@
 # handled separately; see the retraction recipe in README.md (#18).
 set -euo pipefail
 
-HOST=root@146.190.12.8   # geoserv droplet (hostname geopro)
-DB=stac                  # imagery-uav-bc-prod lives in the default stac db
+# Host and db are the write path's own: read from stacs.toml, so a host move
+# cannot leave the delete path pointing at the old machine (#35).
+REPO="$(cd "$(dirname "$0")/../.." && pwd)"
+CFG=$(python3 -c '
+import sys, tomllib
+t = tomllib.load(open(sys.argv[1], "rb"))["transport"]
+print(t["host"], t["db"])' "$REPO/stacs.toml")
+HOST=${CFG% *}
+DB=${CFG#* }
+[ -n "$HOST" ] && [ -n "$DB" ] && [ "$HOST" != "$DB" ] \
+  || { echo "ERROR: could not read [transport] host/db from $REPO/stacs.toml" >&2; exit 1; }
 
 [ $# -ge 1 ] || { echo "usage: $(basename "$0") item-id [item-id ...]" >&2; exit 1; }
 

@@ -1,5 +1,36 @@
 # stac_uav_bc
 
+## Unreleased
+
+Registration and verification move to [`stacs`](https://github.com/NewGraphEnvironment/stacs), and
+the static catalogue's item links are fixed (#35). No item content changes.
+
+**One consumer-visible change:**
+
+- **The static catalogue's item links resolve.** Every `rel: item` href in `collection.json`, and
+  every item's `self` link, was `https://imagery-uav-bc.s3.amazonaws.com/<id>/<id>.json`. That key
+  has never existed, and S3 answers 403. Anything walking the catalogue from `collection.json`, as
+  opposed to querying the API, reached none of the 245 items. They now name the file where the sync
+  puts it, `…/<region>/<watershed>/<year>/<item>/<product dir>/<id>.json`. The cause was
+  `Collection.add_item()`, which overwrote the self href `item_create.py` had set with pystac's
+  default layout. `item_create.py` now refuses to save a `collection.json` whose item links name no
+  file in the prod tree. The API was never affected, because pgstac rewrites links.
+
+**Tooling:**
+
+- `scripts/stacs.sh` runs the `stacs` CLI pinned at `v0.1.0`, and `stacs.toml` declares the
+  catalogue. Compared with the scripts it replaces, registration no longer puts the database
+  password in pypgstac's argv on the host, no longer shares one remote temp path between runs, and
+  counts what arrived. Every write is followed by a check that the API serves what was sent.
+- `catalogue_release.sh` and `dataset_publish.sh` register with `stacs register --mode drift` and
+  check with `stacs verify`, which compares id sets in both directions and every body by digest.
+  This replaces the per-item HTTP 200 loop. The release gate is `stacs validate` and `stacs audit`,
+  with `--expect` set to the collection's link count, so an old-id item JSON left behind by a rename
+  now fails the release instead of being synced.
+- Deleted: `scripts/config/item_register.sh`, `scripts/config/collection_register.sh` and
+  `scripts/item_validate.py`. `item_unregister.sh` stays, because stacs is upsert-only, and it now
+  reads its host and database from `stacs.toml`.
+
 ## v1.0.3 (2026-09-24)
 
 Three new 2026 Wedzin Kwa (Morice River) reach surveys, and a stream-name correction across all

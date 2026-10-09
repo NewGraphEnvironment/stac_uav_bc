@@ -143,7 +143,8 @@ The `scripts/` directory holds the orchestration helpers:
 | `s3_index.R`, `s3_map.R` | Index + map S3 contents for ingestion |
 | `item_create.py` | Create STAC items + update collection.json for new COGs (additive-only) |
 | `web.R` | Web/viewer utilities |
-| `config/` | Server docs + registration scripts (`item_register.sh`, `collection_register.sh`) — see the [add-imagery recipe](scripts/config/README.md) |
+| `stacs.sh` | The pinned [`stacs`](https://github.com/NewGraphEnvironment/stacs) CLI — registers and verifies the catalogue against `stacs.toml` |
+| `config/` | Server docs + `item_unregister.sh` (the delete path; stacs is upsert-only) — see the [add-imagery recipe](scripts/config/README.md) |
 | `viewer.html` | Standalone viewer-page template for single-COG previews |
 
 Recent infrastructure work — see commit history — added client-side

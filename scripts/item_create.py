@@ -14,8 +14,8 @@
 # Run inside the titiler conda env (pystac + rio_stac + rasterio):
 #   conda run -n titiler python scripts/item_create.py --rebuild
 #
-# After building: item_validate.py → S3 sync → config/item_register.sh →
-# config/collection_register.sh (or just scripts/catalogue_release.sh).
+# After building: stacs validate/audit → S3 sync → stacs register → stacs verify,
+# via scripts/stacs.sh with stacs.toml (or just scripts/catalogue_release.sh).
 import argparse
 import csv
 import datetime
@@ -24,6 +24,7 @@ import pathlib
 import subprocess
 import sys
 import tempfile
+from urllib.parse import unquote
 
 import pystac
 import rasterio
@@ -114,6 +115,40 @@ def build_item(path_item, base, s3_url, collection, registry):
     item.validate()
     return item
 
+def collection_add(collection, item):
+    # Collection.add_item() re-homes the item under pystac's best-practice layout,
+    # <collection dir>/<id>/<id>.json, overwriting the self href build_item set. Those
+    # keys never exist on S3 (the sync mirrors the tree), so every collection item link
+    # and item self link was a 403 until this restored the tree path (#35).
+    href = item.get_self_href()
+    collection.add_item(item)
+    item.set_self_href(href)
+
+def links_check(base, s3_url):
+    # Gate: every item link in the saved collection.json must name a file under the
+    # prod tree, so the S3 sync publishes something at exactly that URL. stacs fetches
+    # item bodies through these links; a broken one fails registration far from here.
+    c = json.loads((base / "collection.json").read_text())
+    hrefs = [l["href"] for l in c.get("links", []) if l.get("rel") == "item"]
+    broken = [h for h in hrefs
+              if not h.startswith(s3_url) or not (base / unquote(h[len(s3_url):])).is_file()]
+    if not hrefs:
+        sys.exit("LINKS FAILED: collection.json has no item links")
+    # stacs refuses an id linked twice, but only after the sync has published it,
+    # and additive mode never rewrites an existing link: refuse it here instead.
+    ids = [unquote(h.rsplit("/", 1)[-1]).removesuffix(".json") for h in hrefs]
+    repeated = sorted({i for i in ids if ids.count(i) > 1})
+    if repeated:
+        sys.exit(f"LINKS FAILED: {len(repeated)} id(s) linked more than once, e.g. {repeated[:3]}")
+    if broken:
+        print(f"LINKS FAILED: {len(broken)}/{len(hrefs)} item link(s) name no file under {base}:",
+              file=sys.stderr)
+        for h in broken[:5]:
+            print(f"    {h}", file=sys.stderr)
+        sys.exit("links written before #35 are only rewritten by a full rebuild: "
+                 "run item_create.py --rebuild (or scripts/catalogue_release.sh)")
+    print(f"links OK: {len(hrefs)} item links resolve under {base}")
+
 def stamp_version(collection, version):
     if VERSION_EXT not in collection.stac_extensions:
         collection.stac_extensions.append(VERSION_EXT)
@@ -143,6 +178,11 @@ def main():
     registry = load_registry(args.sites)
     collection = pystac.Collection.from_file(str(base / "collection.json"))
     collection.set_self_href(f"{args.s3_url}collection.json")
+    # The file's root link is the published S3 URL, so without this add_item()
+    # downloads the bucket's collection.json and makes THAT the root of the
+    # collection and every item: a network dependency, and the published copy's
+    # fields in place of the one being built (#35).
+    collection.set_root(collection)
 
     if args.rebuild:
         tifs = sorted(t for t in base.rglob("*.tif") if not t.name.endswith(".original.tif"))
@@ -151,7 +191,7 @@ def main():
         for t in tifs:
             item = build_item(t, base, args.s3_url, collection, registry)
             if item:
-                collection.add_item(item)
+                collection_add(collection, item)
                 item.save_object(dest_href=str(t.parent / f"{item.id}.json"))
                 built += 1
         # A full rebuild is the one place that holds every item, so recompute the
@@ -163,8 +203,12 @@ def main():
         bbox = collection.extent.spatial.bboxes[0]
         print(f"REBUILD: {built} items from {len(tifs)} tifs; collection v{collection.extra_fields['version']}, "
               f"{len(collection.get_links('item'))} links; bbox {[round(v, 5) for v in bbox]}")
+        links_check(base, args.s3_url)
         return
 
+    # Refuse before writing anything: the links already in collection.json have to
+    # resolve too, and only a rebuild rewrites them.
+    links_check(base, args.s3_url)
     existing = {l.href.rsplit("/", 1)[-1].removesuffix(".json") for l in collection.get_links("item")}
     made = []
     for rel in args.tifs:
@@ -177,15 +221,19 @@ def main():
             continue
         item = build_item(path_item, base, args.s3_url, collection, registry)
         if item:
-            collection.add_item(item)
+            collection_add(collection, item)
             item.save_object(dest_href=str(path_item.parent / f"{item_id}.json"))
             made.append(str(path_item.parent / f"{item_id}.json"))
+            # The same tif given twice (`dir` and `dir/`, an overlapping glob) would
+            # otherwise be built and linked twice.
+            existing.add(item_id)
             print(f"CREATED: {item_id}")
     collection.save_object(dest_href=str(base / "collection.json"))
     print(f"collection saved ({len(collection.get_links('item'))} item links)")
+    links_check(base, args.s3_url)
     if made:
-        print("\nafter uploading to S3, register with:")
-        print("  scripts/config/item_register.sh \\\n    " + " \\\n    ".join(made))
+        print("\nafter syncing the prod tree to S3, register with:")
+        print("  scripts/stacs.sh register --config stacs.toml --mode drift")
 
 if __name__ == "__main__":
     main()

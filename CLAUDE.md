@@ -18,9 +18,9 @@ The catalogue is a versioned build artifact of (`data/sites.csv`, COGs on S3) �
 - `scripts/flight_plan.py` - flight planning driver: floodplain polygon + launch point → battery-sized blocks → DJI WPML `.kmz` per block (#26). Built on `flight_coverage.py` (footprint, spacing, serpentine transects), `flight_budget.py` (endurance, calibrated on flown missions) and `flight_wpml.py` (WPML read/write). Each carries its own gate - run them before trusting an output
 - `scripts/dataset_publish.sh` - post-QC publish per dataset (COG → items → S3 → register → verify)
 - `scripts/catalogue_release.sh` - one-command release: rebuild all items from the registry → validate → sync → register → verify
-- `scripts/item_create.py` - item builder (registry properties, gdal_footprint geometries, `--rebuild` mode)
-- `scripts/item_validate.py` - pystac validation gate
-- `scripts/config/` - registration tooling (`item_register.sh`, `collection_register.sh`, `item_unregister.sh`) + server docs. The droplet itself is built from our internal infrastructure repo
+- `scripts/item_create.py` - item builder (registry properties, gdal_footprint geometries, `--rebuild` mode); refuses a `collection.json` whose item links do not name a file in the prod tree
+- `scripts/stacs.sh` + `stacs.toml` - registration, verification, validation and audit through the pinned [`stacs`](https://github.com/NewGraphEnvironment/stacs) CLI (#35); the pin is the one line in `stacs.sh`, the catalogue's api, collection id, bucket, asset rule and STAC-host transport are `stacs.toml`
+- `scripts/config/` - `item_unregister.sh` (the delete path; stacs is upsert-only; reads host/db from `stacs.toml`) + server docs. The droplet itself is built from our internal infrastructure repo
 - `stac_create_*.qmd` - Quarto prototyping docs (routine adds use the scripts above)
 - `scripts/cog_convert.R`, `scripts/odm_process.R`, `scripts/s3_*.R` - R session logs / utilities for COG conversion, ODM, S3
 - `scripts/functions.R`, `scripts/utils.R`, `scripts/web.R` - shared R functions and web/viewer utilities
