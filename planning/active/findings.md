@@ -61,7 +61,20 @@ The API is unaffected (pgstac rewrites links); anything walking the static catal
 - HEAD of all 245 new item hrefs on S3: **245 × 200** (the files were always there at the tree path).
 - The prod tree is now ahead of the bucket by links only; the v1.0.4 release sync publishes it.
 
+## Phase 2 measurements (2026-10-09)
+
+- `scripts/stacs.sh --version` → `stacs 0.1.0` (uvx, 39 packages, cached after first build).
+- Over the 245 rebuilt prod items: `stacs audit --config stacs.toml --expect 245` OK
+  (`require=image forbid=-`); `stacs validate` (paths on stdin) `245 item(s), 0 invalid`.
+- Mutations on scratch copies, the mutated item 120th of 245 in sort order:
+  `collection` changed → `FAIL: 1 item(s) name another collection`, exit 1;
+  `image` renamed `data` → `FAIL: 1 item(s) lack asset 'image'`, exit 1;
+  `password = "x"` in `[transport]` → `unknown key(s) in [transport]: password`, exit 2.
+- `item_unregister.sh` now resolves `root@146.190.12.8` / `stac` from `stacs.toml`; with the
+  toml absent it exits 1 before doing anything.
+
 ## Errors Encountered
 
 | Error | Resolution |
 |-------|------------|
+| Mutation fixture picked `\x1b[00m…json` — `ls` is a colour alias in this shell, so the mutated copies were never written and the audit passed | `command ls`; check the fixture was mutated before reading a pass |

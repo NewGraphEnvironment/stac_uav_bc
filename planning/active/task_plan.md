@@ -27,17 +27,17 @@ Decisions: pin stacs `v0.1.0` (issue; matches stac_dem_bc), run via `uvx`; host 
 - [x] Rebuild the prod tree in place with `--version 1.0.3` (no sync, no version change). Then check that all 245 links resolve locally, and HEAD-probe all 245 S3 tree paths for 200 (the item JSONs are already there)
 
 ## Phase 2: Pin stacs and declare the catalogue
-- [ ] `scripts/stacs.sh`: a pinned launcher, `exec uvx --from "git+https://github.com/NewGraphEnvironment/stacs@v0.1.0" stacs "$@"`, so the pin lives in one place; `scripts/stacs.sh --version` → `stacs 0.1.0`
-- [ ] `stacs.toml` at the repo root:
+- [x] `scripts/stacs.sh`: a pinned launcher, `exec uvx --from "git+https://github.com/NewGraphEnvironment/stacs@v0.1.0" stacs "$@"`, so the pin lives in one place; `scripts/stacs.sh --version` → `stacs 0.1.0`
+- [x] `stacs.toml` at the repo root:
   - `[catalogue]`: api `https://images.a11s.one`, collection_id `imagery-uav-bc-prod`, bucket_url `https://imagery-uav-bc.s3.amazonaws.com`
   - `[assets]`: `require = "image"` (no forbid; nothing has been retired)
   - `[transport]`: host `root@146.190.12.8`, db `stac`, env_file `/opt/geoserv/.env`, workdir `/opt/geoserv/scripts`, path_prepend `/root/.local/bin`, pg `localhost:5432` as `stac`, `password_env = "POSTGRES_PASSWORD"`, `pypgstac = ["uv","run","pypgstac"]`
-- [ ] Prove the config is wired, not just present, on scratch copies:
+- [x] Prove the config is wired, not just present, on scratch copies:
   - `stacs audit` passes the prod items
   - it fails when one middle-sorted item names another collection
   - it fails when one item lacks `image`
   - a `password = "x"` line is refused
-- [ ] `config/item_unregister.sh` reads `host` and `db` from `stacs.toml` (python3 `tomllib`) instead of its own literals, so the delete path cannot drift from the write path
+- [x] `config/item_unregister.sh` reads `host` and `db` from `stacs.toml` (python3 `tomllib`) instead of its own literals, so the delete path cannot drift from the write path
 
 ## Phase 3: Switch the callers, delete the old layer
 - [ ] `catalogue_release.sh`:

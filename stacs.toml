@@ -1,0 +1,30 @@
+# This catalogue, declared for stacs (#35): `scripts/stacs.sh <cmd> --config stacs.toml`.
+#
+# collection_id and bucket_url are also item_create.py's (`collection.json` id and the
+# --s3-url default); api is catalogue_release.sh's. Change them together.
+# config/item_unregister.sh reads host and db from here.
+#
+# No setting is a secret. The password stays on the host, named by password_env.
+
+[catalogue]
+api = "https://images.a11s.one"
+collection_id = "imagery-uav-bc-prod"
+bucket_url = "https://imagery-uav-bc.s3.amazonaws.com"
+
+[assets]
+# Every item carries its COG as `image`. Nothing has been retired, so no forbid.
+require = "image"
+
+[transport]
+# The geoserv droplet (hostname geopro), root-only by design. stac_dem_bc reaches the
+# same machine as root@geopro over the tailnet.
+host = "root@146.190.12.8"
+db = "stac"
+env_file = "/opt/geoserv/.env"
+workdir = "/opt/geoserv/scripts"
+path_prepend = "/root/.local/bin"
+pg_host = "localhost"
+pg_port = 5432
+pg_user = "stac"
+password_env = "POSTGRES_PASSWORD"
+pypgstac = ["uv", "run", "pypgstac"]
