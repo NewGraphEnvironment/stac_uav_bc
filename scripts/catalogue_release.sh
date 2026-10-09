@@ -44,7 +44,10 @@ echo "=== register (stacs: collection first, then whatever the API lacks or serv
 
 echo "=== verify (stacs: id sets both ways, every body by digest)"
 VERIFY_DIR=$(mktemp -d "${TMPDIR:-/tmp}/stacs_verify.XXXXXX")
-"$STACS" verify --config "$CONFIG" --out-dir "$VERIFY_DIR"
+# stacs prints at most 5 ids per drift class; the full lists (orphaned.txt is
+# what item_unregister.sh needs after a rename) are in VERIFY_DIR.
+"$STACS" verify --config "$CONFIG" --out-dir "$VERIFY_DIR" \
+  || { echo "full id lists: $VERIFY_DIR" >&2; exit 1; }
 
 echo "=== verify (this catalogue: version stamp, registry coverage)"
 live_version=$(curl -s "$API" | python3 -c "import json,sys; print(json.load(sys.stdin).get('version','MISSING'))")
