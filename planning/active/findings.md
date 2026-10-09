@@ -51,6 +51,16 @@ Cause, reproduced in conda `titiler` (pystac 1.12.0): an item with self href
 `https://b.example/x/x.json`. `build_item` sets the right href; `add_item` replaces it.
 The API is unaffected (pgstac rewrites links); anything walking the static catalogue, and stacs, is.
 
+## Phase 1 measurements (2026-10-09)
+
+- Synthetic tree (two 64x64 tifs, scratch): additive and rebuild both write tree-path item links and
+  self links; `links OK`. Bug restored (`set_self_href` dropped) → `LINKS FAILED: 2/2`, exit 1.
+  Additive run on a collection carrying one stale link → `LINKS FAILED: 1/3`, exit 1, names the link.
+- Prod tree rebuilt in place, `--version 1.0.3`, 40 s: `245 items from 245 tifs`, `links OK: 245`.
+  Diff against a pre-rebuild copy of all 246 JSONs: **246 differ in `links` only, 0 body diffs**.
+- HEAD of all 245 new item hrefs on S3: **245 × 200** (the files were always there at the tree path).
+- The prod tree is now ahead of the bucket by links only; the v1.0.4 release sync publishes it.
+
 ## Errors Encountered
 
 | Error | Resolution |

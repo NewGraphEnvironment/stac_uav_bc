@@ -22,9 +22,9 @@ Decisions: pin stacs `v0.1.0` (issue; matches stac_dem_bc), run via `uvx`; host 
 `root@146.190.12.8`.
 
 ## Phase 1: Fix the item links (blocker)
-- [ ] `item_create.py`: keep `build_item`'s tree-path self href after `collection.add_item()`, in both rebuild and additive modes, so collection item links and item self links name the file that gets synced
-- [ ] Gate in `item_create.py`: after saving, every `rel: item` href in `collection.json` must map under `--s3-url` to a file that exists under `--base`; otherwise exit non-zero naming the first few broken links. This also refuses an additive run on a collection that still carries old broken links
-- [ ] Rebuild the prod tree in place with `--version 1.0.3` (no sync, no version change). Then check that all 245 links resolve locally, and HEAD-probe all 245 S3 tree paths for 200 (the item JSONs are already there)
+- [x] `item_create.py`: keep `build_item`'s tree-path self href after `collection.add_item()`, in both rebuild and additive modes, so collection item links and item self links name the file that gets synced
+- [x] Gate in `item_create.py`: after saving, every `rel: item` href in `collection.json` must map under `--s3-url` to a file that exists under `--base`; otherwise exit non-zero naming the first few broken links. This also refuses an additive run on a collection that still carries old broken links
+- [x] Rebuild the prod tree in place with `--version 1.0.3` (no sync, no version change). Then check that all 245 links resolve locally, and HEAD-probe all 245 S3 tree paths for 200 (the item JSONs are already there)
 
 ## Phase 2: Pin stacs and declare the catalogue
 - [ ] `scripts/stacs.sh`: a pinned launcher, `exec uvx --from "git+https://github.com/NewGraphEnvironment/stacs@v0.1.0" stacs "$@"`, so the pin lives in one place; `scripts/stacs.sh --version` → `stacs 0.1.0`
