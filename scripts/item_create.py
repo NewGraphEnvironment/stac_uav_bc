@@ -160,9 +160,6 @@ def build_item(path_item, base, s3_url, collection, registry):
         print(f"SKIP (published=false in sites.csv): {item_id}")
         return None
 
-    problems = registry_problems(row) if row else []
-    if problems:
-        sys.exit(f"REFUSED: sites.csv row for {item_id}: {'; '.join(problems)}")
     props = registry_props(row) if row else {}
     props["title"] = item_title(props, parts[3], parts[2], path_item.stem)
 
@@ -327,6 +324,14 @@ def main():
 
     base = pathlib.Path(args.base)
     registry = load_registry(args.sites)
+    # Registry checks run here, before the build loop: refusing per item would leave
+    # the items already saved rewritten in the prod tree with collection.json not,
+    # which the next publish's sync would push.
+    problems = [f"{'/'.join(k)}: {p}" for k, r in registry.items()
+                if r.get("published", "true").strip().lower() != "false"
+                for p in registry_problems(r)]
+    if problems:
+        sys.exit(f"REFUSED: {len(problems)} sites.csv row(s): {problems[:3]}")
     conflicts = registry_conflicts(registry)
     if conflicts:
         sys.exit(f"REFUSED: {args.sites} watershed group code/name pairs disagree: {conflicts}; "
@@ -342,13 +347,18 @@ def main():
     if args.rebuild:
         tifs = sorted(t for t in base.rglob("*.tif") if not t.name.endswith(".original.tif"))
         collection.clear_items()
-        built = 0
+        # Build every item before saving any: a refusal or error partway (a guard in
+        # build_item, a footprint failure) then leaves the prod tree as it was,
+        # rather than part-rewritten for the next publish's sync to push (#38).
+        pending = []
         for t in tifs:
             item = build_item(t, base, args.s3_url, collection, registry)
             if item:
                 collection_add(collection, item)
-                item.save_object(dest_href=str(t.parent / f"{item.id}.json"))
-                built += 1
+                pending.append((item, t.parent / f"{item.id}.json"))
+        for item, dest in pending:
+            item.save_object(dest_href=str(dest))
+        built = len(pending)
         # A full rebuild is the one place that holds every item, so recompute the
         # extent here — nothing else did, and a collection can otherwise advertise
         # an extent that excludes its own items (#22).
@@ -376,7 +386,7 @@ def main():
                  "copied into the prod tree (by the run that hit this), so its sites.csv row "
                  "must exist first.")
     existing = {l.href.rsplit("/", 1)[-1].removesuffix(".json") for l in collection.get_links("item")}
-    made = []
+    pending = []
     for rel in args.tifs:
         path_item = base / rel
         if not path_item.exists():
@@ -388,12 +398,15 @@ def main():
         item = build_item(path_item, base, args.s3_url, collection, registry)
         if item:
             collection_add(collection, item)
-            item.save_object(dest_href=str(path_item.parent / f"{item_id}.json"))
-            made.append(str(path_item.parent / f"{item_id}.json"))
+            pending.append((item, path_item.parent / f"{item_id}.json"))
             # The same tif given twice (`dir` and `dir/`, an overlapping glob) would
             # otherwise be built and linked twice.
             existing.add(item_id)
-            print(f"CREATED: {item_id}")
+            print(f"BUILT: {item_id}")
+    # Saved only once every requested tif has built (see the rebuild branch).
+    for item, dest in pending:
+        item.save_object(dest_href=str(dest))
+    made = [str(dest) for _, dest in pending]
     collection.save_object(dest_href=str(base / "collection.json"))
     print(f"collection saved ({len(collection.get_links('item'))} item links)")
     links_check(base, args.s3_url)
