@@ -52,6 +52,6 @@ No crate schema or crate issue yet: only this catalogue writes these prefixes (c
 ## Validation
 - [x] `item_create.py --selftest` passes, and fails with each guard's defect restored
 - [x] `/code-check` clean (once over the branch with `/code-check branch`)
-- [ ] PWF checkboxes match landed work
-- [ ] `/planning-archive` on completion; PR body lists every old → new pair so the NEWS entry can carry them
+- [x] PWF checkboxes match landed work
+- [x] `/planning-archive` on completion; PR body lists every old → new pair so the NEWS entry can carry them
 
