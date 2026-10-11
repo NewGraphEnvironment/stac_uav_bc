@@ -97,26 +97,31 @@ def registry_props(row):
 def registry_problems(row):
     # The group name is filled from the code by a separate step; a row whose code
     # was added without it would publish fwa:watershed_group_code with no name.
-    # A stale name left beside a changed code is registry_conflicts' job.
-    if (row.get("watershed_group_code") or "").strip() and not (row.get("watershed_group_name") or "").strip():
+    # A name left after its code was cleared would publish a name a filter on the
+    # code cannot find. A stale name beside a changed code is registry_conflicts' job.
+    code = (row.get("watershed_group_code") or "").strip()
+    name = (row.get("watershed_group_name") or "").strip()
+    if code and not name:
         return ["watershed_group_code set but watershed_group_name blank: "
+                "run scripts/sites_fill-wsg_name.py --write"]
+    if name and not code:
+        return ["watershed_group_name set but watershed_group_code blank: "
                 "run scripts/sites_fill-wsg_name.py --write"]
     return []
 
 def registry_conflicts(registry):
-    # Code and name are one-to-one in the atlas, so a code carrying two names (or a
-    # name two codes) across the registry is a row whose code changed without the
-    # fill script being re-run. Catches it whenever the edited row shares its code
-    # or old name with another row; a lone row is the fill script's report to find.
-    by_code, by_name = {}, {}
+    # An atlas code has one name, so a code carrying two names across the registry
+    # is a row whose code changed without the fill script being re-run. Caught when
+    # the new code is shared with another row; otherwise the fill script's report
+    # finds it. Not checked the other way: a name is NOT unique in the atlas
+    # (SALM and SALR are both "Salmon River", measured 2026-10-10).
+    by_code = {}
     for r in registry.values():
         code = (r.get("watershed_group_code") or "").strip()
         name = (r.get("watershed_group_name") or "").strip()
         if code and name:
             by_code.setdefault(code, set()).add(name)
-            by_name.setdefault(name, set()).add(code)
-    return ([f"code {c} has names {sorted(n)}" for c, n in sorted(by_code.items()) if len(n) > 1]
-            + [f"name {n!r} has codes {sorted(c)}" for n, c in sorted(by_name.items()) if len(c) > 1])
+    return [f"code {c} has names {sorted(n)}" for c, n in sorted(by_code.items()) if len(n) > 1]
 
 def item_title(props, dir_name, year, stem):
     stream = props.get("uav:stream_name", dir_name)
@@ -260,12 +265,17 @@ def _selftest():
           "a code without its name passes")
     check(registry_problems({**row, "watershed_group_code": "", "watershed_group_name": ""}) == [],
           "a row with no code is refused")
+    check(registry_problems({**row, "watershed_group_code": ""}) != [],
+          "a name without its code passes")
     other = {**row, "item": "other"}
-    check(registry_conflicts({1: row, 2: other}) == [], "conflict on a consistent registry")
-    check(registry_conflicts({1: row, 2: {**other, "watershed_group_code": "MORR"}}) != [],
+    morr = {**row, "item": "morr", "watershed_group_code": "MORR", "watershed_group_name": "Morice River"}
+    check(registry_conflicts({1: row, 2: other, 3: morr}) == [], "conflict on a consistent registry")
+    check(registry_conflicts({1: row, 2: {**other, "watershed_group_code": "MORR"}, 3: morr}) != [],
           "a changed code beside its stale name passes")
-    check(registry_conflicts({1: row, 2: {**other, "watershed_group_name": "Morice River"}}) != [],
-          "one code with two names passes")
+    salmon = [{**row, "item": c, "watershed_group_code": c, "watershed_group_name": "Salmon River"}
+              for c in ("SALM", "SALR")]
+    check(registry_conflicts(dict(enumerate(salmon))) == [],
+          "two atlas groups sharing a name are refused")
     check(not fields_undeclared({"properties": got}),
           f"registry_props writes undeclared prefixes: {fields_undeclared({'properties': got})}")
 
