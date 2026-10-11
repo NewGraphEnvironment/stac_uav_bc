@@ -42,7 +42,33 @@ Renaming changes every published item, so it rides with this catalogue's next fu
 - Decision drift vs family: user chose `newgraph:` over `nge:` for NGE-as-subject fields. The family text (stac_pointcloud_bc#12, crate#23, sibling issue bodies) says "`nge:` stays"; flag, do not edit.
 - v1.1.0 is reserved for Al's release-loop test (sites.csv corrections he makes himself); the rename should ride with it rather than cut its own tag.
 
+## Superseded in the issue context above
+
+The issue text quoted above says each custom prefix gets a crate schema and that this catalogue's rebuild waits on a crate deploy. Decided otherwise at the plan gate: no prefix here meets crate's two-writers-or-outside-reader rule, so none gets a schema yet and the release waits on nothing in crate. The #38 body now says so.
+
+## Plan review (Plan agent, 2026-10-10; delivered as reply text, read-only agent)
+
+No blockers. Dispositions:
+
+| finding | disposition |
+|---|---|
+| G1 build_item / additive guard wiring not in selftest | Phase 4 red runs: mutant with `proj` undeclared refuses at the first mirror item; additive run on real prod refused, prod JSONs unmodified (0 modified in last 2 h) |
+| G2 code without name passes silently | `registry_problems()` refuses at build; selftest + mutant + mirror run with a blanked name all confirm |
+| G3 prefix set restated in release check | already avoided: release check reads `FIELD_PREFIXES` via `ast`; comment now says the live check confirms, not gates |
+| G4 refusal message omits tag + NEWS | message now names NEWS → tag → `catalogue_release.sh`; same note in `scripts/config/README.md` |
+| G5 index.html not rendered; table must be static; filter eval=FALSE | table static, example `eval=FALSE` already; index.html now rendered too |
+| O1 tif copied before refusal | refusal message and config README say the release publishes it, so its sites.csv row must exist |
+| O2 publish blocked until release; do not tag on merge | PR body + report |
+| O3 docs ahead of API | README + config README say `nge:` names until the release that ships #38; NEWS pairs also recorded in the v1.1.0 memory |
+| A1/A2 mirror safety | `--base` explicit, 0 symlinked JSONs, 0 prod JSONs modified |
+| A4 title check fragile | replaced by AC1 |
+| AC1/AC2 diff mirror vs prod with mapping undone | 245 items, 0 differences in any key (geometry, datetime, proj, assets, links); collection differs only in `version`, links equal |
+| S1 findings stale on crate | section above |
+| S2 dict instead of set | declined: no schema URLs exist yet; becomes a dict when the first crate schema does |
+| S3 CLAUDE.md no-op; publish header | CLAUDE.md now lists the fill script + guard; `dataset_publish.sh` header names the refusal |
+
 ## Errors Encountered
 
 | Error | Resolution |
 |-------|------------|
+| `diff - file` in this shell printed git-diff usage (shell `diff` is a git wrapper) | `command cmp -s` for byte comparison |

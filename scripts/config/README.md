@@ -31,9 +31,11 @@ Both read the **published** catalogue (`collection.json` on the bucket and the i
 
 The item links have only been correct since #35. Before that, every `rel: item` href was `<bucket>/<id>/<id>.json`, a key S3 never held, because `Collection.add_item()` re-homed each item under pystac's default layout. `item_create.py` now keeps the tree path and refuses to save a `collection.json` whose item links name no file in the prod tree. An additive `item_create.py` run (inside `dataset_publish.sh`) refuses until one `--rebuild` has rewritten the old links, so the first release after #35 has to come before the next publish.
 
+The same holds for #38's field rename: an additive run refuses while any item in the prod tree still carries an `nge:` field, so the first publish after #38 waits for a full release (NEWS entry naming each old → new field, tag, `catalogue_release.sh`). Until that release the API serves the `nge:` names. A tif copied into the prod tree by a refused publish is built and published by that release, so its `sites.csv` row has to exist first.
+
 ## The Registry: data/sites.csv
 
-`data/sites.csv` is the **source of truth** for site metadata — stream names (up to three per flight), FWA watershed group codes and names, bcfishpass `aggregated_crossings_id`, aliases, project, `published` flag, and notes. Items carry it as `title` + queryable properties under prefixes that say what each field describes (`newgraph:`, `uav:`, `fwa:`, `bcfishpass:`; the field table is in the top-level README, #38), and item geometries are true `gdal_footprint` outlines. The catalogue is a versioned build artifact of (sites.csv, COGs).
+`data/sites.csv` is the **source of truth** for site metadata — stream names (up to three per flight), FWA watershed group codes and names, bcfishpass `aggregated_crossings_id`, aliases, project, `published` flag, and notes. Items carry it as `title` + queryable properties under prefixes that say what each field describes (`newgraph:`, `uav:`, `fwa:`, `bcfishpass:`; the field table is in the top-level README; `nge:` names until the release that ships #38), and item geometries are true `gdal_footprint` outlines. The catalogue is a versioned build artifact of (sites.csv, COGs).
 
 `watershed_group_name` is the atlas's name for `watershed_group_code`, not something to type: after adding or changing a row's code, run `python3 scripts/sites_fill-wsg_name.py` (reports) and then with `--write` (fills it in place from the public fwapg API). The `watershed` column is the tree's directory slug and stays as it is.
 

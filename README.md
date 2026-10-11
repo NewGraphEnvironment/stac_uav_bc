@@ -180,7 +180,7 @@ The `scripts/` directory holds the orchestration helpers:
 | `odm_process.R` | OpenDroneMap processing (orthomosaic, DSM, DTM generation) |
 | `s3_sync.R` | Sync COGs to the `imagery-uav-bc` S3 bucket |
 | `s3_index.R`, `s3_map.R` | Index + map S3 contents for ingestion |
-| `item_create.py` | Create STAC items + update collection.json for new COGs (additive-only) |
+| `item_create.py` | Create STAC items + update collection.json: additive for new COGs, `--rebuild` for every item, `--selftest` as its gate |
 | `web.R` | Web/viewer utilities |
 | `stacs.sh` | The pinned [`stacs`](https://github.com/NewGraphEnvironment/stacs) CLI — registers and verifies the catalogue against `stacs.toml` |
 | `config/` | Server docs + `item_unregister.sh` (the delete path; stacs is upsert-only) — see the [add-imagery recipe](scripts/config/README.md) |

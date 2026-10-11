@@ -41,16 +41,16 @@ No crate schema or crate issue yet: only this catalogue writes these prefixes (c
 - [x] Update `scripts/config/README.md:36` ("queryable `nge:` properties") and any `CLAUDE.md` line that names the fields
 
 ## Phase 4: Verify offline (nothing published)
-- [ ] Mirror the prod tree into the scratchpad: real directories, symlinked tifs, copied JSONs. Run `item_create.py --rebuild --base <mirror> --version 0.0.0-test`, then `stacs.sh validate` and `audit --expect <links>` on the mirror
-- [ ] On the mirror, assert:
+- [x] Mirror the prod tree into the scratchpad: real directories, symlinked tifs, copied JSONs. Run `item_create.py --rebuild --base <mirror> --version 0.0.0-test`, then `stacs.sh validate` and `audit --expect <links>` on the mirror
+- [x] On the mirror, assert:
   - zero `nge:` keys
   - every item carries `newgraph:region` and `uav:stream_name`
   - `fwa:watershed_group_name` is present wherever the code is
   - titles are unchanged from the live items, compared by id
-- [ ] Confirm that additive mode against the real prod tree, which still holds `nge:` items, refuses without writing anything
+- [x] Confirm that additive mode against the real prod tree, which still holds `nge:` items, refuses without writing anything
 
 ## Validation
-- [ ] `item_create.py --selftest` passes, and fails with each guard's defect restored
+- [x] `item_create.py --selftest` passes, and fails with each guard's defect restored
 - [ ] `/code-check` clean (once over the branch with `/code-check branch`)
 - [ ] PWF checkboxes match landed work
 - [ ] `/planning-archive` on completion; PR body lists every old → new pair so the NEWS entry can carry them

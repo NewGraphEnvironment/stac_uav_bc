@@ -74,6 +74,9 @@ fi
 # stream_name is the property the title actually reads, so it is the one that
 # has to be present.
 #
+# This runs after the sync and register, so it confirms rather than gates: the gate
+# is item_create.py's prefix guard before anything is written.
+#
 # And no live item may carry a field outside item_create.py's FIELD_PREFIXES (#38):
 # an nge: key left live means a filter on the new names finds only part of the
 # catalogue. The set is read from item_create.py, not restated here.

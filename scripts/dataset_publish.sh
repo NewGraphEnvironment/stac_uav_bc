@@ -11,6 +11,10 @@
 # an orphan or stale body anywhere (an old id not yet unregistered after a
 # rename) fails the publish. Resolve it there, then re-run; nothing is lost.
 #
+# item_create.py refuses while the prod tree still holds items with the pre-#38
+# nge: field names, so the first publish after #38 waits for one full release
+# (catalogue_release.sh). The refusal comes after the COG copy, before any upload.
+#
 # Idempotent: existing COGs, items, uploads, and registrations are skipped or
 # upserted, so re-running after an interruption is safe and cheap.
 #

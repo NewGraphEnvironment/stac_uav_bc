@@ -94,6 +94,15 @@ REGISTRY_FIELDS = [
 def registry_props(row):
     return {k: row[col].strip() for k, col in REGISTRY_FIELDS if (row.get(col) or "").strip()}
 
+def registry_problems(row):
+    # The group name is filled from the code by a separate step; a row whose code
+    # was added or changed without it would publish fwa:watershed_group_code with
+    # no name (or a stale one) and nothing else would notice.
+    if (row.get("watershed_group_code") or "").strip() and not (row.get("watershed_group_name") or "").strip():
+        return ["watershed_group_code set but watershed_group_name blank: "
+                "run scripts/sites_fill-wsg_name.py --write"]
+    return []
+
 def item_title(props, dir_name, year, stem):
     stream = props.get("uav:stream_name", dir_name)
     product = PRODUCT_LABEL.get(stem, stem)
@@ -131,6 +140,9 @@ def build_item(path_item, base, s3_url, collection, registry):
         print(f"SKIP (published=false in sites.csv): {item_id}")
         return None
 
+    problems = registry_problems(row) if row else []
+    if problems:
+        sys.exit(f"REFUSED: sites.csv row for {item_id}: {'; '.join(problems)}")
     props = registry_props(row) if row else {}
     props["title"] = item_title(props, parts[3], parts[2], path_item.stem)
 
@@ -228,6 +240,11 @@ def _selftest():
     check("fwa:watershed_group_name" not in registry_props(
         {k: v for k, v in row.items() if k != "watershed_group_name"}),
         "a missing column was carried")
+    check(registry_problems(row) == [], f"registry_problems on a full row: {registry_problems(row)}")
+    check(registry_problems({**row, "watershed_group_name": ""}) != [],
+          "a code without its name passes")
+    check(registry_problems({**row, "watershed_group_code": "", "watershed_group_name": ""}) == [],
+          "a row with no code is refused")
     check(not fields_undeclared({"properties": got}),
           f"registry_props writes undeclared prefixes: {fields_undeclared({'properties': got})}")
 
@@ -318,8 +335,11 @@ def main():
     if stale:
         f, keys = next(iter(stale.items()))
         sys.exit(f"REFUSED: {len(stale)} item JSON(s) in {base} carry fields outside "
-                 f"FIELD_PREFIXES (e.g. {f}: {keys[:3]}); only a full rebuild replaces them: "
-                 "run scripts/catalogue_release.sh first")
+                 f"FIELD_PREFIXES (e.g. {f}: {keys[:3]}); only a full rebuild replaces them. "
+                 "Release first: NEWS entry naming the renamed fields, git tag vX.Y.Z, then "
+                 "scripts/catalogue_release.sh. That release also publishes any tif already "
+                 "copied into the prod tree (by the run that hit this), so its sites.csv row "
+                 "must exist first.")
     existing = {l.href.rsplit("/", 1)[-1].removesuffix(".json") for l in collection.get_links("item")}
     made = []
     for rel in args.tifs:
