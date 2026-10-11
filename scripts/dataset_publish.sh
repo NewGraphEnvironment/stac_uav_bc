@@ -11,6 +11,10 @@
 # an orphan or stale body anywhere (an old id not yet unregistered after a
 # rename) fails the publish. Resolve it there, then re-run; nothing is lost.
 #
+# item_create.py refuses while the prod tree still holds items with the pre-#38
+# nge: field names, so the first publish after #38 waits for one full release
+# (catalogue_release.sh). The refusal comes after the COG copy, before any upload.
+#
 # Idempotent: existing COGs, items, uploads, and registrations are skipped or
 # upserted, so re-running after an interruption is safe and cheap.
 #
@@ -91,6 +95,16 @@ if unlinked:
           + " (published=false in data/sites.csv?) -- not publishing", file=sys.stderr)
     sys.exit(1)
 PYEOF
+
+echo "=== validate + audit the whole prod tree (gate before any upload)"
+# The final sync pushes the WHOLE tree, not just these datasets, and the uploads
+# below push these datasets' JSONs as they stand. A release that rebuilt the tree
+# and then failed its own gate leaves exactly such a tree behind, so check it as
+# catalogue_release.sh does rather than publish what that refused.
+find "$PROD" -name "*.json" | sort | "$STACS" validate
+n_links=$(python3 -c 'import json,sys; print(sum(l["rel"] == "item" for l in json.load(open(sys.argv[1]))["links"]))' "$PROD/collection.json")
+find "$PROD" -name "*.json" -not -name "collection.json" | sort \
+  | "$STACS" audit --config "$CONFIG" --expect "$n_links"
 
 echo "=== upload (per-dataset sync: durable + skips what is already up)"
 for rel in "${rels[@]}"; do
