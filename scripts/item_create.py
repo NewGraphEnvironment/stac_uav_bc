@@ -96,12 +96,27 @@ def registry_props(row):
 
 def registry_problems(row):
     # The group name is filled from the code by a separate step; a row whose code
-    # was added or changed without it would publish fwa:watershed_group_code with
-    # no name (or a stale one) and nothing else would notice.
+    # was added without it would publish fwa:watershed_group_code with no name.
+    # A stale name left beside a changed code is registry_conflicts' job.
     if (row.get("watershed_group_code") or "").strip() and not (row.get("watershed_group_name") or "").strip():
         return ["watershed_group_code set but watershed_group_name blank: "
                 "run scripts/sites_fill-wsg_name.py --write"]
     return []
+
+def registry_conflicts(registry):
+    # Code and name are one-to-one in the atlas, so a code carrying two names (or a
+    # name two codes) across the registry is a row whose code changed without the
+    # fill script being re-run. Catches it whenever the edited row shares its code
+    # or old name with another row; a lone row is the fill script's report to find.
+    by_code, by_name = {}, {}
+    for r in registry.values():
+        code = (r.get("watershed_group_code") or "").strip()
+        name = (r.get("watershed_group_name") or "").strip()
+        if code and name:
+            by_code.setdefault(code, set()).add(name)
+            by_name.setdefault(name, set()).add(code)
+    return ([f"code {c} has names {sorted(n)}" for c, n in sorted(by_code.items()) if len(n) > 1]
+            + [f"name {n!r} has codes {sorted(c)}" for n, c in sorted(by_name.items()) if len(c) > 1])
 
 def item_title(props, dir_name, year, stem):
     stream = props.get("uav:stream_name", dir_name)
@@ -245,6 +260,12 @@ def _selftest():
           "a code without its name passes")
     check(registry_problems({**row, "watershed_group_code": "", "watershed_group_name": ""}) == [],
           "a row with no code is refused")
+    other = {**row, "item": "other"}
+    check(registry_conflicts({1: row, 2: other}) == [], "conflict on a consistent registry")
+    check(registry_conflicts({1: row, 2: {**other, "watershed_group_code": "MORR"}}) != [],
+          "a changed code beside its stale name passes")
+    check(registry_conflicts({1: row, 2: {**other, "watershed_group_name": "Morice River"}}) != [],
+          "one code with two names passes")
     check(not fields_undeclared({"properties": got}),
           f"registry_props writes undeclared prefixes: {fields_undeclared({'properties': got})}")
 
@@ -296,6 +317,10 @@ def main():
 
     base = pathlib.Path(args.base)
     registry = load_registry(args.sites)
+    conflicts = registry_conflicts(registry)
+    if conflicts:
+        sys.exit(f"REFUSED: {args.sites} watershed group code/name pairs disagree: {conflicts}; "
+                 "run scripts/sites_fill-wsg_name.py --write")
     collection = pystac.Collection.from_file(str(base / "collection.json"))
     collection.set_self_href(f"{args.s3_url}collection.json")
     # The file's root link is the published S3 URL, so without this add_item()
