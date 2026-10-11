@@ -23,7 +23,7 @@ No crate schema or crate issue yet: only this catalogue writes these prefixes (c
 - [x] Document the column in the `scripts/config/README.md` registry paragraph and the add-imagery recipe
 
 ## Phase 2: Item builder (`scripts/item_create.py`)
-- [ ] `--selftest` gate first, following `flight_coverage.py --selftest`. It runs on fixture rows with no network and no tifs, and asserts:
+- [x] `--selftest` gate first, following `flight_coverage.py --selftest`. It runs on fixture rows with no network and no tifs, and asserts:
   - the full old→new mapping
   - blank cells are omitted
   - the title reads `uav:stream_name` and `newgraph:alias`
@@ -31,9 +31,9 @@ No crate schema or crate issue yet: only this catalogue writes these prefixes (c
   - additive mode refuses a tree whose items carry an undeclared prefix
 
   Then restore each defect and confirm the gate goes red.
-- [ ] Rewrite the `registry_props()` mapping, update `build_item()`'s `props.get(...)` reads, and add `FIELD_PREFIXES = {proj, fwa, bcfishpass, uav, newgraph}`
-- [ ] Guard in `build_item()`: refuse any property whose prefix is not declared
-- [ ] Additive mode refuses when existing item JSONs in the prod tree carry an undeclared prefix (i.e. `nge:`). The message points to `catalogue_release.sh`. Without this, `dataset_publish.sh` would publish renamed items beside `nge:` ones
+- [x] Rewrite the `registry_props()` mapping, update `build_item()`'s `props.get(...)` reads, and add `FIELD_PREFIXES = {proj, fwa, bcfishpass, uav, newgraph}`
+- [x] Guard in `build_item()`: refuse any property whose prefix is not declared
+- [x] Additive mode refuses when existing item JSONs in the prod tree carry an undeclared prefix (i.e. `nge:`). The message points to `catalogue_release.sh`. Without this, `dataset_publish.sh` would publish renamed items beside `nge:` ones
 
 ## Phase 3: Release gate and reader docs
 - [ ] `scripts/catalogue_release.sh` registry-coverage check: require `newgraph:region` and `uav:stream_name`, and fail if any live item carries a property outside the declared prefixes, so a stray `nge:` key fails the release
