@@ -356,14 +356,15 @@ def main():
             if item:
                 collection_add(collection, item)
                 pending.append((item, t.parent / f"{item.id}.json"))
+        # A full rebuild is the one place that holds every item, so recompute the
+        # extent here — nothing else did, and a collection can otherwise advertise
+        # an extent that excludes its own items (#22). Before the saves, like
+        # everything else that can fail.
+        collection.update_extent_from_items()
+        stamp_version(collection, args.version or git_version())
         for item, dest in pending:
             item.save_object(dest_href=str(dest))
         built = len(pending)
-        # A full rebuild is the one place that holds every item, so recompute the
-        # extent here — nothing else did, and a collection can otherwise advertise
-        # an extent that excludes its own items (#22).
-        collection.update_extent_from_items()
-        stamp_version(collection, args.version or git_version())
         collection.save_object(dest_href=str(base / "collection.json"))
         bbox = collection.extent.spatial.bboxes[0]
         print(f"REBUILD: {built} items from {len(tifs)} tifs; collection v{collection.extra_fields['version']}, "

@@ -96,6 +96,16 @@ if unlinked:
     sys.exit(1)
 PYEOF
 
+echo "=== validate + audit the whole prod tree (gate before any upload)"
+# The final sync pushes the WHOLE tree, not just these datasets, and the uploads
+# below push these datasets' JSONs as they stand. A release that rebuilt the tree
+# and then failed its own gate leaves exactly such a tree behind, so check it as
+# catalogue_release.sh does rather than publish what that refused.
+find "$PROD" -name "*.json" | sort | "$STACS" validate
+n_links=$(python3 -c 'import json,sys; print(sum(l["rel"] == "item" for l in json.load(open(sys.argv[1]))["links"]))' "$PROD/collection.json")
+find "$PROD" -name "*.json" -not -name "collection.json" | sort \
+  | "$STACS" audit --config "$CONFIG" --expect "$n_links"
+
 echo "=== upload (per-dataset sync: durable + skips what is already up)"
 for rel in "${rels[@]}"; do
   aws s3 sync "$PROD/$rel" "$BUCKET/$rel" --profile "$PROFILE" --only-show-errors
