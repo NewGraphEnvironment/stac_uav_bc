@@ -59,7 +59,7 @@ Two commands with a human QC gate between them:
 
 1. Stitch — `caffeinate -s scripts/odm_process-batch.sh <project-dir>...` (skips already-processed dirs; resume-safe after interruption)
 2. QC the ortho — check `odm_report/stats.json` (all images reconstructed? reprojection error ~1-2 px?) and eyeball a preview
-3. Publish — `scripts/dataset_publish.sh <project-dir>...` (COG convert + validate → prod tree → items with flight datetimes → durable S3 upload → collection extent → `stacs register --mode drift` → `stacs verify`; idempotent, safe to re-run)
+3. Publish — `scripts/dataset_publish.sh <project-dir>...` (COG convert + validate → prod tree → items with flight datetimes → whole-tree `stacs validate` + `audit --expect` → durable S3 upload → collection extent → `stacs register --mode drift` → `stacs verify`; idempotent, safe to re-run)
 
 The underlying single-purpose tools these orchestrate, for one-off use:
 
