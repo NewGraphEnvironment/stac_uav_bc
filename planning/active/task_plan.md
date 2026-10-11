@@ -36,9 +36,9 @@ No crate schema or crate issue yet: only this catalogue writes these prefixes (c
 - [x] Additive mode refuses when existing item JSONs in the prod tree carry an undeclared prefix (i.e. `nge:`). The message points to `catalogue_release.sh`. Without this, `dataset_publish.sh` would publish renamed items beside `nge:` ones
 
 ## Phase 3: Release gate and reader docs
-- [ ] `scripts/catalogue_release.sh` registry-coverage check: require `newgraph:region` and `uav:stream_name`, and fail if any live item carries a property outside the declared prefixes, so a stray `nge:` key fails the release
-- [ ] `README.Rmd`: an item-properties table listing each field, what it holds and its source, and how to filter on it with rstac. Re-render `README.md`
-- [ ] Update `scripts/config/README.md:36` ("queryable `nge:` properties") and any `CLAUDE.md` line that names the fields
+- [x] `scripts/catalogue_release.sh` registry-coverage check: require `newgraph:region` and `uav:stream_name`, and fail if any live item carries a property outside the declared prefixes, so a stray `nge:` key fails the release
+- [x] `README.Rmd`: an item-properties table listing each field, what it holds and its source, and how to filter on it with rstac. Re-render `README.md`
+- [x] Update `scripts/config/README.md:36` ("queryable `nge:` properties") and any `CLAUDE.md` line that names the fields
 
 ## Phase 4: Verify offline (nothing published)
 - [ ] Mirror the prod tree into the scratchpad: real directories, symlinked tifs, copied JSONs. Run `item_create.py --rebuild --base <mirror> --version 0.0.0-test`, then `stacs.sh validate` and `audit --expect <links>` on the mirror

@@ -18,6 +18,14 @@ any STAC-compliant client. The API endpoint is
 <https://images.a11s.one>; an interactive single-COG viewer lives at
 <https://viewer.a11s.one>.
 
+The repo also covers the two steps either side of the catalogue:
+**stitching** flights with OpenDroneMap, and **planning** them.
+`scripts/flight_plan.py` reads a floodplain delineation from the
+[`stac-floodplains-bc`](https://github.com/NewGraphEnvironment/stac_floodplains_bc)
+collection, splits a reach into blocks that each fit one battery, and
+writes DJI WPML `.kmz` missions — closing the loop, since the imagery
+those missions produce comes back into this catalogue.
+
 <br>
 
 Sister collections on the same `images.a11s.one` endpoint:
@@ -94,6 +102,37 @@ tab <- tibble::tibble(url_download = purrr::map_chr(r$features, ~ purrr::pluck(.
 
 Please see <http://www.newgraphenvironment.com/stac_uav_bc> for the
 published table of collection links and inline viewer links.
+
+## Item properties
+
+Beside `datetime`, `title` and the `proj:` fields, each item carries its
+site’s row from [`data/sites.csv`](data/sites.csv). Each field’s prefix
+says what it describes
+([\#38](https://github.com/NewGraphEnvironment/stac_uav_bc/issues/38)).
+A blank registry cell is left off the item rather than written empty.
+
+| field | holds | from |
+|----|----|----|
+| `newgraph:region` | New Graph’s region (`skeena`, `fraser`, `mackenzie`, `kootenay`), also the first part of the item id | registry |
+| `uav:stream_name` | the stream the flight covers | registry, picked from PSCIS, bcfishpass or the Freshwater Atlas (`name_source` says which) |
+| `uav:stream_name_02`, `uav:stream_name_03` | further streams in the same flight | registry |
+| `fwa:watershed_group_code` | the Freshwater Atlas watershed group code (`MORR`) | registry |
+| `fwa:watershed_group_name` | the atlas’s name for that group (`Morice River`) | atlas, by code (`scripts/sites_fill-wsg_name.py`) |
+| `bcfishpass:aggregated_crossings_id` | the crossing the flight covers | bcfishpass |
+| `newgraph:alias` | New Graph’s name for the site, which separates repeat flights in the title (`moose pre-replacement`) | registry |
+| `newgraph:project` | New Graph’s project | registry (none set yet) |
+
+They replace the `nge:` fields (`nge:stream_name`, `nge:wsg_code` and
+the rest) that items carried until the release that ships \#38, whose
+`NEWS.md` entry lists each old and new name. Filter on any of them with
+CQL2, for example every item in the Morice watershed group:
+
+``` r
+rstac::stac("https://images.a11s.one/") |>
+  rstac::stac_search(collections = "imagery-uav-bc-prod", limit = 1000) |>
+  rstac::ext_filter(`fwa:watershed_group_code` == "MORR") |>
+  rstac::post_request()
+```
 
 ## QGIS Data Source Manager (v3.42+)
 

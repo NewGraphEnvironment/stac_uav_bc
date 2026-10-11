@@ -145,6 +145,30 @@ tab |>
   my_dt_table(cols_freeze_left = 2, escape = FALSE)
 ```
 
+## Item properties
+
+Beside `datetime`, `title` and the `proj:` fields, each item carries its site's row from [`data/sites.csv`](data/sites.csv). Each field's prefix says what it describes ([#38](https://github.com/NewGraphEnvironment/stac_uav_bc/issues/38)). A blank registry cell is left off the item rather than written empty.
+
+| field | holds | from |
+|---|---|---|
+| `newgraph:region` | New Graph's region (`skeena`, `fraser`, `mackenzie`, `kootenay`), also the first part of the item id | registry |
+| `uav:stream_name` | the stream the flight covers | registry, picked from PSCIS, bcfishpass or the Freshwater Atlas (`name_source` says which) |
+| `uav:stream_name_02`, `uav:stream_name_03` | further streams in the same flight | registry |
+| `fwa:watershed_group_code` | the Freshwater Atlas watershed group code (`MORR`) | registry |
+| `fwa:watershed_group_name` | the atlas's name for that group (`Morice River`) | atlas, by code (`scripts/sites_fill-wsg_name.py`) |
+| `bcfishpass:aggregated_crossings_id` | the crossing the flight covers | bcfishpass |
+| `newgraph:alias` | New Graph's name for the site, which separates repeat flights in the title (`moose pre-replacement`) | registry |
+| `newgraph:project` | New Graph's project | registry (none set yet) |
+
+They replace the `nge:` fields (`nge:stream_name`, `nge:wsg_code` and the rest) that items carried until the release that ships #38, whose `NEWS.md` entry lists each old and new name. Filter on any of them with CQL2, for example every item in the Morice watershed group:
+
+```{r filter, eval=FALSE}
+rstac::stac("https://images.a11s.one/") |>
+  rstac::stac_search(collections = "imagery-uav-bc-prod", limit = 1000) |>
+  rstac::ext_filter(`fwa:watershed_group_code` == "MORR") |>
+  rstac::post_request()
+```
+
 ## QGIS Data Source Manager (v3.42+)
 
 QGIS 3.42 added native STAC support — connect directly to the catalog and filter by the current map view. See [Lutra Consulting's STAC-in-QGIS blog post](https://www.lutraconsulting.co.uk/blogs/stac-in-qgis) for a walk-through.

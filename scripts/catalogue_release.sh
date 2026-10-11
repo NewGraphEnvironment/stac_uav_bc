@@ -65,27 +65,47 @@ if [ -n "${EXPECT_ITEMS:-}" ]; then
 fi
 
 # A registry miss is silent: item_create.py falls back to the directory name as
-# title and emits no nge: properties at all. Count checks cannot see it, so
+# title and emits no registry properties at all. Count checks cannot see it, so
 # assert every live item actually joined its sites.csv row (#22).
 #
-# Check nge:stream_name as well as nge:region, because registry_props drops any
+# Check uav:stream_name as well as newgraph:region, because registry_props drops any
 # column that is blank after strip: a row that joins fine but has an empty
-# stream_name still titles from the directory name while carrying nge:region.
+# stream_name still titles from the directory name while carrying newgraph:region.
 # stream_name is the property the title actually reads, so it is the one that
 # has to be present.
+#
+# And no live item may carry a field outside item_create.py's FIELD_PREFIXES (#38):
+# an nge: key left live means a filter on the new names finds only part of the
+# catalogue. The set is read from item_create.py, not restated here.
 curl -s -X POST "${API%/collections/*}/search" -H "Content-Type: application/json" \
   -d "{\"collections\":[\"${API##*/}\"],\"limit\":1000}" | python3 -c "
-import json, sys
+import ast, json, sys
+tree = ast.parse(open(sys.argv[1]).read())
+declared = next(ast.literal_eval(n.value) for n in tree.body if isinstance(n, ast.Assign)
+                and any(getattr(t, 'id', None) == 'FIELD_PREFIXES' for t in n.targets))
 feats = json.load(sys.stdin)['features']
-need = {'nge:region', 'nge:stream_name'}
+need = {'newgraph:region', 'uav:stream_name'}
 orphans = [f['id'] for f in feats if not need <= f.get('properties', {}).keys()]
 if orphans:
-    print('RELEASE INCOMPLETE: %d item(s) missing nge: properties -- registry miss or blank '
+    print('RELEASE INCOMPLETE: %d item(s) missing registry properties -- registry miss or blank '
           'stream_name; the title fell back to the directory name:' % len(orphans), file=sys.stderr)
     for i in orphans[:10]:
         print('   ', i, file=sys.stderr)
     sys.exit(1)
-print('    registry coverage OK: %d/%d items carry nge:region + nge:stream_name' % (len(feats), len(feats)))
-" || exit 1
+stray = {}
+for f in feats:
+    keys = list(f.get('properties', {})) + [k for a in f.get('assets', {}).values() for k in a]
+    bad = sorted({k for k in keys if ':' in k and k.split(':', 1)[0] not in declared})
+    if bad:
+        stray[f['id']] = bad
+if stray:
+    print('RELEASE INCOMPLETE: %d live item(s) carry fields outside FIELD_PREFIXES:' % len(stray),
+          file=sys.stderr)
+    for i, bad in list(stray.items())[:10]:
+        print('   ', i, bad, file=sys.stderr)
+    sys.exit(1)
+print('    registry coverage OK: %d/%d items carry newgraph:region + uav:stream_name, '
+      'no undeclared fields' % (len(feats), len(feats)))
+" "$REPO/scripts/item_create.py" || exit 1
 
 echo "RELEASE COMPLETE: v$VERSION"
