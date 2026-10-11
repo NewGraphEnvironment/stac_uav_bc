@@ -33,11 +33,13 @@ The item links have only been correct since #35. Before that, every `rel: item` 
 
 ## The Registry: data/sites.csv
 
-`data/sites.csv` is the **source of truth** for site metadata — stream names (up to three per flight), FWA watershed group codes, bcfishpass `aggregated_crossings_id`, aliases, project, `published` flag, and notes. Items carry it as `title` + queryable `nge:` properties, and item geometries are true `gdal_footprint` outlines. The catalogue is a versioned build artifact of (sites.csv, COGs).
+`data/sites.csv` is the **source of truth** for site metadata — stream names (up to three per flight), FWA watershed group codes and names, bcfishpass `aggregated_crossings_id`, aliases, project, `published` flag, and notes. Items carry it as `title` + queryable properties under prefixes that say what each field describes (`newgraph:`, `uav:`, `fwa:`, `bcfishpass:`; the field table is in the top-level README, #38), and item geometries are true `gdal_footprint` outlines. The catalogue is a versioned build artifact of (sites.csv, COGs).
+
+`watershed_group_name` is the atlas's name for `watershed_group_code`, not something to type: after adding or changing a row's code, run `python3 scripts/sites_fill-wsg_name.py` (reports) and then with `--write` (fills it in place from the public fwapg API). The `watershed` column is the tree's directory slug and stays as it is.
 
 **Releasing a registry change:**
 
-1. Edit `data/sites.csv`; add a `NEWS.md` entry; commit
+1. Edit `data/sites.csv` (and `scripts/sites_fill-wsg_name.py --write` if a watershed group code changed); add a `NEWS.md` entry; commit
 2. `git tag vX.Y.Z`
 3. `scripts/catalogue_release.sh` — rebuilds all items, validates + audits (`--expect` is the collection's link count, so a stray item JSON fails here), syncs, `stacs register --mode drift`, `stacs verify`, then checks the version stamp and registry coverage (~5 min, idempotent)
 

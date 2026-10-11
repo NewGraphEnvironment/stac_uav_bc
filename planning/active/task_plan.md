@@ -17,10 +17,10 @@
 No crate schema or crate issue yet: only this catalogue writes these prefixes (crate `pkgdown/assets/stac/README.md` rule). Prefixes are declared locally, with no schema URL.
 
 ## Phase 1: Settle the mapping and add the registry column
-- [ ] Edit the #38 body: replace the "proposal" table with the decided mapping above, including the reasons the `fwa:watershed_group_name` and `fwa:` stream-name rows changed
-- [ ] `scripts/sites_fill-wsg_name.py`: fill `watershed_group_name` from `watershed_group_code` through the fwapg REST collection `whse_basemapping.fwa_watershed_groups_poly` (probed: BULK → "Bulkley River"). It makes one fetch per distinct code from inside one process, sets `--max-time`, prints by default and writes only with `--write`, and refuses a code the atlas does not know. The written CSV must keep its column order, quoting and line endings (diff limited to the new column)
-- [ ] Add the `watershed_group_name` column after `watershed_group_code` and fill it. Report the one row with a blank code
-- [ ] Document the column in the `scripts/config/README.md` registry paragraph and the add-imagery recipe
+- [x] Edit the #38 body: replace the "proposal" table with the decided mapping above, including the reasons the `fwa:watershed_group_name` and `fwa:` stream-name rows changed
+- [x] `scripts/sites_fill-wsg_name.py`: fill `watershed_group_name` from `watershed_group_code` through the fwapg REST collection `whse_basemapping.fwa_watershed_groups_poly` (probed: BULK → "Bulkley River"). It makes one fetch per distinct code from inside one process, sets `--max-time`, prints by default and writes only with `--write`, and refuses a code the atlas does not know. The written CSV must keep its column order, quoting and line endings (diff limited to the new column)
+- [x] Add the `watershed_group_name` column after `watershed_group_code` and fill it. Report the one row with a blank code
+- [x] Document the column in the `scripts/config/README.md` registry paragraph and the add-imagery recipe
 
 ## Phase 2: Item builder (`scripts/item_create.py`)
 - [ ] `--selftest` gate first, following `flight_coverage.py --selftest`. It runs on fixture rows with no network and no tifs, and asserts:

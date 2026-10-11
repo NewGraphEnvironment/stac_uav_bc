@@ -35,7 +35,7 @@ Renaming changes every published item, so it rides with this catalogue's next fu
 - Writer: `registry_props()` in `scripts/item_create.py`; reader: `build_item()` (title from stream_name + alias); release gate `scripts/catalogue_release.sh` checks `nge:region` + `nge:stream_name` live.
 - Built items carry only `proj:` besides `nge:` (rio_stac `with_proj=True`); `stac_extensions` lists projection v1.1.0 only.
 - `sites.csv` (85 rows): `watershed` is the tree slug (`peace_arm`, `upper_arrow_lake`), not the FWA name, so the issue's `fwa:watershed_group_name` for it was wrong. `watershed_group_code` is FWA's, one row blank. `project` blank in all rows.
-- Stream names by `name_source`: pscis 24, bcfishpass_gnis 18, fwa_* ~35, guess_* 5, user 1, blank 1. Not atlas names, hence `uav:` rather than `fwa:`.
+- Stream names by `name_source`: pscis 24, bcfishpass or FWA 54 (bcfishpass_gnis 18, fwa_bbox 7, fwa_nearest_* 24, bulkley-rule 5), guess_* 5, user 1, blank 1. Not atlas names, hence `uav:` rather than `fwa:`.
 - fwapg REST: `https://features.hillcrestgeo.ca/fwa/collections/whse_basemapping.fwa_watershed_groups_poly/items.json?watershed_group_code=BULK&properties=watershed_group_code,watershed_group_name` returns `Bulkley River`.
 - Org code search for each `nge:` key: no code reader outside this repo (rolex planning text only).
 - Precedent: stac_airphoto_bc#47 declares prefixes in `FIELD_PREFIXES` (prefix → schema URL or None) and refuses undeclared ones in `stac_validate.py`.
