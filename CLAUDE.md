@@ -111,6 +111,9 @@ A lint warning of `no visible binding` for a constant added on this branch is us
 ### Tests that silently do not run
 `expect_snapshot()` **skips on CRAN**, and `testthat` treats a non-interactive run as CRAN by default.
 
+### testthat counts an uncaught error under `error`, not `failed`
+Count `r$failed > 0 | r$error` over `r <- as.data.frame(testthat::test_file(f))`, never `failed` alone: a restored defect that raises instead of failing an expectation scores zero failures, so a guard that fired reads as one that never did.
+
 ### A `skip_if_not()` skips only its own `test_that()` block
 Before blaming a failure, or its absence, on a skip, find the `test_that()` block the skip sits in.
 
@@ -292,13 +295,13 @@ testthat 3e writes `tests/testthat/_problems/*.R` and `tests/testthat/testthat-p
 `DISTINCT ON (k) … ORDER BY k, a, b` is deterministic only if `(a, b)` is unique within each `k`.
 
 ### `sprintf("%g", x)` writes `Inf` and `NA` into SQL as bare words, which Postgres reads as column names
-A numeric formatter such as `sprintf("%.10g", x)` has no SQL form for non-finite values, so an open-ended range (`c(min, Inf)`, typically a blank `max` filled with `Inf` by a params loader) produces `x <= Inf`, and Postgres fails with `column "inf" does not exist`.
+A numeric formatter such as `sprintf("%.10g", x)` has no SQL form for non-finite values.
 
 ### An `information_schema` lookup by the literal table name misses what Postgres resolves
-`WHERE table_schema = 's' AND table_name = 'T'` compares the text you passed, but Postgres folds unquoted identifiers to lower case, puts temp tables in `pg_temp_N`, and resolves unqualified names through `search_path`.
+`WHERE table_schema = 's' AND table_name = 'T'` compares the text you passed.
 
 ### Rscript reads a script as it runs, so never edit a script while a run of it is in flight
-Copy the script and run the copy (`cp scripts/x.R "$TMPDIR/x_frozen.R" && Rscript "$TMPDIR/x_frozen.R"`) for anything long-running, or leave the file alone until the run exits.
+Copy the script and run the copy (`cp scripts/x.R "${TMPDIR:-/tmp}/x_frozen.R" && Rscript "${TMPDIR:-/tmp}/x_frozen.R"`) for anything long-running, or leave the file alone until the run exits.
 
 ### A range total taken as the difference of two large running totals loses the small ranges
 Sum a range directly (segment tree, per-range `sum()`, or grouped sums) rather than as `cumsum[hi] - cumsum[lo]` when ranges are small relative to the running total.
@@ -307,7 +310,7 @@ Sum a range directly (segment tree, per-range `sum()`, or grouped sums) rather t
 `R CMD check` warns "'::' or ':::' import not declared from" for any package a test reaches with `::` that `DESCRIPTION` does not list, and under `error-on: "warning"` that reddens every runner.
 
 ### Inside a dplyr verb, a column named like a local variable wins
-Inject a local value into a data-masked verb with `!!x` or `.env$x`, never a bare `x`: `transmute(d, aoi_id = id)` inside `for (id in ids)` reads the frame's own `id` column whenever one exists, with no warning, and the result is well-typed and plausible.
+Inject a local value into a data-masked verb with `!!x` or `.env$x`, never a bare `x`.
 
 ### `earthdatalogin`'s search and download calls overwrite the netrc when they find no Earthdata entry
 Call NASA's CMR search with `curl` and download with `curl` given the netrc directly (`netrc = 1, netrc_file = <path>, cookiefile = ""` follows the URS redirect), or check `earthdatalogin:::has_edl_netrc()` yourself first.
@@ -322,7 +325,7 @@ Assign inside the call, `expect_message(h <- f(x), "msg")`, never `h <- expect_m
 Put a Date first when `c()` combines an optional piece with Dates: `c(NULL, <Date>)` takes the default method and returns a bare day count.
 
 ### `bind_rows()` of all-`NULL` is a 0 x 0 tibble, and a typed template must take its types from the rows' source
-Bind per-group results under a zero-row template so an all-dropped result keeps its columns, and build that template's key columns from the same object the rows are built from (`combos$variable[0]`, not `character()`).
+Bind per-group results under a zero-row template so an all-dropped result keeps its columns.
 
 ### `sample.int(prob =)` without replacement is not a probability-proportional draw, so weighting its result again double-counts
 Draw a subsample to be design-weighted **uniformly** (`sample.int(n, k)`), or keep every unit.
@@ -331,7 +334,7 @@ Draw a subsample to be design-weighted **uniformly** (`sample.int(n, k)`), or ke
 Read the exit status off the result: `st <- attr(out, "status")`, which is `NULL` on success.
 
 ### Forked `parallel::mclapply()` workers segfault in `glm.fit` under macOS Accelerate BLAS
-Fit models in parallel on socket workers (`parallel::makeCluster()` with `parLapply()`), not forks: with R linked to Accelerate's vecLib, `mclapply` children segfault inside `glm.fit` (`address 0x110, cause 'invalid permissions'`), and `mclapply` returns try-errors with a warning rather than stopping.
+Fit models in parallel on socket workers (`parallel::makeCluster()` with `parLapply()`), not forks.
 
 ### `c(name = x)` keeps `x`'s own name, so a value from a named vector becomes `name.X`
 Strip the name before you label it: `c(axis = unname(v[1]))` or `c(axis = v[[1]])`.
@@ -373,16 +376,16 @@ Record the condition in the handler (`hit <<- TRUE`) and raise after `tryCatch()
 Move a directory into place with `base::file.rename()` and check its return value, which is FALSE where the target is a non-empty directory, a symlink or a file.
 
 ### Base `file.info()` has no inode column, so `file.info(x)$ino` is NULL and any comparison of it passes
-Read an inode with `fs::file_info(x)$inode`: base `file.info()` returns size, mode, times and owners only, so `identical(file.info(a)$ino, file.info(b)$ino)` is `identical(NULL, NULL)`, TRUE for any two files.
+Read an inode with `fs::file_info(x)$inode`.
 
 ### `cffr::cff_create()` writes a CRAN DOI for any package that shares a name with a CRAN package
 Drop the generated DOI (`x$doi <- NULL`) unless it is your own, and supply your own through `keys = list(doi = ...)`, because cffr assigns `10.32614/CRAN.package.<name>` whenever CRAN carries a package of that name, whatever your package is.
 
 ### A `{python}` chunk needs reticulate even with `eval = FALSE`
-Set `python.reticulate = FALSE` on a Python chunk that only displays code, or declare reticulate: knitr hands every non-R chunk to its engine whatever `eval` says, and the `python` engine loads reticulate, so a render fails on a machine without it.
+Set `python.reticulate = FALSE` on a Python chunk that only displays code, or declare reticulate.
 
 ### `readBin(size = 4)` returns NA for exactly 2^31, so it cannot read an unsigned 32-bit field
-Sum the bytes as doubles (`sum(as.numeric(raw[i + 1:4]) * 256^(0:3))`) to read a u32 or u64 from a binary header: R has no unsigned or 64-bit integer, and a signed read goes negative above 2^31 and returns `NA_integer_` at 2^31 itself, R's NA bit pattern.
+Sum the bytes as doubles (`sum(as.numeric(raw[i + 1:4]) * 256^(0:3))`) to read a u32 or u64 from a binary header.
 
 ### ajv honours keywords beside a `$ref`; Python's jsonschema ignores them
 Keep every `$ref` alone in a draft-07 schema tested with jsonvalidate and read by pystac.
@@ -1002,6 +1005,12 @@ On a collision, do not resolve conflicts file by file. The merge conflict hides 
 useful question, which is *which body of work survives*. Ask, then re-land the delta on
 top of what shipped; two independent attempts at one problem are usually complementary
 rather than redundant, and a mechanical resolution keeps whichever half git preferred.
+
+## Re-read the issue body before the baseline
+
+Re-fetch it and diff against the copy you planned from. An edit made during plan mode
+is invisible to a plan built on the first read: in stac_airphoto_bc#47 the body gained
+two requirements that way, caught only by the plan review after three phases had landed.
 
 ## An issue number you did not file yet is somebody else's
 
