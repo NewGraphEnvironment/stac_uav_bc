@@ -27,3 +27,4 @@
 - Round 2 (5 findings, 2 inside round 1's fixes, all fixed): api_status 000 (not 000000); item_unregister.sh --collection + the drop's refusal names the ids; direction-aware stub; verdict flag under bash 3.2; private repo names out of the planning files
 - Round 3 (mechanism: guards keyed on a surrogate; 2 findings + 1 wording, fixed): item_unregister.sh option loop and -* refusal (ssh-shim measured); row-count numeric case under --yes; NEWS: /search on the old id answers 200 with no features. Loop ended by enumeration: 19 guard mutants red, every $(...) guarded
 - Phase 4: cutover RELEASE COMPLETE v2.0.0 (20:58Z); hand checks 245/245, tile 200; README rendered from the new collection; issue body rewritten; 13 sweep PRs opened (21:00Z)
+- Phase 5: 13 PRs open and MERGEABLE/CLEAN; template gate 245 on the new id; gh pr merge refused by the auto-mode classifier (merge without review): Al merges, then Phase 6

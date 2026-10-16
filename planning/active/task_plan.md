@@ -119,24 +119,27 @@ Decided with Al at the plan gate (2026-10-16): this session runs the cutover, an
 
 ## Phase 5: The consumer sweep (one PR per repo; merged after Phase 4, before Phase 6)
 
-- [ ] `git fetch` every cloned consumer first; clone `stac_floodplains_bc` and `stac_pointcloud_bc`
-      into a worktree dir
-- [ ] the report template repo first: `0400-results.Rmd:156`
-- [ ] Seven reports, one line each: `0400-results.Rmd` (fraser_2023, peace_2024, skeena_2024),
-      `0740-appendix-uav-imagery.Rmd` (fraser_2025, peace_2025, skeena_2025); `docs/*.html` is
-      rendered output and changes at the report's next render
-- [ ] `restoration_wedzin_kwa_2024`: `2042-Appendix-uav-imagery.Rmd:11`, `scripts/functions.R:582`
-- [ ] the two talk repos: the four UAV scripts of the 2026 Terrace talk, each (the second from a worktree
-      off main; `_site`, `_freeze` and the ledger untouched, said in the PR)
-- [ ] the infrastructure repo: register-all list (both the uav line and the stale `stac-dem-bc` line →
-      `stac-elevation-bc`), geoserv README counts, `the endpoints doc`, the two unregister
-      comment lines; logs untouched
-- [ ] Sibling READMEs: `stac_dem_bc`, `stac_floodplains_bc` (+ `scripts/item_unregister.sh`),
-      `stac_pointcloud_bc`, `README.Rmd` and `README.md` each
-- [ ] Each PR body says the old id serves until the drop; R&D cross-reference where the repo's
-      `CLAUDE.md` configures one; public repos get no private pointers
-- [ ] Gate: the template's `0400-results.Rmd` chunk (BC bbox) run against the new id returns 245
-      features, equal to the same query against the old id taken before the drop
+- [x] `git fetch` every cloned consumer first; clone `stac_floodplains_bc` and `stac_pointcloud_bc`
+      (branches cut from each repo's `origin/main` in scratch worktrees)
+- [x] the report template repo first: `0400-results.Rmd:156` (PR #239)
+- [x] Seven reports, one line each: `0400-results.Rmd` (fraser_2023 #162, peace_2024 #42,
+      skeena_2024 #49), `0740-appendix-uav-imagery.Rmd` (fraser_2025 #40, peace_2025 #51,
+      skeena_2025 #22); `docs/*.html` is rendered output and changes at the report's next render
+- [x] `restoration_wedzin_kwa_2024` #163: `2042-Appendix-uav-imagery.Rmd:11`, `scripts/functions.R:582`
+- [x] the two talk repos: the four UAV scripts of the 2026 Terrace talk; the first repo's PR #5;
+      the second repo holds them only on Al's in-flight feature branch (his to change; the lines
+      are the same four `collections =` / `stac_items(` literals plus three comments)
+- [x] the infrastructure repo PR #398: register-all list (both the uav line and the stale
+      `stac-dem-bc` line → `stac-elevation-bc`), geoserv README counts, the endpoints doc, the two
+      unregister comment lines; logs untouched
+- [x] Sibling READMEs: `stac_dem_bc` #65, `stac_floodplains_bc` #97 (+ `scripts/item_unregister.sh`),
+      `stac_pointcloud_bc` #29, `README.Rmd`, `README.md` and the rendered `index.html` where tracked
+- [x] Each PR body says the old id serves until the drop and what `/search` answers after it; no
+      repo configures an R&D cross-reference; public repos get no private pointers
+- [x] Gate: the template's `0400-results.Rmd` query lines run against the new id return 245
+      features, equal to the old id's 245 measured before the drop
+- [ ] The thirteen PRs merged (all MERGEABLE/CLEAN at 21:03Z; the auto-mode classifier refused
+      `gh pr merge` as a merge without review, so Al merges them)
 - [ ] QGIS count on each other machine that holds projects (hand Al the one-liner; this machine:
       0 of 301 name the id); each machine's number recorded before the drop
 
