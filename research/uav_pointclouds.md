@@ -123,7 +123,8 @@ Ranked by value for the effort, cheapest first.
 the ODM ground (class 2) to the newest LidarBC delivery that covers at least half the flight, writes
 one row to `data/alignment_lidarbc.csv`, and `item_create.py` carries a fitted row on every item of the
 dataset as `alignment:` fields (the README's "Elevations" section says how to apply them). The rasters
-are published as they are. What changed from the probe, and why:
+are published as they are, and `alignment:applied` says so (`false`); #46 publishes them corrected and
+flips it, and #42 then publishes the clouds the same way. What changed from the probe, and why:
 
 - **Bilinear DEM sampling.** Nearest-cell added slope × U(−0.5, 0.5) m per point and made the
   0.25 m search a step function.

@@ -603,6 +603,9 @@ def item_fields(row):
     fields = {k: cast(row[c]) for k, c, cast in ITEM_FIELDS}
     fields["alignment:surface"] = [float(c) for c in json.loads(row["surface"])]
     fields["alignment:centre"] = [float(row["centre_x"]), float(row["centre_y"])]
+    # As item_create.py writes it: no published raster is corrected until #46, which
+    # will read this from the corrected raster rather than from the table.
+    fields["alignment:applied"] = False
     return fields
 
 
@@ -944,6 +947,11 @@ def _selftest():
         (v_pub / "odm_dem" / v_item).write_text(json.dumps({"properties": item_fields(again[v])}))
         check(not any(d.startswith("r/w/2026/v") for d in check_table(again, root, prod, cog)),
               "--check on an item carrying exactly the fitted row's fields")
+        stale = {f: x for f, x in item_fields(again[v]).items() if f != "alignment:applied"}
+        (v_pub / "odm_dem" / v_item).write_text(json.dumps({"properties": stale}))
+        check(any(d.startswith(f"r/w/2026/v: item {v_item}") for d in check_table(again, root, prod, cog)),
+              "--check blind to an item built before alignment:applied existed")
+        (v_pub / "odm_dem" / v_item).write_text(json.dumps({"properties": item_fields(again[v])}))
         again[v]["misfit_m"] = str(float(again[v]["misfit_m"]) + 0.5)
         check(any(d.startswith(f"r/w/2026/v: item {v_item}") for d in check_table(again, root, prod, cog)),
               "--check blind to a fitted row that changed after its items were built")

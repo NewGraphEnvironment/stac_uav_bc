@@ -19,6 +19,8 @@ horizontally. The fields give the horizontal shift and the quadratic surface
 - `alignment:misfit_m`, `alignment:points`, `alignment:model`: NMAD of the residual over the ground
   points compared, how many, and `quadratic` (a plane, tried first, left a median of 0.78 m on the
   same datasets)
+- `alignment:applied`: `false` on every item, the rasters being published as ODM wrote them; #46
+  publishes them corrected and sets it `true`
 
 The README's "Elevations" section says how to apply them. `data/alignment_lidarbc.csv` is the table,
 `scripts/dataset_align-lidarbc.py` writes it, and a publish now needs the dataset's row; the first

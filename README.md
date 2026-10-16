@@ -163,6 +163,12 @@ determined (a flat site gives the shift no signal; a flight the DEM
 covers only partly) and the 3 with no ODM point cloud (two
 orthophoto-only datasets and one duplicate flight) carry no fields.
 
+`alignment:applied` is `false` on every item: the rasters are published
+as ODM wrote them, and the fields are there to be applied.
+[\#46](https://github.com/NewGraphEnvironment/stac_uav_bc/issues/46)
+publishes them corrected and sets it `true`, and the fields then record
+what was applied.
+
 To apply a fit, in the item’s own CRS (`proj:epsg`):
 
 - corrected (x, y) = published (x, y) + (`alignment:shift_x_m`,
@@ -188,6 +194,7 @@ by default.
 | `alignment:misfit_m` | NMAD of the residual over the ground points compared, m |
 | `alignment:points` | ground points compared |
 | `alignment:model` | `quadratic` (chosen over a plane by the trial in [`research/uav_pointclouds.md`](research/uav_pointclouds.md)) or `plane` |
+| `alignment:applied` | `false`: the raster is as ODM wrote it, apply the fields; `true` (after \#46): the fit was applied to the published raster |
 
 The fields are numbers, so they filter. Every dataset that fits LidarBC
 within a metre:

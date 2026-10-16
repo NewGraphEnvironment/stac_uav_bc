@@ -153,6 +153,12 @@ def alignment_props(row):
     except (KeyError, ValueError, TypeError) as e:
         sys.exit(f"REFUSED: alignment row for {'/'.join(row.get(k, '?') for k in ('region', 'watershed', 'year', 'item'))} "
                  f"is fitted but not readable: {e}")
+    # The rasters are published as ODM wrote them, so the fields are there to be
+    # applied. #46 publishes them corrected and sets this true per dataset, read from
+    # the corrected raster; until then no raster is corrected and the table has no
+    # column for it, so it is a constant here and in dataset_align-lidarbc.py's
+    # item_fields(), which restates this join for --check.
+    props["alignment:applied"] = False
     # json.dumps writes NaN and Infinity, item.validate() accepts them as numbers,
     # pgstac does not: a fitted row has to be finite everywhere.
     numbers = [v for v in props.values() if isinstance(v, float)] + props["alignment:surface"] + props["alignment:centre"]
@@ -343,7 +349,8 @@ def _selftest():
                   "alignment:shift_x_m": 3.0, "alignment:shift_y_m": -4.88, "alignment:offset_m": 69.823,
                   "alignment:tilt_m_per_100m": 1.273, "alignment:misfit_m": 0.982,
                   "alignment:surface": [69.8227, -0.6341, 1.1037],
-                  "alignment:centre": [529546.71, 5915090.51], "alignment:points": 200000}
+                  "alignment:centre": [529546.71, 5915090.51], "alignment:points": 200000,
+                  "alignment:applied": False}
     got_align = alignment_props(fitted)
     check(got_align == want_align, f"alignment_props: got {got_align}, want {want_align}")
     check(not fields_undeclared({"properties": got_align}), "alignment: prefix is undeclared")
