@@ -178,6 +178,19 @@ Prod tree mirrored into the scratchpad (245 tifs symlinked, 246 JSONs copied), `
 
 Repeated on a fresh mirror with the quadratic table (`mirror2.log`): 245 items from 245 tifs, 245 links resolve; validate 246, 0 invalid; audit OK against 245; 46 fitted datasets carry the fields on every item, six coefficients in `alignment:surface`, and the build differs from the control only in the `alignment:` fields.
 
+## Branch review (`/code-check branch`, 2026-10-16)
+
+Round 1 (`review-round1.md`): no defect in a shipped path; three fragile points and three minor notes, all fixed:
+
+| finding | fix |
+|---|---|
+| the justification beside `MAX_SHIFT_SPREAD` described the plane run; under the quadratic the largest fitted spread is 1.95 m and the refusals 2.6 and 5.6 m, so the cut is 5 cm from a fitted row | comment and research bullet restated: set from the plane run (dated), the quadratic's spreads given |
+| README and NEWS said which datasets carry no fields and omitted the 3 with no ODM cloud | added |
+| nothing in the pipeline ran `--check`: a cloud re-stitched between the fit and the publish would ship another cloud's fields with every gate green | `dataset_publish.sh` runs `--check` before anything (proved: a planted `cloud_points` drift stops it before the missing-tif check; 0.1 s) and `catalogue_release.sh` before the rebuild |
+| the release script's three live checks read one 1000-item page with no page-full assertion (two inherited) | `assert len(feats) < 1000` in all three |
+| `alignment:reference` can carry two deliveries `;`-joined (the two moose flights) | README field table says so |
+| a comment named the href path as `<bucket>/<region>/…`; the code takes four segments under the virtual-hosted URL | comment fixed |
+
 ## Errors Encountered
 
 | Error | Resolution |

@@ -130,10 +130,13 @@ are published as they are. What changed from the probe, and why:
 - **A Huber fit** (k = 1.345 robust scales) in place of least squares with a 3-NMAD trim, so the
   fitter and the score (NMAD) share a loss; ten rows of the table above got worse from shift-only to
   shift + tilt under the trimmed fit.
-- **The shift searched twice**, on two disjoint 20 000-point samples, which must agree within 2 m.
-  Over the 47 datasets that fit, 41 agree within 1 m, four within 1.3 m, then 5.5 m (`maxan_mx1`)
-  and 8.5 m (the moose pre flight): a flat site gives the shift no signal, and the probe's single
-  search returned a number there all the same.
+- **The shift searched twice**, on two disjoint 20 000-point samples, which must agree within 2 m:
+  a flat site gives the shift no signal, and the probe's single search returned a number there all
+  the same. The cut was set from the plane run, where the 47 that fit agree within 1 m (41) or
+  1.3 m (four) and the next two sit at 5.5 m (`maxan_mx1`) and 8.5 m (the moose pre flight). The
+  quadratic table (the one shipped) is not as cleanly split: the quadratic fits both of those (spreads
+  0.5 and 0.8 m), its largest fitted spread is 1.95 m (`richfield_lower_RC3`, the one dataset it fits
+  worse than the plane) and its refusals sit at 2.6 m (`197912_roberthatch`) and 5.6 m.
 - **Coverage.** A delivery covering under half the flight is refused, after trying the older ones:
   `16701523_table_ck` (27 %) is refused where the probe fitted it on a sliver.
 - **The dataset's own DTM checked** against its cloud (median within 0.1 m over 2000 ground points)

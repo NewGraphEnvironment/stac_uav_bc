@@ -67,7 +67,7 @@ Two commands with a human QC gate between them:
 The underlying single-purpose tools these orchestrate, for one-off use:
 
 - `scripts/item_create.py <tifs relative to prod tree>` — items + collection.json (conda env `titiler`)
-- `uv run scripts/dataset_align-lidarbc.py --check` — every published dataset has an alignment row and no cloud changed since its fit; `--selftest` is the script's gate, `--trial grid.csv` fits every model × mask per dataset
+- `uv run scripts/dataset_align-lidarbc.py --check` — every published dataset has an alignment row and no cloud changed since its fit (`dataset_publish.sh` runs it before the COG step and `catalogue_release.sh` before the rebuild, so a re-stitched cloud cannot ship another cloud's fit); `--selftest` is the script's gate, `--trial grid.csv` fits every model × mask per dataset
 - `scripts/stacs.sh register --config stacs.toml --mode drift` — upsert the collection, then every item the API lacks or serves stale (reads the published catalogue: sync first)
 - `scripts/stacs.sh verify --config stacs.toml --out-dir <dir>` — what the API serves against what is published
 - `find <prod tree> -name '*.json' ! -name collection.json | scripts/stacs.sh validate` (or `audit --config stacs.toml`) — pystac validation / collection + asset audit; `--dir` does not recurse, so pass paths on stdin

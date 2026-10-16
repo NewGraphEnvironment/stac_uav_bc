@@ -21,9 +21,9 @@ horizontally. The fields give the horizontal shift and the quadratic surface
   same datasets)
 
 The README's "Elevations" section says how to apply them. `data/alignment_lidarbc.csv` is the table,
-`scripts/dataset_align-lidarbc.py` writes it, and a publish now needs the dataset's row. The
-31 datasets with no LidarBC under them and the 3 whose fit could not be
-determined carry no fields.
+`scripts/dataset_align-lidarbc.py` writes it, and a publish now needs the dataset's row. The 31
+datasets with no LidarBC under them, the 3 whose fit could not be determined and the 3 with no ODM
+point cloud carry no fields.
 
 ## v1.0.4 (2026-10-09)
 

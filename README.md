@@ -157,9 +157,10 @@ one row per dataset in
 fit, the ground misfits LidarBC by a median of 0.42 m (NMAD over the
 ground points compared): 42 of 46 datasets within 1 m, 26 within 0.5 m.
 The 31 datasets with no LidarBC under them (mostly the Morice 2021–2026
-and the upper Parsnip 2022–2024) and the 3 whose fit could not be
+and the upper Parsnip 2022–2024) , the 3 whose fit could not be
 determined (a flat site gives the shift no signal; a flight the DEM
-covers only partly) carry no fields.
+covers only partly) and the 3 with no ODM point cloud (two
+orthophoto-only datasets and one duplicate flight) carry no fields.
 
 To apply a fit, in the item’s own CRS (`proj:epsg`):
 
@@ -178,7 +179,7 @@ by default.
 
 | field | holds |
 |----|----|
-| `alignment:reference` | the LidarBC delivery the fit used (`093/093g/2024`, collection `stac-elevation-bc`) |
+| `alignment:reference` | the LidarBC delivery the fit used (`093/093g/2024`, collection `stac-elevation-bc`); two deliveries `;`-joined where the flight spans them |
 | `alignment:shift_x_m`, `alignment:shift_y_m` | the horizontal shift, m, in the item’s CRS |
 | `alignment:offset_m` | the vertical correction at the dataset’s centre, m |
 | `alignment:tilt_m_per_100m` | the magnitude of the tilt |

@@ -39,6 +39,12 @@ TIFS="odm_orthophoto/odm_orthophoto.tif odm_dem/dtm.tif odm_dem/dsm.tif"
 
 [ $# -ge 1 ] || { echo "usage: $(basename "$0") project-dir [project-dir ...]" >&2; exit 1; }
 
+# The alignment table must match the trees before anything is built from it (#41):
+# a cloud re-stitched since its fit would otherwise publish alignment: fields that
+# describe another cloud, with every gate below green. Reads the laz headers only
+# (seconds); laspy lives under uv, so this cannot be the python3 block below.
+uv run "$REPO/scripts/dataset_align-lidarbc.py" --check || exit 1
+
 rels=()
 new_tifs=()
 for proj in "$@"; do

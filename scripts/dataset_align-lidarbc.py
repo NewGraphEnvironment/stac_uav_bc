@@ -91,10 +91,12 @@ MASKS = ("none", "slope", "open", "slope+open")
 SLOPE_MAX_DEG = 15.0  # LidarBC ground steeper than this is left out of a `slope` fit
 OPEN_MAX_M = 0.5  # DSM - DTM above this is canopy, left out of an `open` fit
 SEARCH_M, COARSE_STEP, FINE_M, FINE_STEP = 20.0, 1.0, 1.0, 0.25
-# m between the two samples' shifts; beyond it the shift is not determined. Measured
-# over the 47 datasets that fit (2026-10-16): 41 agree within 1.0 m, four between 1.0
-# and 1.3 m, then nothing until 5.5 m and 8.5 m, which the research also called
-# undetermined (2.6 m apart on the moose post flight). 2 m sits in that gap.
+# m between the two samples' shifts; beyond it the shift is not determined. Set from
+# the plane run of 2026-10-16 (47 fitted: 41 agree within 1.0 m, four between 1.0 and
+# 1.3 m, then nothing until 5.5 m and 8.5 m, which the research also called
+# undetermined). The quadratic table is not as cleanly split: its largest fitted
+# spread is 1.95 m (richfield_lower_RC3, also the one dataset the quadratic fits
+# worse than the plane), and its refusals sit at 2.6 and 5.6 m.
 MAX_SHIFT_SPREAD = 2.0
 MIN_POINTS = 2000  # fewer ground points over the DEM than this is no fit
 MIN_COVERAGE = 0.5  # share of the ground points the DEM must cover, or the tilt is extrapolated
