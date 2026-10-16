@@ -38,7 +38,8 @@
 # The misfit is always scored on every point, so masks are judged on the same
 # points as no mask; misfit_masked_m is the score on the masked points alone.
 # --trial fits every model x mask on each dataset in one pass and writes the
-# grid; the settled defaults are --model and --mask.
+# grid (research/uav_pointclouds/trials/grid.csv); the defaults of --model and
+# --mask are its winner: the quadratic, no mask.
 #
 # Output: one row per dataset in data/alignment_lidarbc.csv, keyed like
 # data/sites.csv. `status` is fitted, no_cloud, no_reference or
@@ -276,10 +277,11 @@ def canopy_height(proj_raw, proj_prod, x, y):
             a = r.read(1, out_shape=shape, resampling=Resampling.average, masked=True)
             arrs.append((a.filled(np.nan).astype("float64"),
                          r.transform * r.transform.scale(r.width / shape[1], r.height / shape[0])))
+    # Each raster sampled on its own grid: on 16 published datasets the DSM and
+    # DTM differ by a column or a centimetre of origin, so a shared grid cannot
+    # be assumed, and a difference of the arrays would be off by a cell there.
     (dsm, t), (dtm, t2) = arrs
-    if dsm.shape != dtm.shape or t != t2:
-        raise Refused("dsm_dtm_grids_differ")
-    return sample_tiles([(dsm - dtm, t)], x, y)
+    return sample_tiles([(dsm, t)], x, y) - sample_tiles([(dtm, t2)], x, y)
 
 
 def mask_points(mask, x, y, X, Y, tiles, proj_raw, proj_prod):
@@ -675,20 +677,27 @@ def _selftest():
             keep=np.arange(20_000) < 500)
 
     # The open mask reads the dataset's own DSM - DTM: trees east of x0 + 300.
+    # The DSM is a column wider than the DTM and its origin 1 cm west, as the
+    # published pairs can be, and the mask must still come out.
     with tempfile.TemporaryDirectory() as td:
         import rasterio
         raw = pathlib.Path(td) / "raw"
         (raw / "odm_dem").mkdir(parents=True)
         dtm = tiles_of(ramp)[0][0].astype("float32")
-        dsm = dtm.copy()
+        dsm = np.hstack([dtm, dtm[:, -1:]])
         dsm[:, 300:] += 3.0
-        for name, a in ((DTM, dtm), (DSM, dsm)):
-            with rasterio.open(str(raw / name), "w", driver="GTiff", height=n, width=n, count=1, dtype="float32",
-                               crs="EPSG:32610", transform=Affine(1.0, 0.0, x0, 0.0, -1.0, y1), nodata=-9999.0) as w:
+        for name, a, west in ((DTM, dtm, 0.0), (DSM, dsm, 0.01)):
+            with rasterio.open(str(raw / name), "w", driver="GTiff", height=n, width=a.shape[1], count=1,
+                               dtype="float32", crs="EPSG:32610", transform=Affine(1.0, 0.0, x0 - west, 0.0, -1.0, y1),
+                               nodata=-9999.0) as w:
                 w.write(a, 1)
-        keep = mask_points("open", x, y, x, y, bumps, raw, pathlib.Path(td) / "none")
+        try:
+            keep = mask_points("open", x, y, x, y, bumps, raw, pathlib.Path(td) / "none")
+            keep2 = mask_points("slope+open", x, y, x, y, bumps, raw, pathlib.Path(td) / "none")
+        except Refused as e:
+            keep = keep2 = np.zeros(len(x), bool)
+            check(False, f"open mask refused a DSM and DTM on grids a centimetre apart: {e}")
         check((keep == (x < x0 + 299)).mean() > 0.99, f"open mask: {keep.mean():.2f} kept, {(x < x0 + 300).mean():.2f} west of the trees")
-        keep2 = mask_points("slope+open", x, y, x, y, bumps, raw, pathlib.Path(td) / "none")
         check((keep2 <= keep).all(), "slope+open keeps a point open alone drops")
 
     # The table: what a run writes is what the next run reads, and a merge keeps
@@ -745,7 +754,9 @@ def main():
     p.add_argument("--selftest", action="store_true", help="run the gate and exit")
     p.add_argument("--check", action="store_true", help="report table drift against the trees and exit")
     p.add_argument("--trial", metavar="GRID.csv", help="fit every model x mask per dataset into this file")
-    p.add_argument("--model", choices=MODELS, default="plane")
+    # The defaults are the trial's winner (research/uav_pointclouds.md, 2026-10-16):
+    # the quadratic halves the plane's misfit on 42 of 44 datasets; no mask moves it.
+    p.add_argument("--model", choices=MODELS, default="quadratic")
     p.add_argument("--mask", choices=MASKS, default="none")
     p.add_argument("--root", default=str(ROOT), help="raw imagery tree")
     p.add_argument("--base", default=str(PROD), help="published tree, enumerated when no project is given")

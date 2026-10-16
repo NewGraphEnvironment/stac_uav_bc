@@ -115,6 +115,9 @@ Not adopted: widening the search window once before refusing (cost ×4; no ODM f
 | slope mask inverted (`>=`) | red: keeps 0.45 of the hill but the wrong half |
 | open mask inverted | red: keeps the half under the trees |
 | mask minimum removed | red: a mask keeping 500 points was fitted |
+| `open` mask refuses a DSM and DTM on different grids (the exact-affine check the trial removed, Phase 2) | red: the refusal is a failed check and the mask keeps nothing (first try crashed the selftest from the second mask call, outside the `try`; wrapped) |
+
+Re-run after Phase 2 (quadratic default, per-raster canopy sampling): the same 12 red, nearest-cell green (`mutants_quad.log`).
 
 `conda run -n titiler python scripts/item_create.py --selftest`: `alignment` removed from `FIELD_PREFIXES` (red, 4 checks), fields written for every status (red, 3), finite check removed (red, 2: `nan` and `Infinity` pass), `published=false` ignored by the no-row check (red, 2).
 
@@ -163,11 +166,23 @@ The nine shifts over 1 m apart sit on near-flat score valleys: `sandstone_mcdone
 
 `data/alignment_lidarbc.csv`: 83 rows; **45 fitted**, 4 refused (`199663…11000` `shift_unstable` 8.5 m, `…post_replacement` 3.2 m, `maxan_mx1` 5.5 m; `16701523_table_ck` `low_coverage` 0.27), 31 `no_reference`, 3 `no_cloud`. Identical to the lifted-cut scan except the three rows the cut turns. `--check` OK. Over the 45: raw vertical offset median +6.0 m (absolute median 7.2 m, −96.7 to +92.2 m); horizontal shift median 3.4 m (up to 10.9 m); misfit median 0.79 m, 27 within 1 m, 12 within 0.5 m. 49 datasets sit on LidarBC (45 + 4 refused).
 
+## Trial grid and the production table, quadratic model (2026-10-16)
+
+`--trial` over all 83 (1 h 50 min, resumed once after the progress-line crash): the grid is `research/uav_pointclouds/trials/grid.csv`, its table in `research/uav_pointclouds.md`. The quadratic against the plane, paired on the 44 datasets both fit: misfit median 0.78 → 0.42 m, −0.225 m per dataset, lower on 42 of 44 (worse on `richfield_lower_RC3` 0.53 → 0.85 and `richfield_upper_RC1` 0.65 → 0.65). Within 1 m: 27 → 41; within 0.5 m: 12 → 25. The masks, paired against no mask within the quadratic, move the median by under 5 mm and lower it on about half the datasets, so no mask is the default (ties to the simpler). The `open` mask was first refused on 16 datasets whose published DSM and DTM are not on one grid (a column, or a centimetre of origin, apart); the refusal was an exact affine comparison, replaced by sampling each raster on its own grid, and the 16 re-run.
+
+**Production table, quadratic, no mask** (`data/alignment_lidarbc.csv`, 32 min): 83 rows; **46 fitted**, 3 refused (`197912_roberthatch` `shift_unstable` 2.6 m, the moose post flight 5.6 m, `16701523_table_ck` `low_coverage` 0.27), 31 `no_reference`, 3 `no_cloud`; `--check` OK. The rows equal the trial's quadratic/none arm cell for cell (same per-dataset random state), which is the reproduction check. Over the 46: raw vertical offset median 8.3 m in size (signed +5.8; −97 to +92 m); horizontal shift median 3.2 m (up to 12.4 m); misfit median **0.42 m** (quartiles 0.32–0.69), 42 within 1 m, 26 within 0.5 m; one dataset above 2 m (`track_ck_johnson_fsr`, 4.9 m). Against the plane table: the quadratic fits `maxan_mx1` (0.29 m) and the moose pre flight (1.53 m), whose plane shifts were unstable, and refuses `roberthatch`, whose plane shift was not. The shifts differ between the two models by a median of 1.3 m (25 datasets over 1 m, up to 6 m), the along-feature ambiguity again: the shift is the fit's least determined number and the misfit says nothing about it.
+
 ## Offline verification of the join (2026-10-16)
 
 Prod tree mirrored into the scratchpad (245 tifs symlinked, 246 JSONs copied), `item_create.py --rebuild --base <mirror> --version 0.0.0-test`: 245 items from 245 tifs, 245 links resolve; `stacs validate` 246 validated, 0 invalid; `stacs audit --expect 245` OK. A second rebuild of the same tree with a table in which every row is `no_reference` is the control: the two builds differ only in the `alignment:` fields; every fitted dataset's three items carry identical values; no other item carries any (`mirror_check.py`). Comparing against prod itself is not possible yet: prod's items still carry the pre-#38 `nge:` fields, which the #38 release will replace.
+
+Repeated on a fresh mirror with the quadratic table (`mirror2.log`): 245 items from 245 tifs, 245 links resolve; validate 246, 0 invalid; audit OK against 245; 46 fitted datasets carry the fields on every item, six coefficients in `alignment:surface`, and the build differs from the control only in the `alignment:` fields.
 
 ## Errors Encountered
 
 | Error | Resolution |
 |-------|------------|
+| `--trial` crashed with `KeyError: 'model'` printing progress for a dataset with no fit (its one row is status only) | the progress line branches on `"model" in r`; `--trial` resumes, skipping datasets already in the grid |
+| `open` mask refused 16 datasets as `dsm_dtm_grids_differ`: the published DSM and DTM differ by a column or a centimetre of origin, and the check was exact affine equality | each raster sampled on its own grid, no shared grid assumed; selftest writes the DSM a column wider and 1 cm west, the restored refusal goes red |
+| `python3` (3.14) numpy has no `median` for the comparison scripts | `uv run --no-project --with numpy` |
+| the selftest's `check_blind` mutant crashed (IndexError on a shorter drift list) instead of failing | the check filters the list instead of indexing it, so a missing drift reads as a failed check |

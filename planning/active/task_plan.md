@@ -45,9 +45,9 @@ Sign convention is stated once, in the README, and the NEWS entry repeats it.
 
 ## Phase 2: The two trials (scope 2)
 - [ ] ~~Held-out scoring for every model: fit on a random half of the compared points, report NMAD on the other half, so the quadratic's three extra terms have to earn their keep~~ Dropped 2026-10-16 (findings): every arm is scored on every point compared instead, which is the same ground for all of them, and three extra parameters cannot overfit 10^5 points
-- [ ] `--model plane|quadratic` and `--mask none|slope|slope+open` (slope: LidarBC DEM slope under a threshold, so banks where horizontal error reads as vertical misfit drop out; open: UAV DSM − DTM < 0.5 m at the point, from the dataset's own prod rasters, so ground the cameras saw under no canopy). `--trial` evaluates all six cells per dataset in one pass (load each cloud and DEM once) and writes the grid
-- [ ] Run the grid over the 51 ODM datasets on LidarBC, into `research/uav_pointclouds/trials/`; a table of median, quartiles, count within 1 m and 0.5 m per cell; the winner (lowest median misfit over the same points, ties to the simpler) becomes the default; the trial table goes into `research/uav_pointclouds.md` (revised in place, Verified date updated) and the archive README's Measurement section
-- [ ] Regenerate `data/alignment_lidarbc.csv` with the settled defaults; report the misfit distribution against the research figure (acceptance: median ≤ 0.82 m)
+- [x] `--model plane|quadratic` and `--mask none|slope|slope+open` (slope: LidarBC DEM slope under a threshold, so banks where horizontal error reads as vertical misfit drop out; open: UAV DSM − DTM < 0.5 m at the point, from the dataset's own prod rasters, so ground the cameras saw under no canopy). `--trial` evaluates all six cells per dataset in one pass (load each cloud and DEM once) and writes the grid (as built: eight arms, `open` alone too; the DSM and DTM each sampled on their own grid after an exact-grid check refused 16 datasets)
+- [x] Run the grid over the 51 ODM datasets on LidarBC, into `research/uav_pointclouds/trials/`; a table of median, quartiles, count within 1 m and 0.5 m per cell; the winner (lowest median misfit over the same points, ties to the simpler) becomes the default; the trial table goes into `research/uav_pointclouds.md` (revised in place, Verified date updated) and the archive README's Measurement section (run over all 83; the quadratic by 0.225 m on 42 of 44, the masks a tie: `quadratic`, `none`)
+- [x] Regenerate `data/alignment_lidarbc.csv` with the settled defaults; report the misfit distribution against the research figure (acceptance: median ≤ 0.82 m) (46 fitted, median 0.42 m, 42 within 1 m; the rows equal the trial's quadratic/none arm)
 
 ## Phase 3: Items — `scripts/item_create.py`
 - [x] `--selftest` first: a `fitted` row yields exactly the `alignment:` fields above; a `no_reference` or refused row yields none; a published dataset absent from the table is refused; the prefix guard accepts `alignment:` and still refuses `nge:`. Restore each defect, gate goes red (4 mutants red; a fitted row with `nan` or `Infinity` is refused too)
@@ -57,12 +57,12 @@ Sign convention is stated once, in the README, and the NEWS entry repeats it.
 
 ## Phase 4: Docs and release notes
 - [ ] `README.Rmd`: an "Elevations" paragraph — UAV elevations are GPS-referenced (no ground control); measured against LidarBC, the vertical offset's median and range and the misfit after the fit, every number derived from `data/alignment_lidarbc.csv` at writing time; the sign convention and how to apply the fields; that flights off LidarBC carry none. The fields join the item-properties table with an rstac filter example (`alignment:misfit_m < 1`). Re-render `README.md` and `index.html` (the `build` chunk)
-- [ ] `scripts/config/README.md`: recipe step 2b — `uv run scripts/dataset_align-lidarbc.py <project-dir>` after QC and before `dataset_publish.sh` (`item_create.py` refuses a published dataset with no row); registry section names the table. `CLAUDE.md` script list line
+- [ ] `scripts/config/README.md`: recipe step 2b (landed as step 3 of a renumbered recipe, with `odm_qc.py` as step 2) — `uv run scripts/dataset_align-lidarbc.py <project-dir>` after QC and before `dataset_publish.sh` (`item_create.py` refuses a published dataset with no row); registry section names the table. `CLAUDE.md` script list line
 - [ ] `NEWS.md`: an entry for the release that will carry the fields, naming each, the sign convention, and that nothing changes until that release
 - [ ] Edit the #41 body to the decided field list and decisions (bodies get edited, not appended)
 
 ## Validation
-- [ ] `uv run scripts/dataset_align-lidarbc.py --selftest` and `conda run -n titiler python scripts/item_create.py --selftest` pass, and fail with each guard's defect restored
+- [ ] `uv run scripts/dataset_align-lidarbc.py --selftest` and `conda run -n titiler python scripts/item_create.py --selftest` pass, and fail with each guard's defect restored (12 and 4 guards red, `findings.md`)
 - [ ] `/code-check` clean (once over the branch with `/code-check branch`)
 - [ ] PWF checkboxes match landed work
 - [ ] `/planning-archive` on completion; the archive README carries Measurement (misfit distribution, trial grid) and Evidence (`research/uav_pointclouds/trials/`, `data/alignment_lidarbc.csv`)
@@ -70,7 +70,7 @@ Sign convention is stated once, in the README, and the NEWS entry repeats it.
 ## Verification, end to end
 
 1. Both selftests green, and red with each defect restored (listed per guard in `findings.md`).
-2. The production table: 81 rows; `fitted` count ≥ 51 (every research dataset) and the ODM rows agree with the research table.
+2. The production table: 81 rows; `fitted` count ≥ 51 (every research dataset) and the ODM rows agree with the research table. (As measured: 83 rows; only 49 published datasets sit on LidarBC, so 51 was never reachable; 46 fitted, and the plane fit of the 49 reproduces the research table.)
 3. Trial grid table in the research doc; the default is the measured winner.
 4. Mirror rebuild validates and audits clean; field coverage asserted by script over the mirror.
 5. Live checks run only at the next release (not in this PR).
