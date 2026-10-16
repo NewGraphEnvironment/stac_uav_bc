@@ -1,7 +1,7 @@
 # UAV point clouds: what we have, how far off they sit, and where the value is
 
-**Verified:** 2026-10-16 · **Issues:** spawned the alignment, point-cloud publishing and change-detection
-issues linked from the PR that added this file · **Produced by:** the probes in
+**Verified:** 2026-10-16 · **Issues:** spawned #41 (alignment), #42 (COPC publishing), #43 (change
+detection); added in #44 · **Produced by:** the probes in
 [`uav_pointclouds/`](uav_pointclouds/) (each says what it reads), run over the raw imagery tree;
 per-flight numbers in [`uav_pointclouds/uav_lidarbc_offsets.csv`](uav_pointclouds/uav_lidarbc_offsets.csv)
 
