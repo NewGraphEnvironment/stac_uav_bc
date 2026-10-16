@@ -111,4 +111,29 @@ print('    registry coverage OK: %d/%d items carry newgraph:region + uav:stream_
       'no undeclared fields' % (len(feats), len(feats)))
 " "$REPO/scripts/item_create.py" || exit 1
 
+# And the alignment fields (#41): a live item carries alignment:reference exactly when
+# its dataset's row in data/alignment_lidarbc.csv is fitted. The table is the one
+# source; the dataset is read off the asset href (<bucket>/<region>/<wsg>/<year>/<item>/...).
+curl -s -X POST "${API%/collections/*}/search" -H "Content-Type: application/json" \
+  -d "{\"collections\":[\"${API##*/}\"],\"limit\":1000}" | python3 -c "
+import csv, json, sys
+from urllib.parse import urlsplit, unquote
+fitted = {(r['region'], r['watershed'], r['year'], r['item']) for r in csv.DictReader(open(sys.argv[1]))
+          if r['status'] == 'fitted'}
+feats = json.load(sys.stdin)['features']
+wrong = []
+for f in feats:
+    key = tuple(unquote(urlsplit(f['assets']['image']['href']).path).strip('/').split('/')[:4])
+    has = 'alignment:reference' in f.get('properties', {})
+    if has != (key in fitted):
+        wrong.append('%s: %s' % (f['id'], 'carries alignment fields, row not fitted' if has else 'row fitted, no alignment fields'))
+if wrong:
+    print('RELEASE INCOMPLETE: %d live item(s) disagree with %s:' % (len(wrong), sys.argv[1]), file=sys.stderr)
+    for w in wrong[:10]:
+        print('   ', w, file=sys.stderr)
+    sys.exit(1)
+n = sum('alignment:reference' in f.get('properties', {}) for f in feats)
+print('    alignment coverage OK: %d/%d items carry alignment: fields, matching %d fitted rows' % (n, len(feats), len(fitted)))
+" "$REPO/data/alignment_lidarbc.csv" || exit 1
+
 echo "RELEASE COMPLETE: v$VERSION"
