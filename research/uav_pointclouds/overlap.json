@@ -1,0 +1,3001 @@
+[
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/fraser/cottonwood/2026/198285_pedley_lake_creek_rd/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093g-2024-pointcloud-bc_093g038_3_3_2_xyes_8_utm10_20240710_20240714",
+    "dt": "2024-07-10T00:00:00Z",
+    "delivery": "093/093g/2024",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093g/2024/pointcloud/bc_093g038_3_3_2_xyes_8_utm10_20240710_20240714.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093g-2019-pointcloud-bc_093g038_3_3_2_xyes_8_utm10_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093g/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093g/2019/pointcloud/bc_093g038_3_3_2_xyes_8_utm10_2019.laz",
+    "copc": "https://canelevation-lidar-point-clouds.s3.ca-central-1.amazonaws.com/pointclouds_nuagespoints/BC/Riverine_Floodplain_UTM10_2019/bc_093g038_3_3_2_xyes_8_utm10_2019.copc.laz"
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093g-2024-dem-bc_093g038_3_3_2_xli1m_utm10_20240710_20240714",
+    "dt": "2024-07-10T00:00:00Z",
+    "assets": [
+     "dem",
+     "dsm"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093g/2024/dem/bc_093g038_3_3_2_xli1m_utm10_20240710_20240714.tif"
+   },
+   {
+    "id": "093-093g-2019-dem-bc_093g038_xli1m_utm10_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093g/2019/dem/bc_093g038_xli1m_utm10_2019.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_122_094",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_122_094.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/fraser/morkill/2024/199256_kenneth_hwy16/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093h-2025-pointcloud-bc_093h092_1_2_3_xyes_8_utm10_20250528_20250528",
+    "dt": "2025-05-28T00:00:00Z",
+    "delivery": "093/093h/2025",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093h/2025/pointcloud/bc_093h092_1_2_3_xyes_8_utm10_20250528_20250528.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093h-2025-pointcloud-bc_093h092_1_1_4_xyes_8_utm10_20250528_20250528",
+    "dt": "2025-05-28T00:00:00Z",
+    "delivery": "093/093h/2025",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093h/2025/pointcloud/bc_093h092_1_1_4_xyes_8_utm10_20250528_20250528.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093h-2025-dem-bc_093h092_1_2_3_xli1m_utm10_20250528_20250528",
+    "dt": "2025-05-28T00:00:00Z",
+    "assets": [
+     "dem",
+     "dsm"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093h/2025/dem/bc_093h092_1_2_3_xli1m_utm10_20250528_20250528.tif"
+   },
+   {
+    "id": "093-093h-2025-dem-bc_093h092_1_1_4_xli1m_utm10_20250528_20250528",
+    "dt": "2025-05-28T00:00:00Z",
+    "assets": [
+     "dem",
+     "dsm"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093h/2025/dem/bc_093h092_1_1_4_xli1m_utm10_20250528_20250528.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/fraser/nechacko/2024/199173_necr_trib_dog/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093k-2024-pointcloud-bc_093k018_1_2_1_xyes_8_utm10_20240823_20240823",
+    "dt": "2024-08-23T00:00:00Z",
+    "delivery": "093/093k/2024",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093k/2024/pointcloud/bc_093k018_1_2_1_xyes_8_utm10_20240823_20240823.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093k-2019-pointcloud-bc_093k018_1_2_1_xyes_8_utm10_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093k/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093k/2019/pointcloud/bc_093k018_1_2_1_xyes_8_utm10_2019.laz",
+    "copc": "https://canelevation-lidar-point-clouds.s3.ca-central-1.amazonaws.com/pointclouds_nuagespoints/BC/Riverine_Floodplain_UTM10_2019/bc_093k018_1_2_1_xyes_8_utm10_2019.copc.laz"
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093k-2024-dem-bc_093k018_1_2_1_xli1m_utm10_20240823_20240823",
+    "dt": "2024-08-23T00:00:00Z",
+    "assets": [
+     "dem",
+     "dsm"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093k/2024/dem/bc_093k018_1_2_1_xli1m_utm10_20240823_20240823.tif"
+   },
+   {
+    "id": "093-093k-2019-dem-bc_093k018_xli1m_utm10_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093k/2019/dem/bc_093k018_xli1m_utm10_2019.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_109_102",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_109_102.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/fraser/nechacko/2024/199174_necr_trib_dog_settlement/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093k-2024-pointcloud-bc_093k018_1_1_2_xyes_8_utm10_20240823_20240823",
+    "dt": "2024-08-23T00:00:00Z",
+    "delivery": "093/093k/2024",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093k/2024/pointcloud/bc_093k018_1_1_2_xyes_8_utm10_20240823_20240823.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093k-2024-pointcloud-bc_093k018_1_1_1_xyes_8_utm10_20240823_20240823",
+    "dt": "2024-08-23T00:00:00Z",
+    "delivery": "093/093k/2024",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093k/2024/pointcloud/bc_093k018_1_1_1_xyes_8_utm10_20240823_20240823.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093k-2019-pointcloud-bc_093k018_1_1_2_xyes_8_utm10_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093k/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093k/2019/pointcloud/bc_093k018_1_1_2_xyes_8_utm10_2019.laz",
+    "copc": "https://canelevation-lidar-point-clouds.s3.ca-central-1.amazonaws.com/pointclouds_nuagespoints/BC/Riverine_Floodplain_UTM10_2019/bc_093k018_1_1_2_xyes_8_utm10_2019.copc.laz"
+   },
+   {
+    "id": "093-093k-2019-pointcloud-bc_093k018_1_1_1_xyes_8_utm10_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093k/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093k/2019/pointcloud/bc_093k018_1_1_1_xyes_8_utm10_2019.laz",
+    "copc": "https://canelevation-lidar-point-clouds.s3.ca-central-1.amazonaws.com/pointclouds_nuagespoints/BC/Riverine_Floodplain_UTM10_2019/bc_093k018_1_1_1_xyes_8_utm10_2019.copc.laz"
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093k-2024-dem-bc_093k018_1_1_2_xli1m_utm10_20240823_20240823",
+    "dt": "2024-08-23T00:00:00Z",
+    "assets": [
+     "dem",
+     "dsm"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093k/2024/dem/bc_093k018_1_1_2_xli1m_utm10_20240823_20240823.tif"
+   },
+   {
+    "id": "093-093k-2024-dem-bc_093k018_1_1_1_xli1m_utm10_20240823_20240823",
+    "dt": "2024-08-23T00:00:00Z",
+    "assets": [
+     "dem",
+     "dsm"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093k/2024/dem/bc_093k018_1_1_1_xli1m_utm10_20240823_20240823.tif"
+   },
+   {
+    "id": "093-093k-2019-dem-bc_093k018_xli1m_utm10_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093k/2019/dem/bc_093k018_xli1m_utm10_2019.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_109_102",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_109_102.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/fraser/nechacko/2024/199171_burnt_cabin_gala/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093k-2024-pointcloud-bc_093k017_1_2_2_xyes_8_utm10_20240824_20240824",
+    "dt": "2024-08-24T00:00:00Z",
+    "delivery": "093/093k/2024",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093k/2024/pointcloud/bc_093k017_1_2_2_xyes_8_utm10_20240824_20240824.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093k-2024-pointcloud-bc_093k017_2_1_1_xyes_8_utm10_20240823_20240824",
+    "dt": "2024-08-23T00:00:00Z",
+    "delivery": "093/093k/2024",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093k/2024/pointcloud/bc_093k017_2_1_1_xyes_8_utm10_20240823_20240824.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093k-2021-pointcloud-bc_093k017_2_1_1_xyes_8_utm10_2021",
+    "dt": "2021-01-01T00:00:00Z",
+    "delivery": "093/093k/2021",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093k/2021/pointcloud/bc_093k017_2_1_1_xyes_8_utm10_2021.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093k-2021-pointcloud-bc_093k017_1_2_2_xyes_8_utm10_2021",
+    "dt": "2021-01-01T00:00:00Z",
+    "delivery": "093/093k/2021",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093k/2021/pointcloud/bc_093k017_1_2_2_xyes_8_utm10_2021.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093k-2024-dem-bc_093k017_1_2_2_xli1m_utm10_20240824_20240824",
+    "dt": "2024-08-24T00:00:00Z",
+    "assets": [
+     "dem",
+     "dsm"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093k/2024/dem/bc_093k017_1_2_2_xli1m_utm10_20240824_20240824.tif"
+   },
+   {
+    "id": "093-093k-2024-dem-bc_093k017_2_1_1_xli1m_utm10_20240823_20240824",
+    "dt": "2024-08-23T00:00:00Z",
+    "assets": [
+     "dem",
+     "dsm"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093k/2024/dem/bc_093k017_2_1_1_xli1m_utm10_20240823_20240824.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/fraser/nechacko/2024/chilako_mud1/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093g-2024-pointcloud-bc_093g086_1_3_2_xyes_8_utm10_20240712_20240713",
+    "dt": "2024-07-12T00:00:00Z",
+    "delivery": "093/093g/2024",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093g/2024/pointcloud/bc_093g086_1_3_2_xyes_8_utm10_20240712_20240713.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093g-2019-pointcloud-bc_093g086_1_3_2_xyes_8_utm10_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093g/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093g/2019/pointcloud/bc_093g086_1_3_2_xyes_8_utm10_2019.laz",
+    "copc": "https://canelevation-lidar-point-clouds.s3.ca-central-1.amazonaws.com/pointclouds_nuagespoints/BC/Riverine_Floodplain_UTM10_2019/bc_093g086_1_3_2_xyes_8_utm10_2019.copc.laz"
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093g-2024-dem-bc_093g086_1_3_2_xli1m_utm10_20240712_20240713",
+    "dt": "2024-07-12T00:00:00Z",
+    "assets": [
+     "dem",
+     "dsm"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093g/2024/dem/bc_093g086_1_3_2_xli1m_utm10_20240712_20240713.tif"
+   },
+   {
+    "id": "093-093g-2019-dem-bc_093g086_xli1m_utm10_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093g/2019/dem/bc_093g086_xli1m_utm10_2019.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_119_099",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_119_099.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/kootenay/upper_arrow_lake/2024/arrow-whiskey-hadow/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/kootenay/salmo_erie_ck/processed/salmoerie2020042820210210.las",
+  "pc": [
+   {
+    "id": "082-082f-2018-pointcloud-bc_082f014_4_3_4_xyes_12_utm11_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "delivery": "082/082f/2018",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/082/082f/2018/pointcloud/bc_082f014_4_3_4_xyes_12_utm11_2018.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "082-082f-2018-dem-bc_082f014_xli1m_utm11_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/082/082f/2018/dem/bc_082f014_xli1m_utm11_2018.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_163_051",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_163_051.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/kootenay/elk/2021/parker/mme/20211016parker20220921.las",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/kootenay/elk/2021/parker/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "082-082g-2016-pointcloud-bc_082g028_1_1_2_xyes_6_utm11_2016",
+    "dt": "2016-01-01T00:00:00Z",
+    "delivery": "082/082g/2016",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/082/082g/2016/pointcloud/bc_082g028_1_1_2_xyes_6_utm11_2016.laz",
+    "copc": null
+   }
+  ],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/kootenay/regent/20250616/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "082-082f-2017-pointcloud-bc_082f044_4_3_3_xyes_8_utm11_180827",
+    "dt": "2017-01-01T00:00:00Z",
+    "delivery": "082/082f/2017",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/082/082f/2017/pointcloud/bc_082f044_4_3_3_xyes_8_utm11_180827.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "082-082f-2017-dem-bc_082f044_l1m_utm11_20180830",
+    "dt": "2018-08-30T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/082/082f/2017/dem/bc_082f044_l1m_utm11_20180830.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_163_054",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_163_054.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/kootenay/regent/20191103/processed/regent20191103b20210402.las",
+  "pc": [
+   {
+    "id": "082-082f-2017-pointcloud-bc_082f044_4_3_3_xyes_8_utm11_180827",
+    "dt": "2017-01-01T00:00:00Z",
+    "delivery": "082/082f/2017",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/082/082f/2017/pointcloud/bc_082f044_4_3_3_xyes_8_utm11_180827.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "082-082f-2017-dem-bc_082f044_l1m_utm11_20180830",
+    "dt": "2018-08-30T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/082/082f/2017/dem/bc_082f044_l1m_utm11_20180830.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_163_054",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_163_054.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/mackenzie/upper_peace/2026/23502870_track_ck_johnson_fsr/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093o-2025-pointcloud-bc_093o099_4_3_4_xyes_8_utm10_20250814_20250815",
+    "dt": "2025-08-14T00:00:00Z",
+    "delivery": "093/093o/2025",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093o/2025/pointcloud/bc_093o099_4_3_4_xyes_8_utm10_20250814_20250815.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093o-2025-pointcloud-bc_093o099_4_3_2_xyes_8_utm10_20250814_20250815",
+    "dt": "2025-08-14T00:00:00Z",
+    "delivery": "093/093o/2025",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093o/2025/pointcloud/bc_093o099_4_3_2_xyes_8_utm10_20250814_20250815.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093o-2025-pointcloud-bc_093o099_4_1_4_xyes_8_utm10_20250814_20250815",
+    "dt": "2025-08-14T00:00:00Z",
+    "delivery": "093/093o/2025",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093o/2025/pointcloud/bc_093o099_4_1_4_xyes_8_utm10_20250814_20250815.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093o-2025-dem-bc_093o099_4_3_4_xli1m_utm10_20250814_20250815",
+    "dt": "2025-08-14T00:00:00Z",
+    "assets": [
+     "dem",
+     "dsm"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093o/2025/dem/bc_093o099_4_3_4_xli1m_utm10_20250814_20250815.tif"
+   },
+   {
+    "id": "093-093o-2025-dem-bc_093o099_4_3_2_xli1m_utm10_20250814_20250815",
+    "dt": "2025-08-14T00:00:00Z",
+    "assets": [
+     "dem",
+     "dsm"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093o/2025/dem/bc_093o099_4_3_2_xli1m_utm10_20250814_20250815.tif"
+   },
+   {
+    "id": "093-093o-2025-dem-bc_093o099_4_1_4_xli1m_utm10_20250814_20250815",
+    "dt": "2025-08-14T00:00:00Z",
+    "assets": [
+     "dem",
+     "dsm"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093o/2025/dem/bc_093o099_4_1_4_xli1m_utm10_20250814_20250815.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/mackenzie/carp/2024/198692_kerry_lake_trib/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093j-2025-pointcloud-bc_093j066_4_4_2_xyes_8_utm10_20250515_20250515",
+    "dt": "2025-05-15T00:00:00Z",
+    "delivery": "093/093j/2025",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093j/2025/pointcloud/bc_093j066_4_4_2_xyes_8_utm10_20250515_20250515.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093j-2025-dem-bc_093j066_4_4_2_xli1m_utm10_20250515_20250515",
+    "dt": "2025-05-15T00:00:00Z",
+    "assets": [
+     "dem",
+     "dsm"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093j/2025/dem/bc_093j066_4_4_2_xli1m_utm10_20250515_20250515.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/mackenzie/parsnip/2022/125179_missinka_trib/mme/20220816missinka20220927.las",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/mackenzie/parsnip/2022/125179_missinka_trib/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/mackenzie/parsnip/2022/125000_parsnip_trib_arctic/mme/20220816arctic20220927.las",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/mackenzie/parsnip/2022/125000_parsnip_trib_arctic/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/mackenzie/parsnip/2024/125231_table_trib_tablefsr_21k/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/mackenzie/parsnip/2023/125261_fern_tablefsr_2k/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093j-2025-pointcloud-bc_093j078_4_1_2_xyes_8_utm10_20250526_20250527",
+    "dt": "2025-05-26T00:00:00Z",
+    "delivery": "093/093j/2025",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093j/2025/pointcloud/bc_093j078_4_1_2_xyes_8_utm10_20250526_20250527.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093j-2025-dem-bc_093j078_4_1_2_xli1m_utm10_20250526_20250527",
+    "dt": "2025-05-26T00:00:00Z",
+    "assets": [
+     "dem",
+     "dsm"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093j/2025/dem/bc_093j078_4_1_2_xli1m_utm10_20250526_20250527.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/mackenzie/parsnip/2023/125231_table_trib_tablefsr_21k/mme/20240828table21tribparsnip20240528.las",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/mackenzie/parsnip/2023/125231_table_trib_tablefsr_21k/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/mackenzie/parsnip/2026/199663_parsnip_trib_chco_11000_post_replacement/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093o-2025-pointcloud-bc_093o007_1_1_2_xyes_8_utm10_20250804_20250804",
+    "dt": "2025-08-04T00:00:00Z",
+    "delivery": "093/093o/2025",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093o/2025/pointcloud/bc_093o007_1_1_2_xyes_8_utm10_20250804_20250804.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093o-2025-pointcloud-bc_093o007_1_1_1_xyes_8_utm10_20250804_20250805",
+    "dt": "2025-08-04T00:00:00Z",
+    "delivery": "093/093o/2025",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093o/2025/pointcloud/bc_093o007_1_1_1_xyes_8_utm10_20250804_20250805.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093j-2025-pointcloud-bc_093j097_3_3_4_xyes_8_utm10_20250804_20250805",
+    "dt": "2025-08-04T00:00:00Z",
+    "delivery": "093/093j/2025",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093j/2025/pointcloud/bc_093j097_3_3_4_xyes_8_utm10_20250804_20250805.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093j-2025-pointcloud-bc_093j097_3_3_3_xyes_8_utm10_20250804_20250805",
+    "dt": "2025-08-04T00:00:00Z",
+    "delivery": "093/093j/2025",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093j/2025/pointcloud/bc_093j097_3_3_3_xyes_8_utm10_20250804_20250805.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093o-2017-pointcloud-bc_093o007_1_1_2_xyes_8_utm10_2017",
+    "dt": "2017-01-01T00:00:00Z",
+    "delivery": "093/093o/2017",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093o/2017/pointcloud/bc_093o007_1_1_2_xyes_8_utm10_2017.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093o-2017-pointcloud-bc_093o007_1_1_1_xyes_8_utm10_2017",
+    "dt": "2017-01-01T00:00:00Z",
+    "delivery": "093/093o/2017",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093o/2017/pointcloud/bc_093o007_1_1_1_xyes_8_utm10_2017.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093j-2017-pointcloud-bc_093j097_3_3_4_xyes_8_utm10_2017",
+    "dt": "2017-01-01T00:00:00Z",
+    "delivery": "093/093j/2017",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093j/2017/pointcloud/bc_093j097_3_3_4_xyes_8_utm10_2017.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093j-2017-pointcloud-bc_093j097_3_3_3_xyes_8_utm10_2017",
+    "dt": "2017-01-01T00:00:00Z",
+    "delivery": "093/093j/2017",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093j/2017/pointcloud/bc_093j097_3_3_3_xyes_8_utm10_2017.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093o-2025-dem-bc_093o007_1_1_2_xli1m_utm10_20250804_20250804",
+    "dt": "2025-08-04T00:00:00Z",
+    "assets": [
+     "dem",
+     "dsm"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093o/2025/dem/bc_093o007_1_1_2_xli1m_utm10_20250804_20250804.tif"
+   },
+   {
+    "id": "093-093o-2025-dem-bc_093o007_1_1_1_xli1m_utm10_20250804_20250805",
+    "dt": "2025-08-04T00:00:00Z",
+    "assets": [
+     "dem",
+     "dsm"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093o/2025/dem/bc_093o007_1_1_1_xli1m_utm10_20250804_20250805.tif"
+   },
+   {
+    "id": "093-093j-2025-dem-bc_093j097_3_3_4_xli1m_utm10_20250804_20250805",
+    "dt": "2025-08-04T00:00:00Z",
+    "assets": [
+     "dem",
+     "dsm"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093j/2025/dem/bc_093j097_3_3_4_xli1m_utm10_20250804_20250805.tif"
+   },
+   {
+    "id": "093-093j-2025-dem-bc_093j097_3_3_3_xli1m_utm10_20250804_20250805",
+    "dt": "2025-08-04T00:00:00Z",
+    "assets": [
+     "dem",
+     "dsm"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093j/2025/dem/bc_093j097_3_3_3_xli1m_utm10_20250804_20250805.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/mackenzie/parsnip/2026/199663_parsnip_trib_chco_11000/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093o-2025-pointcloud-bc_093o007_1_1_2_xyes_8_utm10_20250804_20250804",
+    "dt": "2025-08-04T00:00:00Z",
+    "delivery": "093/093o/2025",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093o/2025/pointcloud/bc_093o007_1_1_2_xyes_8_utm10_20250804_20250804.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093o-2025-pointcloud-bc_093o007_1_1_1_xyes_8_utm10_20250804_20250805",
+    "dt": "2025-08-04T00:00:00Z",
+    "delivery": "093/093o/2025",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093o/2025/pointcloud/bc_093o007_1_1_1_xyes_8_utm10_20250804_20250805.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093j-2025-pointcloud-bc_093j097_3_3_4_xyes_8_utm10_20250804_20250805",
+    "dt": "2025-08-04T00:00:00Z",
+    "delivery": "093/093j/2025",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093j/2025/pointcloud/bc_093j097_3_3_4_xyes_8_utm10_20250804_20250805.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093j-2025-pointcloud-bc_093j097_3_3_3_xyes_8_utm10_20250804_20250805",
+    "dt": "2025-08-04T00:00:00Z",
+    "delivery": "093/093j/2025",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093j/2025/pointcloud/bc_093j097_3_3_3_xyes_8_utm10_20250804_20250805.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093o-2017-pointcloud-bc_093o007_1_1_2_xyes_8_utm10_2017",
+    "dt": "2017-01-01T00:00:00Z",
+    "delivery": "093/093o/2017",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093o/2017/pointcloud/bc_093o007_1_1_2_xyes_8_utm10_2017.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093o-2017-pointcloud-bc_093o007_1_1_1_xyes_8_utm10_2017",
+    "dt": "2017-01-01T00:00:00Z",
+    "delivery": "093/093o/2017",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093o/2017/pointcloud/bc_093o007_1_1_1_xyes_8_utm10_2017.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093j-2017-pointcloud-bc_093j097_3_3_4_xyes_8_utm10_2017",
+    "dt": "2017-01-01T00:00:00Z",
+    "delivery": "093/093j/2017",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093j/2017/pointcloud/bc_093j097_3_3_4_xyes_8_utm10_2017.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093j-2017-pointcloud-bc_093j097_3_3_3_xyes_8_utm10_2017",
+    "dt": "2017-01-01T00:00:00Z",
+    "delivery": "093/093j/2017",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093j/2017/pointcloud/bc_093j097_3_3_3_xyes_8_utm10_2017.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093o-2025-dem-bc_093o007_1_1_2_xli1m_utm10_20250804_20250804",
+    "dt": "2025-08-04T00:00:00Z",
+    "assets": [
+     "dem",
+     "dsm"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093o/2025/dem/bc_093o007_1_1_2_xli1m_utm10_20250804_20250804.tif"
+   },
+   {
+    "id": "093-093o-2025-dem-bc_093o007_1_1_1_xli1m_utm10_20250804_20250805",
+    "dt": "2025-08-04T00:00:00Z",
+    "assets": [
+     "dem",
+     "dsm"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093o/2025/dem/bc_093o007_1_1_1_xli1m_utm10_20250804_20250805.tif"
+   },
+   {
+    "id": "093-093j-2025-dem-bc_093j097_3_3_4_xli1m_utm10_20250804_20250805",
+    "dt": "2025-08-04T00:00:00Z",
+    "assets": [
+     "dem",
+     "dsm"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093j/2025/dem/bc_093j097_3_3_4_xli1m_utm10_20250804_20250805.tif"
+   },
+   {
+    "id": "093-093j-2025-dem-bc_093j097_3_3_3_xli1m_utm10_20250804_20250805",
+    "dt": "2025-08-04T00:00:00Z",
+    "assets": [
+     "dem",
+     "dsm"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093j/2025/dem/bc_093j097_3_3_3_xli1m_utm10_20250804_20250805.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/mackenzie/pine/2026/6971_pine_oxbox_hwy97S/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093o-2025-pointcloud-bc_093o069_2_1_3_xyes_8_utm10_20250814_20250815",
+    "dt": "2025-08-14T00:00:00Z",
+    "delivery": "093/093o/2025",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093o/2025/pointcloud/bc_093o069_2_1_3_xyes_8_utm10_20250814_20250815.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093o-2025-pointcloud-bc_093o069_2_1_1_xyes_8_utm10_20250814_20250815",
+    "dt": "2025-08-14T00:00:00Z",
+    "delivery": "093/093o/2025",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093o/2025/pointcloud/bc_093o069_2_1_1_xyes_8_utm10_20250814_20250815.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093o-2025-pointcloud-bc_093o069_1_2_4_xyes_8_utm10_20250814_20250814",
+    "dt": "2025-08-14T00:00:00Z",
+    "delivery": "093/093o/2025",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093o/2025/pointcloud/bc_093o069_1_2_4_xyes_8_utm10_20250814_20250814.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093o-2025-pointcloud-bc_093o069_1_2_2_xyes_8_utm10_20250814_20250814",
+    "dt": "2025-08-14T00:00:00Z",
+    "delivery": "093/093o/2025",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093o/2025/pointcloud/bc_093o069_1_2_2_xyes_8_utm10_20250814_20250814.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093o-2025-dem-bc_093o069_2_1_3_xli1m_utm10_20250814_20250815",
+    "dt": "2025-08-14T00:00:00Z",
+    "assets": [
+     "dem",
+     "dsm"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093o/2025/dem/bc_093o069_2_1_3_xli1m_utm10_20250814_20250815.tif"
+   },
+   {
+    "id": "093-093o-2025-dem-bc_093o069_2_1_1_xli1m_utm10_20250814_20250815",
+    "dt": "2025-08-14T00:00:00Z",
+    "assets": [
+     "dem",
+     "dsm"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093o/2025/dem/bc_093o069_2_1_1_xli1m_utm10_20250814_20250815.tif"
+   },
+   {
+    "id": "093-093o-2025-dem-bc_093o069_1_2_4_xli1m_utm10_20250814_20250814",
+    "dt": "2025-08-14T00:00:00Z",
+    "assets": [
+     "dem",
+     "dsm"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093o/2025/dem/bc_093o069_1_2_4_xli1m_utm10_20250814_20250814.tif"
+   },
+   {
+    "id": "093-093o-2025-dem-bc_093o069_1_2_2_xli1m_utm10_20250814_20250814",
+    "dt": "2025-08-14T00:00:00Z",
+    "assets": [
+     "dem",
+     "dsm"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093o/2025/dem/bc_093o069_1_2_2_xli1m_utm10_20250814_20250814.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/mackenzie/peace_arm/2026/16701333_carbon_trib_johnson_fsr/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/mackenzie/peace_arm/2026/16701523_table_ck_table_fsr/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "094-094b-2025-pointcloud-bc_094b009_3_4_1_xyes_8_utm10_20250814_20250814",
+    "dt": "2025-08-14T00:00:00Z",
+    "delivery": "094/094b/2025",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/094/094b/2025/pointcloud/bc_094b009_3_4_1_xyes_8_utm10_20250814_20250814.laz",
+    "copc": null
+   },
+   {
+    "id": "094-094b-2025-pointcloud-bc_094b009_3_2_3_xyes_8_utm10_20250814_20250814",
+    "dt": "2025-08-14T00:00:00Z",
+    "delivery": "094/094b/2025",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/094/094b/2025/pointcloud/bc_094b009_3_2_3_xyes_8_utm10_20250814_20250814.laz",
+    "copc": null
+   },
+   {
+    "id": "094-094b-2025-pointcloud-bc_094b009_3_2_1_xyes_8_utm10_20250814_20250814",
+    "dt": "2025-08-14T00:00:00Z",
+    "delivery": "094/094b/2025",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/094/094b/2025/pointcloud/bc_094b009_3_2_1_xyes_8_utm10_20250814_20250814.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "094-094b-2025-dem-bc_094b009_3_4_1_xli1m_utm10_20250814_20250814",
+    "dt": "2025-08-14T00:00:00Z",
+    "assets": [
+     "dem",
+     "dsm"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/094/094b/2025/dem/bc_094b009_3_4_1_xli1m_utm10_20250814_20250814.tif"
+   },
+   {
+    "id": "094-094b-2025-dem-bc_094b009_3_2_3_xli1m_utm10_20250814_20250814",
+    "dt": "2025-08-14T00:00:00Z",
+    "assets": [
+     "dem",
+     "dsm"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/094/094b/2025/dem/bc_094b009_3_2_3_xli1m_utm10_20250814_20250814.tif"
+   },
+   {
+    "id": "094-094b-2025-dem-bc_094b009_3_2_1_xli1m_utm10_20250814_20250814",
+    "dt": "2025-08-14T00:00:00Z",
+    "assets": [
+     "dem",
+     "dsm"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/094/094b/2025/dem/bc_094b009_3_2_1_xli1m_utm10_20250814_20250814.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/sakals/20191015/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l059_1_2_2_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l059_1_2_2_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l049_3_4_4_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l049_3_4_4_xyes_8_utm09_2019.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2019-dem-bc_093l059_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l059_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "093-093l-2019-dem-bc_093l049_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l049_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_098_106",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_098_106.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/sakals/20191030/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l059_2_1_3_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l059_2_1_3_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l059_2_1_1_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l059_2_1_1_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l059_1_2_4_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l059_1_2_4_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l059_1_2_3_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l059_1_2_3_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l059_1_2_2_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l059_1_2_2_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l059_1_2_1_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l059_1_2_1_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l059_1_1_4_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l059_1_1_4_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l059_1_1_3_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l059_1_1_3_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l059_1_1_2_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l059_1_1_2_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l059_1_1_1_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l059_1_1_1_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l058_2_2_4_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l058_2_2_4_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l058_2_2_3_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l058_2_2_3_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l058_2_2_2_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l058_2_2_2_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l058_2_2_1_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l058_2_2_1_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l049_4_3_3_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l049_4_3_3_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l049_3_4_4_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l049_3_4_4_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l049_3_4_3_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l049_3_4_3_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l049_3_3_4_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l049_3_3_4_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l049_3_3_3_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l049_3_3_3_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l048_4_4_4_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l048_4_4_4_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l048_4_4_3_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l048_4_4_3_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2018-pointcloud-bc_093l059_2_1_3_xyes_12_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "delivery": "093/093l/2018",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/pointcloud/bc_093l059_2_1_3_xyes_12_utm09_2018.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2018-pointcloud-bc_093l059_1_2_4_xyes_12_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "delivery": "093/093l/2018",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/pointcloud/bc_093l059_1_2_4_xyes_12_utm09_2018.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2018-pointcloud-bc_093l059_1_2_3_xyes_12_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "delivery": "093/093l/2018",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/pointcloud/bc_093l059_1_2_3_xyes_12_utm09_2018.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2018-pointcloud-bc_093l059_1_2_2_xyes_12_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "delivery": "093/093l/2018",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/pointcloud/bc_093l059_1_2_2_xyes_12_utm09_2018.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2019-dem-bc_093l059_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l059_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "093-093l-2019-dem-bc_093l058_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l058_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "093-093l-2019-dem-bc_093l049_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l049_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "093-093l-2019-dem-bc_093l048_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l048_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "093-093l-2018-dem-bc_093l059_xli1m_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/dem/bc_093l059_xli1m_utm09_2018.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_098_106",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_098_106.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_097_106",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_097_106.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2022/richfield_sern_2022/mme/20220916richfieldupper20221004.las",
+  "pc": [
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l059_1_4_1_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l059_1_4_1_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l059_1_2_3_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l059_1_2_3_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2018-pointcloud-bc_093l059_1_4_1_xyes_12_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "delivery": "093/093l/2018",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/pointcloud/bc_093l059_1_4_1_xyes_12_utm09_2018.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2018-pointcloud-bc_093l059_1_2_3_xyes_12_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "delivery": "093/093l/2018",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/pointcloud/bc_093l059_1_2_3_xyes_12_utm09_2018.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2019-dem-bc_093l059_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l059_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "093-093l-2018-dem-bc_093l059_xli1m_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/dem/bc_093l059_xli1m_utm09_2018.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_097_106",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_097_106.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2022/richfield_sern_2022/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l059_1_4_1_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l059_1_4_1_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l059_1_2_3_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l059_1_2_3_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2018-pointcloud-bc_093l059_1_4_1_xyes_12_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "delivery": "093/093l/2018",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/pointcloud/bc_093l059_1_4_1_xyes_12_utm09_2018.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2018-pointcloud-bc_093l059_1_2_3_xyes_12_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "delivery": "093/093l/2018",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/pointcloud/bc_093l059_1_2_3_xyes_12_utm09_2018.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2019-dem-bc_093l059_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l059_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "093-093l-2018-dem-bc_093l059_xli1m_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/dem/bc_093l059_xli1m_utm09_2018.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_097_106",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_097_106.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2022/richfield_upper_RC1-2021/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l059_1_2_3_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l059_1_2_3_xyes_8_utm09_2019.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2019-dem-bc_093l059_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l059_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_097_106",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_097_106.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2022/198066_thompson_udder_view/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l056_4_2_3_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l056_4_2_3_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l056_4_2_1_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l056_4_2_1_xyes_8_utm09_2019.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2019-dem-bc_093l056_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l056_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_094_107",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_094_107.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2022/bulkley_dickson_BR1-2021_BR2-2021/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l059_1_4_2_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l059_1_4_2_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l059_1_4_1_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l059_1_4_1_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l059_1_2_4_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l059_1_2_4_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l059_1_2_3_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l059_1_2_3_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l059_1_2_2_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l059_1_2_2_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l059_1_2_1_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l059_1_2_1_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2018-pointcloud-bc_093l059_1_4_2_xyes_12_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "delivery": "093/093l/2018",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/pointcloud/bc_093l059_1_4_2_xyes_12_utm09_2018.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2018-pointcloud-bc_093l059_1_4_1_xyes_12_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "delivery": "093/093l/2018",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/pointcloud/bc_093l059_1_4_1_xyes_12_utm09_2018.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2018-pointcloud-bc_093l059_1_2_4_xyes_12_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "delivery": "093/093l/2018",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/pointcloud/bc_093l059_1_2_4_xyes_12_utm09_2018.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2018-pointcloud-bc_093l059_1_2_3_xyes_12_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "delivery": "093/093l/2018",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/pointcloud/bc_093l059_1_2_3_xyes_12_utm09_2018.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2019-dem-bc_093l059_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l059_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "093-093l-2018-dem-bc_093l059_xli1m_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/dem/bc_093l059_xli1m_utm09_2018.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_097_106",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_097_106.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2022/coffin_dam/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l056_3_4_4_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l056_3_4_4_xyes_8_utm09_2019.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2019-dem-bc_093l056_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l056_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_094_107",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_094_107.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2022/richfield_lower_RC3-2021/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l059_1_2_3_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l059_1_2_3_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l059_1_2_1_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l059_1_2_1_xyes_8_utm09_2019.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2019-dem-bc_093l059_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l059_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_097_106",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_097_106.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2025/bulkley_bul33/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l037_4_3_3_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l037_4_3_3_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l037_3_4_4_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l037_3_4_4_xyes_8_utm09_2019.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2019-dem-bc_093l037_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l037_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_095_105",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_095_105.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2025/buck_buc64/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093l-2018-pointcloud-bc_093l037_2_2_3_xyes_12_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "delivery": "093/093l/2018",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/pointcloud/bc_093l037_2_2_3_xyes_12_utm09_2018.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2018-pointcloud-bc_093l037_2_2_1_xyes_12_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "delivery": "093/093l/2018",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/pointcloud/bc_093l037_2_2_1_xyes_12_utm09_2018.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2018-dem-bc_093l037_xli1m_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/dem/bc_093l037_xli1m_utm09_2018.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_095_104",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_095_104.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2025/buck_bridge1_buc87/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093l-2018-pointcloud-bc_093l037_2_2_1_xyes_12_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "delivery": "093/093l/2018",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/pointcloud/bc_093l037_2_2_1_xyes_12_utm09_2018.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2018-dem-bc_093l037_xli1m_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/dem/bc_093l037_xli1m_utm09_2018.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_095_104",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_095_104.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2025/buck_bulkley_buc7/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l047_2_1_2_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l047_2_1_2_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l037_4_3_4_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l037_4_3_4_xyes_8_utm09_2019.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2019-dem-bc_093l047_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l047_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "093-093l-2019-dem-bc_093l037_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l037_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_095_105",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_095_105.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2025/buck_bob_buc78/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093l-2018-pointcloud-bc_093l037_2_2_1_xyes_12_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "delivery": "093/093l/2018",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/pointcloud/bc_093l037_2_2_1_xyes_12_utm09_2018.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2018-dem-bc_093l037_xli1m_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/dem/bc_093l037_xli1m_utm09_2018.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_095_104",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_095_104.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2025/maxan_reserve5/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2025/maxan_foxy_confluence/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2025/buck_bridge1_buc87b/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093l-2018-pointcloud-bc_093l037_2_2_1_xyes_12_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "delivery": "093/093l/2018",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/pointcloud/bc_093l037_2_2_1_xyes_12_utm09_2018.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2018-dem-bc_093l037_xli1m_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/dem/bc_093l037_xli1m_utm09_2018.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_095_104",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_095_104.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2025/buck_buc172/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2025/124421_waterfall_11th/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093m-2019-pointcloud-bc_093m023_1_3_3_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093m/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093m/2019/pointcloud/bc_093m023_1_3_3_xyes_8_utm09_2019.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093m-2019-dem-bc_093m023_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093m/2019/dem/bc_093m023_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_089_115",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_089_115.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_089_114",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_089_114.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2025/bulkley_br5/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l058_2_2_3_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l058_2_2_3_xyes_8_utm09_2019.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2019-dem-bc_093l058_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l058_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_097_106",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_097_106.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2025/maxan_mx2/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l040_3_1_4_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l040_3_1_4_xyes_8_utm09_2019.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2019-dem-bc_093l040_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l040_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_098_105",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_098_105.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2025/bulkley_bul38/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l047_2_1_2_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l047_2_1_2_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l037_4_3_4_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l037_4_3_4_xyes_8_utm09_2019.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2019-dem-bc_093l047_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l047_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "093-093l-2019-dem-bc_093l037_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l037_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_095_105",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_095_105.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2025/197640_buck_buc192/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2025/buck_buc207/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2025/maxan_mx1/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l040_3_4_1_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l040_3_4_1_xyes_8_utm09_2019.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2019-dem-bc_093l040_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l040_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_099_105",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_099_105.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2025/bulkley_bul24/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l047_1_2_2_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l047_1_2_2_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l047_1_2_1_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l047_1_2_1_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l037_3_4_4_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l037_3_4_4_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l037_3_4_3_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l037_3_4_3_xyes_8_utm09_2019.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2019-dem-bc_093l047_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l047_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "093-093l-2019-dem-bc_093l037_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l037_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_095_105",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_095_105.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2025/58264_simpson_nielson/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l084_2_2_4_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l084_2_2_4_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l084_2_2_3_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l084_2_2_3_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l084_2_2_2_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l084_2_2_2_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l084_2_2_1_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l084_2_2_1_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2018-pointcloud-bc_093l084_2_2_2_xyes_12_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "delivery": "093/093l/2018",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/pointcloud/bc_093l084_2_2_2_xyes_12_utm09_2018.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2018-pointcloud-bc_093l084_2_2_1_xyes_12_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "delivery": "093/093l/2018",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/pointcloud/bc_093l084_2_2_1_xyes_12_utm09_2018.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2019-dem-bc_093l084_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l084_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "093-093l-2018-dem-bc_093l084_xli1m_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/dem/bc_093l084_xli1m_utm09_2018.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_092_110",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_092_110.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2024/bulkley-groot05/mme/20240928bulkleygroot0520241217.las",
+  "pc": [
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l058_2_2_4_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l058_2_2_4_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l058_2_2_3_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l058_2_2_3_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l058_2_2_2_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l058_2_2_2_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l058_2_2_1_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l058_2_2_1_xyes_8_utm09_2019.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2019-dem-bc_093l058_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l058_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_097_106",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_097_106.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2024/bulkley-groot05/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l058_2_2_4_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l058_2_2_4_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l058_2_2_3_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l058_2_2_3_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l058_2_2_2_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l058_2_2_2_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l058_2_2_1_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l058_2_2_1_xyes_8_utm09_2019.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2019-dem-bc_093l058_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l058_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_097_106",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_097_106.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2024/195943_stock_barren_station/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l047_1_3_4_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l047_1_3_4_xyes_8_utm09_2019.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2019-dem-bc_093l047_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l047_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_095_105",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_095_105.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2024/bulkley-mckilligan-rd-upper/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l048_3_2_1_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l048_3_2_1_xyes_8_utm09_2019.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2019-dem-bc_093l048_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l048_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_096_106",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_096_106.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2024/124423_waterfall_cnrail/mme/20240926waterfall20241218.las",
+  "pc": [
+   {
+    "id": "093-093m-2019-pointcloud-bc_093m023_3_1_1_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093m/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093m/2019/pointcloud/bc_093m023_3_1_1_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093m-2019-pointcloud-bc_093m023_1_3_3_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093m/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093m/2019/pointcloud/bc_093m023_1_3_3_xyes_8_utm09_2019.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093m-2019-dem-bc_093m023_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093m/2019/dem/bc_093m023_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_089_115",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_089_115.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_089_114",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_089_114.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2024/124423_waterfall_cnrail/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093m-2019-pointcloud-bc_093m023_3_1_1_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093m/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093m/2019/pointcloud/bc_093m023_3_1_1_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093m-2019-pointcloud-bc_093m023_1_3_3_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093m/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093m/2019/pointcloud/bc_093m023_1_3_3_xyes_8_utm09_2019.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093m-2019-dem-bc_093m023_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093m/2019/dem/bc_093m023_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_089_115",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_089_115.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_089_114",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_089_114.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2024/bulkley-wilson01/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l048_4_3_1_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l048_4_3_1_xyes_8_utm09_2019.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2019-dem-bc_093l048_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l048_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_096_106",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_096_106.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2023/124500_helps_lawson/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l065_4_2_2_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l065_4_2_2_xyes_8_utm09_2019.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2019-dem-bc_093l065_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l065_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_093_108",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_093_108.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2023/123377_thompson_walcott/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l056_4_2_4_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l056_4_2_4_xyes_8_utm09_2019.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2019-dem-bc_093l056_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l056_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_094_107",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_094_107.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2021/124420_station_hwy16/mme/20210916missionwaterfallwetland20210917.las",
+  "pc": [
+   {
+    "id": "093-093m-2019-pointcloud-bc_093m022_2_4_2_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093m/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093m/2019/pointcloud/bc_093m022_2_4_2_xyes_8_utm09_2019.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093m-2019-dem-bc_093m022_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093m/2019/dem/bc_093m022_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_089_114",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_089_114.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2021/124420_station_hwy16/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093m-2019-pointcloud-bc_093m022_2_4_2_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093m/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093m/2019/pointcloud/bc_093m022_2_4_2_xyes_8_utm09_2019.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093m-2019-dem-bc_093m022_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093m/2019/dem/bc_093m022_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_089_114",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_089_114.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2021/197662_richfield_hwy16/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l059_1_2_3_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l059_1_2_3_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l059_1_2_1_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l059_1_2_1_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2018-pointcloud-bc_093l059_1_2_3_xyes_12_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "delivery": "093/093l/2018",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/pointcloud/bc_093l059_1_2_3_xyes_12_utm09_2018.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2019-dem-bc_093l059_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l059_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "093-093l-2018-dem-bc_093l059_xli1m_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/dem/bc_093l059_xli1m_utm09_2018.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_097_106",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_097_106.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2021/197912_roberthatch/mme/20210911roberthatch20211007.las",
+  "pc": [
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l059_1_4_1_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l059_1_4_1_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l059_1_3_2_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l059_1_3_2_xyes_8_utm09_2019.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2019-dem-bc_093l059_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l059_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_097_106",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_097_106.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2021/197912_roberthatch/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l059_1_4_1_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l059_1_4_1_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l059_1_3_2_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l059_1_3_2_xyes_8_utm09_2019.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2019-dem-bc_093l059_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l059_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_097_106",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_097_106.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2020/195288_gibson_snider/mme/gibson195288202020210120.las",
+  "pc": [
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l056_4_4_4_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l056_4_4_4_xyes_8_utm09_2019.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2019-dem-bc_093l056_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l056_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_094_107",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_094_107.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2020/195288_gibson_snider/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l056_4_4_4_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l056_4_4_4_xyes_8_utm09_2019.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2019-dem-bc_093l056_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l056_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_094_107",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_094_107.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2020/195290_gibson_hwy16/mme/gibson195290202020210121.las",
+  "pc": [
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l056_4_4_3_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l056_4_4_3_xyes_8_utm09_2019.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2019-dem-bc_093l056_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l056_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_094_107",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_094_107.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2020/195290_gibson_hwy16/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093l-2019-pointcloud-bc_093l056_4_4_3_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093l/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/pointcloud/bc_093l056_4_4_3_xyes_8_utm09_2019.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2019-dem-bc_093l056_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2019/dem/bc_093l056_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_094_107",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_094_107.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2020/197360_riddeck_moriceowenfsr/mme/riddeck202020210118.las",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/bulkley/2020/197360_riddeck_moriceowenfsr/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/babine/2022/198283_cross/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/zymoetz/2024/8530_sandstone_mcdonell/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093l-2018-pointcloud-bc_093l082_1_2_2_xyes_12_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "delivery": "093/093l/2018",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/pointcloud/bc_093l082_1_2_2_xyes_12_utm09_2018.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2018-dem-bc_093l082_xli1m_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/dem/bc_093l082_xli1m_utm09_2018.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_089_110",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_089_110.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/zymoetz/2023/8478_mcdonell_trib/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093l-2018-pointcloud-bc_093l073_3_1_3_xyes_12_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "delivery": "093/093l/2018",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/pointcloud/bc_093l073_3_1_3_xyes_12_utm09_2018.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2018-pointcloud-bc_093l072_4_2_4_xyes_12_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "delivery": "093/093l/2018",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/pointcloud/bc_093l072_4_2_4_xyes_12_utm09_2018.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2018-dem-bc_093l073_xli1m_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/dem/bc_093l073_xli1m_utm09_2018.tif"
+   },
+   {
+    "id": "093-093l-2018-dem-bc_093l072_xli1m_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/dem/bc_093l072_xli1m_utm09_2018.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_089_109",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_089_109.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/zymoetz/2023/8525_coal_trib/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093l-2018-pointcloud-bc_093l082_1_2_3_xyes_12_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "delivery": "093/093l/2018",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/pointcloud/bc_093l082_1_2_3_xyes_12_utm09_2018.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2018-pointcloud-bc_093l082_1_2_1_xyes_12_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "delivery": "093/093l/2018",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/pointcloud/bc_093l082_1_2_1_xyes_12_utm09_2018.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2018-dem-bc_093l082_xli1m_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/dem/bc_093l082_xli1m_utm09_2018.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_088_110",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_088_110.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/morice/2025/197962_peacock_morice/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093l-2018-pointcloud-bc_093l037_3_1_3_xyes_12_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "delivery": "093/093l/2018",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/pointcloud/bc_093l037_3_1_3_xyes_12_utm09_2018.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093l-2018-pointcloud-bc_093l037_3_1_1_xyes_12_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "delivery": "093/093l/2018",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/pointcloud/bc_093l037_3_1_1_xyes_12_utm09_2018.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093l-2018-dem-bc_093l037_xli1m_utm09_2018",
+    "dt": "2018-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093l/2018/dem/bc_093l037_xli1m_utm09_2018.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_094_105",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_094_105.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_094_104",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_094_104.tif"
+   }
+  ]
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/morice/2023/198022_tagit_trib/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/morice/2023/198940_knapper_trib/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/morice/2023/198936_morice_trib/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/morice/2023/198942_houston_tommy_trib/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/morice/2023/197949_tagit_trib/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/morice/2023/198934_houston_tommy_trib/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/morice/2023/198935_knapper_trib/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/morice/2026/wedzin_cedric/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/morice/2026/wedzin_pimpernel/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/morice/2026/wedzin_lwd001/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/morice/2026/wedzin_braid_001/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/morice/2026/wedzin_canyon_km25/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/morice/2026/wedzin_gosnell_confluence/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/morice/2026/wedzin_morice_km61/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/morice/2021/198062_moricetrib_moricewfsr/mme/20210906lampreymoricetribv220230317.las",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/morice/2021/198062_moricetrib_moricewfsr/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/morice/2021/197370_owen_moricewfsr/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/morice/2021/198000_mcbride_nanikafsr/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [],
+  "dem": []
+ },
+ {
+  "path": "/Users/airvine/Projects/gis/uav_imagery/skeena/kispiox/2022/198216_glenvowell_kispioxvalleyrd/odm_georeferencing/odm_georeferenced_model.laz",
+  "pc": [
+   {
+    "id": "093-093m-2019-pointcloud-bc_093m032_2_1_3_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093m/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093m/2019/pointcloud/bc_093m032_2_1_3_xyes_8_utm09_2019.laz",
+    "copc": null
+   },
+   {
+    "id": "093-093m-2019-pointcloud-bc_093m032_2_1_1_xyes_8_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "delivery": "093/093m/2019",
+    "laz": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093m/2019/pointcloud/bc_093m032_2_1_1_xyes_8_utm09_2019.laz",
+    "copc": null
+   }
+  ],
+  "dem": [
+   {
+    "id": "093-093m-2019-dem-bc_093m032_xli1m_utm09_2019",
+    "dt": "2019-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/093/093m/2019/dem/bc_093m032_xli1m_utm09_2019.tif"
+   },
+   {
+    "id": "albers10k2m-_completed_dem-dem_089_115",
+    "dt": "2000-01-01T00:00:00Z",
+    "assets": [
+     "dem"
+    ],
+    "dem": "https://nrs.objectstore.gov.bc.ca/gdwuts/albers10k2m/_completed_dem/dem_089_115.tif"
+   }
+  ]
+ }
+]
