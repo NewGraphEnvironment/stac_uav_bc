@@ -1,14 +1,16 @@
 # This catalogue, declared for stacs (#35): `scripts/stacs.sh <cmd> --config stacs.toml`.
 #
-# collection_id and bucket_url are also item_create.py's (`collection.json` id and the
-# --s3-url default); api is catalogue_release.sh's. Change them together.
-# config/item_unregister.sh reads host and db from here.
+# collection_id has one source, this line: item_create.py --rebuild stamps it, and the
+# title built from it, into collection.json and so into every item, and an additive run
+# refuses a prod tree that names another id (#48). bucket_url is item_create.py's --s3-url
+# default; api is catalogue_release.sh's. config/item_unregister.sh and
+# config/collection_unregister.sh read host, db, api and collection_id from here.
 #
 # No setting is a secret. The password stays on the host, named by password_env.
 
 [catalogue]
 api = "https://images.a11s.one"
-collection_id = "imagery-uav-bc-prod"
+collection_id = "stac-imagery-uav-bc"
 bucket_url = "https://imagery-uav-bc.s3.amazonaws.com"
 
 [assets]

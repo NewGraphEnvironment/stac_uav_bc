@@ -29,23 +29,24 @@ Decided with Al at the plan gate (2026-10-16): this session runs the cutover, an
 
 ## Phase 1: The id has one source: `stacs.toml` → `item_create.py`
 
-- [ ] `stacs.toml`: `collection_id = "stac-imagery-uav-bc"`; header says `item_create.py` stamps it
+- [x] `stacs.toml`: `collection_id = "stac-imagery-uav-bc"`; header says `item_create.py` stamps it
       on `--rebuild` and refuses a tree that disagrees (no longer "change them together")
-- [ ] `item_create.py`: read `[catalogue] collection_id` from `stacs.toml` (tomllib); on `--rebuild`
+- [x] `item_create.py`: read `[catalogue] collection_id` from `stacs.toml` (tomllib); on `--rebuild`
       set `collection.id` and `collection.title` (`COLLECTION_TITLE = "UAV Imagery from British
       Columbia - {id}"`) before any item is built; additive mode refuses when the tree's
       `collection.json` id differs from the toml's, naming the release recipe; header comment
       names the new id
-- [ ] `dataset_publish.sh`: the same toml-vs-tree id check beside the alignment pre-check
+- [x] `dataset_publish.sh`: the same toml-vs-tree id check beside the alignment pre-check
       (`:62-69`), before the COG conversion spends its minutes
-- [ ] `--selftest`: the toml read, a rebuild-style stamp on a temp collection (id, title, root link
+- [x] `--selftest`: the toml read, a rebuild-style stamp on a temp collection (id, title, root link
       title, an item's `collection` and link titles), the additive refusal; restore-the-bug: drop
-      the stamp, selftest red
-- [ ] Offline mirror of the prod tree (symlinked tifs, copied JSONs, as #38 did):
+      the stamp, selftest red (4 checks; a first version let the refusal's `sys.exit` mask them)
+- [x] Offline mirror of the prod tree (symlinked tifs, copied JSONs, as #38 did):
       `--rebuild --base <mirror> --version 2.0.0`, then `grep -rl imagery-uav-bc-prod <mirror>`
       returns nothing and 246 files name the new id; items differ from prod only in `collection`,
-      the three link titles, the `alignment:` fields #41 added and the registry fields Al's edits
-      changed; `stacs validate` and `audit --config stacs.toml --expect 245` pass
+      the three link titles (and link order), the `alignment:` fields #41 added, the #38 field
+      renames and the registry fields Al's edits changed (15 titles, 6 aliases); `stacs validate`
+      246/0 invalid and `audit --config stacs.toml --expect 245` OK; prod untouched
 
 ## Phase 2: `collection_unregister.sh`, the drop path (written now, run in Phase 6)
 
