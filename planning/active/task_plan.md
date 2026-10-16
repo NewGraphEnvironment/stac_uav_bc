@@ -56,13 +56,13 @@ Sign convention is stated once, in the README, and the NEWS entry repeats it.
 - [x] Offline verification as in #38: mirror the prod tree into the scratchpad (symlinked tifs, copied JSONs), `--rebuild --base <mirror> --version 0.0.0-test`, then `scripts/stacs.sh validate` and `audit --expect`; assert every fitted dataset's three items carry identical `alignment:` values and no other item carries any (validate 246/0, audit OK; against a control rebuild with no fitted row the builds differ only in the `alignment:` fields)
 
 ## Phase 4: Docs and release notes
-- [ ] `README.Rmd`: an "Elevations" paragraph — UAV elevations are GPS-referenced (no ground control); measured against LidarBC, the vertical offset's median and range and the misfit after the fit, every number derived from `data/alignment_lidarbc.csv` at writing time; the sign convention and how to apply the fields; that flights off LidarBC carry none. The fields join the item-properties table with an rstac filter example (`alignment:misfit_m < 1`). Re-render `README.md` and `index.html` (the `build` chunk)
-- [ ] `scripts/config/README.md`: recipe step 2b (landed as step 3 of a renumbered recipe, with `odm_qc.py` as step 2) — `uv run scripts/dataset_align-lidarbc.py <project-dir>` after QC and before `dataset_publish.sh` (`item_create.py` refuses a published dataset with no row); registry section names the table. `CLAUDE.md` script list line
-- [ ] `NEWS.md`: an entry for the release that will carry the fields, naming each, the sign convention, and that nothing changes until that release
-- [ ] Edit the #41 body to the decided field list and decisions (bodies get edited, not appended)
+- [x] `README.Rmd`: an "Elevations" paragraph — UAV elevations are GPS-referenced (no ground control); measured against LidarBC, the vertical offset's median and range and the misfit after the fit, every number derived from `data/alignment_lidarbc.csv` at writing time; the sign convention and how to apply the fields; that flights off LidarBC carry none. The fields join the item-properties table with an rstac filter example (`alignment:misfit_m < 1`). Re-render `README.md` and `index.html` (the `build` chunk)
+- [x] `scripts/config/README.md`: recipe step 2b (landed as step 3 of a renumbered recipe, with `odm_qc.py` as step 2) — `uv run scripts/dataset_align-lidarbc.py <project-dir>` after QC and before `dataset_publish.sh` (`item_create.py` refuses a published dataset with no row); registry section names the table. `CLAUDE.md` script list line
+- [x] `NEWS.md`: an entry for the release that will carry the fields, naming each, the sign convention, and that nothing changes until that release
+- [x] Edit the #41 body to the decided field list and decisions (bodies get edited, not appended)
 
 ## Validation
-- [ ] `uv run scripts/dataset_align-lidarbc.py --selftest` and `conda run -n titiler python scripts/item_create.py --selftest` pass, and fail with each guard's defect restored (12 and 4 guards red, `findings.md`)
+- [x] `uv run scripts/dataset_align-lidarbc.py --selftest` and `conda run -n titiler python scripts/item_create.py --selftest` pass, and fail with each guard's defect restored (12 and 4 guards red, `findings.md`)
 - [ ] `/code-check` clean (once over the branch with `/code-check branch`)
 - [ ] PWF checkboxes match landed work
 - [ ] `/planning-archive` on completion; the archive README carries Measurement (misfit distribution, trial grid) and Evidence (`research/uav_pointclouds/trials/`, `data/alignment_lidarbc.csv`)

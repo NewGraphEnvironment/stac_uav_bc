@@ -39,6 +39,8 @@ The same holds for #38's field rename: an additive run refuses while any item in
 
 `watershed_group_name` is the atlas's name for `watershed_group_code`, not something to type: after adding or changing a row's code, run `python3 scripts/sites_fill-wsg_name.py` (reports) and then with `--write` (fills it in place from the public fwapg API). The `watershed` column is the tree's directory slug and stays as it is.
 
+Beside it, `data/alignment_lidarbc.csv` holds each dataset's fit to the LidarBC 1 m DEM (#41): the horizontal shift, vertical offset and tilt that put the flight's ground on LidarBC, and the misfit left. It is written only by `scripts/dataset_align-lidarbc.py`, keyed like the registry, and `item_create.py` carries a `fitted` row on the dataset's items as `alignment:` fields; a `no_reference`, `no_cloud` or `refused:*` row carries nothing. Every dataset built needs a row, whatever its status, so the publish cannot skip the step.
+
 **Releasing a registry change:**
 
 1. Edit `data/sites.csv` (and `scripts/sites_fill-wsg_name.py --write` if a watershed group code changed); add a `NEWS.md` entry; commit
@@ -58,12 +60,14 @@ The same holds for #38's field rename: an additive run refuses while any item in
 Two commands with a human QC gate between them:
 
 1. Stitch — `caffeinate -s scripts/odm_process-batch.sh <project-dir>...` (skips already-processed dirs; resume-safe after interruption)
-2. QC the ortho — check `odm_report/stats.json` (all images reconstructed? reprojection error ~1-2 px?) and eyeball a preview
-3. Publish — `scripts/dataset_publish.sh <project-dir>...` (COG convert + validate → prod tree → items with flight datetimes → whole-tree `stacs validate` + `audit --expect` → durable S3 upload → collection extent → `stacs register --mode drift` → `stacs verify`; idempotent, safe to re-run)
+2. QC the ortho — `python3 scripts/odm_qc.py <project-dir>...` (fails on mixed input resolutions, a split reconstruction or reprojection error past 2 px), then eyeball a preview
+3. Fit to LidarBC — `uv run scripts/dataset_align-lidarbc.py <project-dir>...` (~30 s per dataset; writes the dataset's row to `data/alignment_lidarbc.csv`, which the publish commits with the registry row; `item_create.py` refuses a dataset with no row)
+4. Publish — `scripts/dataset_publish.sh <project-dir>...` (COG convert + validate → prod tree → items with flight datetimes → whole-tree `stacs validate` + `audit --expect` → durable S3 upload → collection extent → `stacs register --mode drift` → `stacs verify`; idempotent, safe to re-run)
 
 The underlying single-purpose tools these orchestrate, for one-off use:
 
 - `scripts/item_create.py <tifs relative to prod tree>` — items + collection.json (conda env `titiler`)
+- `uv run scripts/dataset_align-lidarbc.py --check` — every published dataset has an alignment row and no cloud changed since its fit; `--selftest` is the script's gate, `--trial grid.csv` fits every model × mask per dataset
 - `scripts/stacs.sh register --config stacs.toml --mode drift` — upsert the collection, then every item the API lacks or serves stale (reads the published catalogue: sync first)
 - `scripts/stacs.sh verify --config stacs.toml --out-dir <dir>` — what the API serves against what is published
 - `find <prod tree> -name '*.json' ! -name collection.json | scripts/stacs.sh validate` (or `audit --config stacs.toml`) — pystac validation / collection + asset audit; `--dir` does not recurse, so pass paths on stdin

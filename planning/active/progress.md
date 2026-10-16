@@ -19,4 +19,8 @@
 - Production run (plane, 2 m cut): 45 fitted, 4 refused, 31 no_reference, 3 no_cloud; `--check` OK
 - Phase 1 committed (script, table); Phase 3 committed (item join, release and publish gates)
 - The trial grid runs (resumed after a print bug on a refused dataset's row)
-- Next: Phase 2 when the trial lands (settle the model, regenerate the table if it changes), then Phase 4's numbers
+- Trial grid landed (1 h 50 min): the quadratic wins by 0.225 m on 42 of 44; the masks are a tie; 16 datasets re-run after the `open` mask's exact-grid refusal was replaced by per-raster sampling (the re-run reproduced the first pass)
+- Default set to `quadratic`/`none`; selftest green, 12 guards red again (and a 13th for the grid refusal); production table regenerated (46 fitted, median 0.42 m); `--check` OK; mirror rebuild validated, audited and checked against the control
+- Phase 4 docs filled from the table (`fill_numbers.py`), README re-rendered, issue body edited
+- Phase 2 and Phase 4 committed
+- Next: `/code-check branch`, `/planning-archive`, `/gh-pr-push`

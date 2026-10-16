@@ -121,6 +121,7 @@ A blank registry cell is left off the item rather than written empty.
 | `bcfishpass:aggregated_crossings_id` | the crossing the flight covers | bcfishpass |
 | `newgraph:alias` | New Graph’s name for the site, which separates repeat flights in the title (`moose pre-replacement`) | registry |
 | `newgraph:project` | New Graph’s project | registry (none set yet) |
+| `alignment:*` | the dataset’s fit to the LidarBC 1 m DEM: shift, offset, tilt, misfit (see [Elevations](#elevations)) | `data/alignment_lidarbc.csv`, by `scripts/dataset_align-lidarbc.py` |
 
 They replace the `nge:` fields (`nge:stream_name`, `nge:wsg_code` and
 the rest) that items carried until the release that ships \#38, whose
@@ -131,6 +132,68 @@ CQL2, for example every item in the Morice watershed group:
 rstac::stac("https://images.a11s.one/") |>
   rstac::stac_search(collections = "imagery-uav-bc-prod", limit = 1000) |>
   rstac::ext_filter(`fwa:watershed_group_code` == "MORR") |>
+  rstac::post_request()
+```
+
+## Elevations
+
+UAV elevations in this catalogue are GPS-referenced. No flight used
+ground control, so each DTM and DSM sits where the drone’s own GPS
+placed it, and so does the orthophoto. Measured against the LidarBC 1 m
+DEM for the 49 datasets that have one under them, the published rasters
+sit a median of 8.3 m from LidarBC vertically (from −97 to +92 m) and
+3.2 m horizontally (up to 12.4 m). The geoid (−8 to −15 m here) does not
+explain it; the drone’s altitude does. The measurements are in
+[`research/uav_pointclouds.md`](research/uav_pointclouds.md).
+
+The rasters are published as they are. Instead, every item of a dataset
+on LidarBC carries the dataset’s fit as `alignment:` fields: a
+horizontal shift and a quadratic correction surface (vertical offset,
+tilt and curvature, the doming a GPS-only photogrammetric block has),
+fitted to LidarBC ground by
+[`scripts/dataset_align-lidarbc.py`](scripts/dataset_align-lidarbc.py),
+one row per dataset in
+[`data/alignment_lidarbc.csv`](data/alignment_lidarbc.csv). After the
+fit, the ground misfits LidarBC by a median of 0.42 m (NMAD over the
+ground points compared): 42 of 46 datasets within 1 m, 26 within 0.5 m.
+The 31 datasets with no LidarBC under them (mostly the Morice 2021–2026
+and the upper Parsnip 2022–2024) and the 3 whose fit could not be
+determined (a flat site gives the shift no signal; a flight the DEM
+covers only partly) carry no fields.
+
+To apply a fit, in the item’s own CRS (`proj:epsg`):
+
+- corrected (x, y) = published (x, y) + (`alignment:shift_x_m`,
+  `alignment:shift_y_m`)
+- corrected z = published z − s(u, v), where u = (x − cx) / 100 and v =
+  (y − cy) / 100 with (cx, cy) = `alignment:centre`, and s = a + b·u +
+  c·v + d·u² + e·u·v + f·v² with \[a, b, c, d, e, f\] =
+  `alignment:surface` (`alignment:model` is `quadratic`; a `plane` row
+  would carry \[a, b, c\] alone)
+
+LidarBC is NAD83(CSRS) UTM and the items are WGS 84 UTM. The fit went
+through PROJ’s default transformation between the two, so the corrected
+coordinates land on LidarBC when reprojected the way QGIS, GDAL and R do
+by default.
+
+| field | holds |
+|----|----|
+| `alignment:reference` | the LidarBC delivery the fit used (`093/093g/2024`, collection `stac-elevation-bc`) |
+| `alignment:shift_x_m`, `alignment:shift_y_m` | the horizontal shift, m, in the item’s CRS |
+| `alignment:offset_m` | the vertical correction at the dataset’s centre, m |
+| `alignment:tilt_m_per_100m` | the magnitude of the tilt |
+| `alignment:surface`, `alignment:centre` | the fitted coefficients, per 100 m, and the point they are about |
+| `alignment:misfit_m` | NMAD of the residual over the ground points compared, m |
+| `alignment:points` | ground points compared |
+| `alignment:model` | `quadratic` (chosen over a plane by the trial in [`research/uav_pointclouds.md`](research/uav_pointclouds.md)) or `plane` |
+
+The fields are numbers, so they filter. Every dataset that fits LidarBC
+within a metre:
+
+``` r
+rstac::stac("https://images.a11s.one/") |>
+  rstac::stac_search(collections = "imagery-uav-bc-prod", limit = 1000) |>
+  rstac::ext_filter(`alignment:misfit_m` < 1) |>
   rstac::post_request()
 ```
 
