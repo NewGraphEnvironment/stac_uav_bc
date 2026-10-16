@@ -99,22 +99,23 @@ Decided with Al at the plan gate (2026-10-16): this session runs the cutover, an
 
 ## Phase 4: Cutover: register the new collection, old stays live
 
-- [ ] Pre-flight: tree clean and committed; `item_create.py --selftest`,
+- [x] Pre-flight: tree clean and committed; `item_create.py --selftest`,
       `dataset_align-lidarbc.py --selftest`, `collection_unregister.sh --selftest` green;
-      `git fetch` and re-read `origin/main`
-- [ ] `EXPECT_ITEMS=245 scripts/catalogue_release.sh 2.0.0` from the branch: rebuild → `--check` →
+      `git fetch` and re-read `origin/main` (20:56Z)
+- [x] `EXPECT_ITEMS=245 scripts/catalogue_release.sh 2.0.0` from the branch: rebuild → `--check` →
       validate + audit → sync → `stacs register --mode drift` (collection first, then 245) →
       `stacs verify` IN SYNC → version 2.0.0, 245 items, registry, field and alignment coverage OK
-- [ ] Verify by hand, saved to `findings.md`: `/collections/stac-imagery-uav-bc` serves the new
+      (`RELEASE COMPLETE: v2.0.0`, 20:56:51Z to 20:58:24Z; `evidence/20261016_catalogue_release_2.0.0.log`)
+- [x] Verify by hand, saved to `findings.md`: `/collections/stac-imagery-uav-bc` serves the new
       title and 245 via search; the old id still serves 245 at 1.0.4; pgstac items by collection
       245 + 245; an rstac query from R against the new id returns 245 features; the tile:
       `/stac/WebMercatorQuad/tilejson.json?url=<new-collection item URL>&assets=image`, then one
-      tile at its minzoom, HTTP 200 `image/png`, bytes > 0
-- [ ] Render `README.Rmd` with `update_query = TRUE` (regenerates `data/stac_result.rds` from the
-      new collection: the client gate), then README.md and index.html; commit
-- [ ] Edit the issue body: the title deviation; the 320 cached searches are the API's query cache,
+      tile at its minzoom, HTTP 200 `image/png`, 693 bytes
+- [x] Render `README.Rmd` with `update_query = TRUE` (regenerates `data/stac_result.rds` from the
+      new collection: the client gate, 245 features), then README.md and index.html; commit
+- [x] Edit the issue body: the title deviation; the 320 cached searches are the API's query cache,
       not mosaics, left as the 988 `stac-dem-bc` rows were; `restoration_wedzin_kwa_2024` added
-      to the sweep; the static-catalogue flip date
+      to the sweep; the static-catalogue flip date; what `/search` answers after the drop
 
 ## Phase 5: The consumer sweep (one PR per repo; merged after Phase 4, before Phase 6)
 
@@ -155,7 +156,7 @@ Decided with Al at the plan gate (2026-10-16): this session runs the cutover, an
 
 ## Validation
 
-- [ ] Selftests pass (`item_create.py`, `collection_unregister.sh`, `dataset_align-lidarbc.py`)
-- [ ] `/code-check` clean (each commit, or once over the branch with `/code-check branch`)
+- [x] Selftests pass (`item_create.py`, `collection_unregister.sh`, `dataset_align-lidarbc.py`)
+- [x] `/code-check` clean (once over the branch: three rounds, ended by enumeration)
 - [ ] PWF checkboxes match landed work
 - [ ] `/planning-archive` on completion

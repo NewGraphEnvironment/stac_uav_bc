@@ -314,6 +314,32 @@ Two sets, both walked mechanically on 2026-10-16 (`scratchpad/enum/mutate.sh`):
    the four settings (the refusal still fired, with mislabelled values): the python now
    validates and prints tab-separated, and the reads use a tab IFS (round 3's commit).
 
+## Phase 4: the cutover (2026-10-16)
+
+- `EXPECT_ITEMS=245 scripts/catalogue_release.sh 2.0.0` from the branch, 20:56:51Z to 20:58:24Z
+  (`evidence/20261016_catalogue_release_2.0.0.log`): rebuild 245 items, `ALIGN CHECK OK` (83
+  rows), validate 246/0, audit OK against the new id, sync, `stacs register --mode drift` found
+  the collection `missing` and registered it then 245 items, re-compared the whole catalogue,
+  `stacs verify` `IN SYNC: 245`, version 2.0.0, item count 245, registry coverage 245/245,
+  alignment coverage 138/245 on 46 fitted rows. `RELEASE COMPLETE: v2.0.0`.
+- By hand, 20:59Z: `/collections` lists both, `stac-imagery-uav-bc` with the new title at 2.0.0
+  and `imagery-uav-bc-prod` at 1.0.4; `/search` 245 on each; pgstac 245 + 245, 0 old ids absent
+  from the new collection; an item read off the new collection carries `collection =
+  stac-imagery-uav-bc` (the API rebuilds root/parent/collection links without titles; the static
+  JSON on S3 carries them); titiler `/stac/WebMercatorQuad/tilejson.json` on that item, one tile
+  at minzoom 16: `200 image/png`, 693 bytes. rstac from R (the README's BC-bbox query) against
+  the new id: 245 features, first item `collection = stac-imagery-uav-bc`.
+- README rendered with `update_query = TRUE` (4 s): `data/stac_result.rds` now holds 245 features
+  from the new collection; README.md and index.html name the new id, the old one only in the
+  two by-design sentences (`evidence/20261016_readme_render.log`).
+- Issue #48 body rewritten (title deviation, the cached searches, the extra consumer repo, the
+  flip date, what `/search` answers after the drop). PR #50 is the work.
+- Sweep PRs opened 21:00Z (one per repo, same body; none of the repos configures an R&D
+  cross-reference): the report template, the seven reports, restoration_wedzin_kwa_2024, the
+  first talk repo, the infrastructure repo (with its stale `stac-dem-bc` line fixed),
+  stac_dem_bc, stac_floodplains_bc, stac_pointcloud_bc. The second talk repo's four scripts live
+  only on Al's in-flight branch there; his to change.
+
 ## Errors Encountered
 
 | Error | Resolution |

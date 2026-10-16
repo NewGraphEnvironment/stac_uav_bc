@@ -44,8 +44,9 @@ To add new imagery to the catalog follow the recipe in
 
 ## Query the collection
 
-Query the `imagery-uav-bc-prod` collection by bounding box. Below: every
-UAV item whose footprint intersects the full BC extent.
+Query the `stac-imagery-uav-bc` collection by bounding box
+(`imagery-uav-bc-prod` until v2.0.0; see [`NEWS.md`](NEWS.md)). Below:
+every UAV item whose footprint intersects the full BC extent.
 
 ``` r
 # bc bounding box
@@ -57,7 +58,7 @@ bcbbox <-  as.numeric(
 # use rstac to query the collection
 q <- rstac::stac("https://images.a11s.one/") |>
     rstac::stac_search(
-      collections = "imagery-uav-bc-prod",
+      collections = "stac-imagery-uav-bc",
       bbox = bcbbox
     ) |>
   rstac::post_request()
@@ -130,7 +131,7 @@ CQL2, for example every item in the Morice watershed group:
 
 ``` r
 rstac::stac("https://images.a11s.one/") |>
-  rstac::stac_search(collections = "imagery-uav-bc-prod", limit = 1000) |>
+  rstac::stac_search(collections = "stac-imagery-uav-bc", limit = 1000) |>
   rstac::ext_filter(`fwa:watershed_group_code` == "MORR") |>
   rstac::post_request()
 ```
@@ -202,7 +203,7 @@ within a metre:
 
 ``` r
 rstac::stac("https://images.a11s.one/") |>
-  rstac::stac_search(collections = "imagery-uav-bc-prod", limit = 1000) |>
+  rstac::stac_search(collections = "stac-imagery-uav-bc", limit = 1000) |>
   rstac::ext_filter(`alignment:misfit_m` < 1) |>
   rstac::post_request()
 ```
@@ -214,12 +215,19 @@ and filter by the current map view. See [Lutra Consulting’s STAC-in-QGIS
 blog post](https://www.lutraconsulting.co.uk/blogs/stac-in-qgis) for a
 walk-through.
 
+The collection is listed by its title,
+`UAV Imagery from British Columbia - stac-imagery-uav-bc`. A connection
+saved before v2.0.0 shows the old `imagery-uav-bc-prod` entry until the
+collection is re-added in the browser; layers already added keep
+working, because a layer holds the asset href, which did not change.
+
 <div class="figure">
 
-<img src="fig/a11sone01.png" alt="Connecting to https://images.a11s.one" width="100%" />
+<img src="fig/a11sone01.png" alt="Connecting to https://images.a11s.one (taken before v2.0.0: the collection now appears under its new title)" width="100%" />
 <p class="caption">
 
-Connecting to <https://images.a11s.one>
+Connecting to <https://images.a11s.one> (taken before v2.0.0: the
+collection now appears under its new title)
 </p>
 
 </div>
@@ -256,7 +264,7 @@ The `scripts/` directory holds the orchestration helpers:
 | `item_create.py` | Create STAC items + update collection.json: additive for new COGs, `--rebuild` for every item, `--selftest` as its gate |
 | `web.R` | Web/viewer utilities |
 | `stacs.sh` | The pinned [`stacs`](https://github.com/NewGraphEnvironment/stacs) CLI — registers and verifies the catalogue against `stacs.toml` |
-| `config/` | Server docs + `item_unregister.sh` (the delete path; stacs is upsert-only) — see the [add-imagery recipe](scripts/config/README.md) |
+| `config/` | Server docs + `item_unregister.sh` and `collection_unregister.sh` (the delete paths; stacs is upsert-only) — see the [add-imagery recipe](scripts/config/README.md) |
 | `viewer.html` | Standalone viewer-page template for single-COG previews |
 
 Recent infrastructure work — see commit history — added client-side
