@@ -2,6 +2,67 @@
 
 ## Unreleased
 
+Three consumer-visible changes in one release, so that consumers absorb one break: the collection
+is renamed (#48), the item fields move off `nge:` (#38), and every item of a dataset fitted to
+LidarBC carries `alignment:` fields (#41). Eight registry rows are corrected. **Unchanged:** item
+ids, the S3 bucket, every asset href and download link, and the asset key `image`.
+
+### The collection is `stac-imagery-uav-bc` (#48)
+
+- `imagery-uav-bc-prod` → **`stac-imagery-uav-bc`**: product first like `stac-airphoto-bc`,
+  `stac-elevation-bc`, `stac-floodplains-bc` and `stac-pointcloud-bc`, the stem of the bucket
+  (`imagery-uav-bc`), and the pair of the coming `stac-pointcloud-uav-bc` (#42). The title follows,
+  `UAV Imagery from British Columbia - stac-imagery-uav-bc`, in `collection.json` and in every
+  item's root, parent and collection links; the item's `collection` field names the new id.
+- **What a consumer changes:** `collections = "stac-imagery-uav-bc"` in an `rstac` search, and
+  anything that reads an item's `collection` field. A QGIS STAC connection lists the collection
+  under its new title: re-add it in the browser. Layers already added keep working, because a
+  layer holds the asset href.
+- **When:** the static catalogue on S3 (`collection.json` and every item JSON) names the new id
+  from this release. The API serves both collections from this release until the old one is
+  dropped (date to follow here), the old one frozen at 1.0.4 with no new flights; after the drop
+  the old id answers 404.
+- The rename rides on `catalogue_release.sh`: `stacs.toml` is the id's one source,
+  `item_create.py --rebuild` stamps it, and a publish refuses a prod tree that names another id.
+  The drop is `scripts/config/collection_unregister.sh`, which reports before it deletes, refuses
+  the live collection, and refuses while the live collection is not served with at least as many
+  items (the recipe is in `scripts/config/README.md`).
+
+### Item fields move off `nge:` (#38)
+
+Each field's prefix now says what it describes. A saved filter on an old name matches nothing
+from this release; the README's field table says what each holds.
+
+| until v1.0.4 | from v2.0.0 |
+|---|---|
+| `nge:region` | `newgraph:region` |
+| `nge:alias` | `newgraph:alias` |
+| `nge:project` | `newgraph:project` |
+| `nge:stream_name`, `nge:stream_name_02`, `nge:stream_name_03` | `uav:stream_name`, `uav:stream_name_02`, `uav:stream_name_03` |
+| `nge:wsg_code` | `fwa:watershed_group_code` |
+| `nge:site_id` | `bcfishpass:aggregated_crossings_id` |
+| `nge:watershed_group` | dropped: it held the tree's directory slug, which is in the item id |
+| — | `fwa:watershed_group_name`, the atlas's name for the group, new |
+
+### Registry corrections
+
+Eight `data/sites.csv` rows change: five rename the stream, which changes `title` and
+`uav:stream_name` on their 15 items, and three add a second stream (`uav:stream_name_02`, 9 items):
+
+- `mackenzie/parsnip/2022/125000_parsnip_trib_arctic`: `tributary to Parsnip River` →
+  `Tributary to Parsnip River`
+- `mackenzie/parsnip/2022/125179_missinka_trib`: `Unnamed tributary to Missinka River` →
+  `Tributary to Missinka River`
+- `skeena/bulkley/2022/bulkley_dickson_BR1-2021_BR2-2021`: `Tributary to Richfield Creek` →
+  `Bulkley River`
+- `skeena/zymoetz/2023/8478_mcdonell_trib`: `Copper` → `Tributary to McDonell Lake`
+- `skeena/zymoetz/2023/8525_coal_trib`: `Copper` → `Tributary to Coal Creek`
+- `skeena/bulkley/2025/buck_bob_buc78` gains `uav:stream_name_02 = Bob Creek`;
+  `skeena/bulkley/2025/maxan_foxy_confluence` gains `Foxy Creek`;
+  `skeena/morice/2021/198000_mcbride_nanikafsr` gains `McBride Lake`
+
+### Alignment fields (#41)
+
 Every item of a dataset on a LidarBC DEM carries the dataset's fit to it as `alignment:` fields
 (#41). The rasters are unchanged.
 

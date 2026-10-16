@@ -207,8 +207,8 @@ after the tag.
   parent and collection link titles on every item (hrefs identical, link order differs); the #38
   renames (`nge:*` gone, `newgraph:`, `uav:`, `fwa:`, `bcfishpass:` present); `alignment:*` on
   the fitted datasets' items (1,518 field differences); `title` on 15 items and `uav:stream_name*`
-  on the rows Al corrected; `newgraph:alias` on the 6 moose items (#22's aliases, never
-  released). Log: `evidence/20261016_mirror_rebuild_new_id.log`.
+  on the rows Al corrected (the 6 `nge:alias` / `newgraph:alias` differences are the key rename on
+  the moose pair, not a value change). Log: `evidence/20261016_mirror_rebuild_new_id.log`.
 - `collection_unregister.sh --selftest`: 11 cases PASS; with the configured-id guard removed,
   that one case fails. Report mode on the real database: `imagery-uav-bc-prod` 245 items,
   nothing deleted; `stac-imagery-uav-bc` refused as the configured collection.

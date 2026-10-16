@@ -19,3 +19,6 @@
   stubbed cases; guard-dropped mutant red on the configured-id case; real report mode: old id 245,
   nothing deleted, configured id refused); `item_unregister.sh` verify line from `stacs.toml`;
   config README gotcha + "Renaming the collection" recipe; CLAUDE.md line
+- Phase 3: README.Rmd (new id in the prose and the three searches, QGIS note, figure caption,
+  scripts table), qmd and research doc, NEWS v2.0.0 entry (rename, #38 pairs, registry
+  corrections, #41). README.md and index.html render after the cutover

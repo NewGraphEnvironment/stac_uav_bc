@@ -45,7 +45,7 @@ Decided with Al at the plan gate (2026-10-16): this session runs the cutover, an
       `--rebuild --base <mirror> --version 2.0.0`, then `grep -rl imagery-uav-bc-prod <mirror>`
       returns nothing and 246 files name the new id; items differ from prod only in `collection`,
       the three link titles (and link order), the `alignment:` fields #41 added, the #38 field
-      renames and the registry fields Al's edits changed (15 titles, 6 aliases); `stacs validate`
+      renames and the registry fields Al's edits changed (15 titles); `stacs validate`
       246/0 invalid and `audit --config stacs.toml --expect 245` OK; prod untouched
 
 ## Phase 2: `collection_unregister.sh`, the drop path (written now, run in Phase 6)
@@ -77,18 +77,19 @@ Decided with Al at the plan gate (2026-10-16): this session runs the cutover, an
 
 ## Phase 3: Docs, NEWS, README source (the render waits for Phase 4)
 
-- [ ] `README.Rmd`: the prose at line 75 and the three `collections =` → new id; QGIS section: a
+- [x] `README.Rmd`: the prose at line 75 and the three `collections =` → new id; QGIS section: a
       saved connection re-adds the collection (listed by its new title) after the rename, layers
-      keep working; `fig/a11sone01.png` captioned as the pre-rename picker
-- [ ] `stac_create_collection.qmd:50` → new id, with a note that `--rebuild` stamps it from
+      keep working; `fig/a11sone01.png` captioned as the pre-rename picker; the scripts table
+      names `collection_unregister.sh`
+- [x] `stac_create_collection.qmd:50` → new id, with a note that `--rebuild` stamps it from
       `stacs.toml`; `research/uav_pointclouds.md:102` → new id
-- [ ] `NEWS.md` Unreleased becomes the v2.0.0 entry (heading dated at the release): the rename
+- [x] `NEWS.md` Unreleased becomes the v2.0.0 entry (heading dated at the release): the rename
       first (old → new id and title; unchanged: item ids, bucket, hrefs, `image`; what a consumer
       changes: `collections =`, QGIS re-add, anything reading an item's `collection` field; the
       static S3 catalogue names the new id from the release date, the API serves both until the
       drop date, the old frozen at 1.0.4; the drop date filled in Phase 6), then #38's old → new
-      field pairs, then the registry corrections from Al's edits (each a title and
-      `uav:stream_name` change), then #41's text
+      field pairs, then the registry corrections from Al's edits (five renames: 15 items retitled;
+      three second streams: 9 items), then #41's text
 - [ ] `/code-check branch`; open the PR as draft with Phases 4–6 listed as pending
 
 ## Phase 4: Cutover: register the new collection, old stays live

@@ -99,7 +99,7 @@ over a few tens of metres) cannot be separated from that with these flights.**
 
 Ranked by value for the effort, cheapest first.
 
-1. **Fix the absolute elevations we already publish.** Every UAV DTM and DSM in `imagery-uav-bc-prod`
+1. **Fix the absolute elevations we already publish.** Every UAV DTM and DSM in `stac-imagery-uav-bc`
    is off by the flight's GPS error. Measuring each flight's shift + tilt against LidarBC is a script
    that already runs (here, 15 minutes for 61 clouds), and recording it on the items, or publishing
    corrected rasters, turns a misleading elevation into a useful one for the 29 flights that fit
