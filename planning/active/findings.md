@@ -227,6 +227,18 @@ Mutants for round 3's guards (`mutants_r3.log`): eight red. Two needed a second 
 
 The enumeration, corrected: the copies are raw `.laz` → raw DTM/DSM/orthophoto → COG tree → prod → S3 → API. Ties: row ↔ laz by count, date and size; laz ↔ raw DTM by `check_dtm` at fit time; raw ↔ COG tree and raw ↔ prod by grid and five data-bearing windows with a floor on the cells compared; prod ↔ items by the path-key join and its refusals; prod ↔ S3 ↔ API by the pipeline's sync, register, verify and the live presence check. Each tie reads content or an identity the producer cannot keep, and each was shown to fire on the state it separates.
 
+Round 4 (`review-round4.md`) found that enumeration short one copy: the item JSONs are written from the table at a build and never read back, so a row changed afterwards (a re-fit without a re-stitch: a new default, a newer LidarBC delivery) leaves its items stale with every gate green until a release, and the re-stitch recipe's "publish again" cannot complete, because deleting the prod dir deletes item JSONs the collection still links (`links_check` refuses; measured on a mirror). Fixed the way the repo already treats a registry change:
+
+| finding | fix | proof |
+|---|---|---|
+| table ↔ items was a build-time tie only | `--check` reads every item JSON under a dataset back against its row (`item_fields`, the join restated since `item_create.py` cannot be imported under uv): a fitted row's exact values, nothing otherwise. `dataset_publish.sh` runs it first, so a row changed since the last release holds every publish until the next one, as #38's rename does; `catalogue_release.sh` runs it after its rebuild, so the arm reads what the release wrote and a stale cloud or raster still stops it before the sync | on the real prod tree (items built before #41) it reports exactly the 46 fitted datasets; on the mirror rebuilt from the table, OK in 17 s, which also holds the restated join to what `item_create.py` writes; selftest: fields on an item whose row is not fitted, and a fitted row changed after its item was built, both reported; `items_blind` mutant |
+| the re-stitch recipe said "publish again" | the recipe says release (steps 2–3 again, then `catalogue_release.sh`, as for a retraction); a re-fit is a registry change (step 1 of "Releasing a registry change"); the `--check` remedies say so; NEWS and the recipe say the first publish after #41 waits for the release, as after #38 | |
+| the collar fixture's patch held 900 distinct cells, under the 1000 floor, passing only through window overlap | patch 40 × 40 (1600) | selftest |
+| `cloud_date` reads as 31 December of the year before (ODM writes day 0) | said in `cloud_header`'s docstring: compared, never read as a date | |
+| the two Maps Made Easy `ortho.tif` were not compared | `RASTERS` includes it | real check covers them |
+
+The chain, final: raw `.laz` →(count, date, size)→ table row →(`check_dtm` at the fit)→ raw DTM; raw rasters →(grid + data-bearing windows, floor)→ COG tree and prod; table row →(`item_fields` read back)→ prod items; prod →(sync, `stacs verify` by digest, the live presence check)→ S3 and the API. `stacs verify` compares every published body with the API's by digest, so the live values are the prod items' and the new arm closes the last proxy. Every tie was shown to fire on the state it separates.
+
 ## Errors Encountered
 
 | Error | Resolution |

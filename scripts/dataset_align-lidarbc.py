@@ -47,9 +47,10 @@
 # downstream can read a guess. A run merges its rows into the table by key and
 # writes after every dataset, so an interrupted run keeps what it did. Rows
 # record the cloud's point count, date and size; --check reports rows whose cloud
-# has since changed, published datasets with no row, and published or COG-tree
-# rasters that are not the raw tree's (dataset_publish.sh and catalogue_release.sh
-# run it first).
+# has since changed, published datasets with no row, published or COG-tree rasters
+# that are not the raw tree's, and items that do not carry their row's fields
+# (dataset_publish.sh runs it first; catalogue_release.sh after its rebuild, so a
+# row changed since the last release holds every publish until the next one).
 #
 # uv resolves the dependencies from the header above (no conda env has laspy):
 #   uv run scripts/dataset_align-lidarbc.py --selftest         # the gate: no network, no laz
@@ -82,6 +83,8 @@ LAZ = pathlib.Path("odm_georeferencing") / "odm_georeferenced_model.laz"
 DTM = pathlib.Path("odm_dem") / "dtm.tif"
 DSM = pathlib.Path("odm_dem") / "dsm.tif"
 ORTHO = pathlib.Path("odm_orthophoto") / "odm_orthophoto.tif"
+MME_ORTHO = pathlib.Path("ortho.tif")  # the two Maps Made Easy datasets: an orthophoto, no cloud
+RASTERS = (DTM, DSM, ORTHO, MME_ORTHO)  # every raster a dataset publishes; --check ties each copy to the raw tree
 TIMEOUT = 60  # s, on every fetch: a hung read must fail loud, not stall the run
 KEY = ["region", "watershed", "year", "item"]
 COLUMNS = KEY + ["status", "reference", "reference_crs", "dem_ids", "model", "mask", "shift_x_m",
@@ -89,6 +92,13 @@ COLUMNS = KEY + ["status", "reference", "reference_crs", "dem_ids", "model", "ma
                  "centre_y", "dz_raw_m", "misfit_m", "misfit_masked_m", "points", "coverage",
                  "outlier_frac", "cloud_points", "cloud_date", "cloud_bytes", "run_date"]
 CLOUD = ("cloud_points", "cloud_date", "cloud_bytes")  # what cloud_header() gives, what --check compares
+# What item_create.py puts on a fitted dataset's items, restated so --check can read an
+# item back against its row (item_create.py cannot be imported under uv). --check on
+# the real tree holds the two statements to agree.
+ITEM_FIELDS = (("alignment:reference", "reference", str), ("alignment:model", "model", str),
+               ("alignment:shift_x_m", "shift_x_m", float), ("alignment:shift_y_m", "shift_y_m", float),
+               ("alignment:offset_m", "offset_m", float), ("alignment:tilt_m_per_100m", "tilt_m_per_100m", float),
+               ("alignment:misfit_m", "misfit_m", float), ("alignment:points", "points", int))
 TRIAL_COLUMNS = KEY + ["model", "mask", "status", "reference", "shift_x_m", "shift_y_m", "shift_spread_m",
                        "offset_m", "tilt_m_per_100m", "misfit_m", "misfit_masked_m", "points", "outlier_frac"]
 MODELS = ("plane", "quadratic")
@@ -311,9 +321,11 @@ def mask_points(mask, x, y, X, Y, tiles, proj_raw, proj_prod):
 
 def cloud_header(path):
     """Point count, creation date and file size: the row's identity for its cloud.
-    The date is only the processing year on ODM's files, and ODM reclassifies a laz
-    in place (same count, same date) when its DEM stage is re-run, so the size is
-    the one of the three a rewrite cannot keep."""
+    The date is laspy's reading of the header, where ODM writes day 0 of the
+    processing year, so it comes out as 31 December of the year before; it is
+    compared, never read as a date. ODM reclassifies a laz in place (same count,
+    same date) when its DEM stage is re-run, so the size is the one of the three a
+    rewrite cannot keep."""
     import laspy
     with laspy.open(path) as f:
         return int(f.header.point_count), str(f.header.creation_date or ""), path.stat().st_size
@@ -579,25 +591,46 @@ def published_matches(raw, pub, rng):
     return None
 
 
+def item_fields(row):
+    """The alignment: fields a row puts on its dataset's items, as item_create.py
+    writes them: none unless the row is fitted."""
+    if row.get("status") != "fitted":
+        return {}
+    fields = {k: cast(row[c]) for k, c, cast in ITEM_FIELDS}
+    fields["alignment:surface"] = [float(c) for c in json.loads(row["surface"])]
+    fields["alignment:centre"] = [float(row["centre_x"]), float(row["centre_y"])]
+    return fields
+
+
 def check_table(rows, root, prod, cog):
-    """Rows whose cloud changed since the fit, published datasets with no row, and
-    published or COG-tree rasters that are not the raw tree's: a row describes the raw
-    cloud, whose DTM the fit checked; the items that carry it sit beside the published
-    DTM, DSM and orthophoto, which a re-stitch replaces together; and a publish reuses
-    a COG copy that exists. Each line ends with its remedy; a run writes rows and never
-    deletes one."""
+    """The table against the trees. Published datasets with no row; published or
+    COG-tree rasters that are not the raw tree's (a row describes the raw cloud, whose
+    DTM the fit checked; the items that carry it sit beside the published rasters,
+    which a re-stitch replaces together; a publish reuses a COG copy that exists);
+    rows whose cloud changed since the fit; and items that do not carry their row's
+    fields (an item is written from the table at a build and never again, so a row
+    that changed after it needs a release). Each line ends with its remedy; a run
+    writes rows and never deletes one."""
     drift = [f"{'/'.join(k)}: published, no row: run the script on it" for k in published_keys(prod) if k not in rows]
-    copies = ((cog, "COG", "delete the dataset's COG copy and publish it again"),
-              (prod, "published", "delete the dataset's COG and prod copies and publish it again"))
+    copies = ((cog, "COG", "delete the dataset's COG copy, then fit it again and release"),
+              (prod, "published", "delete the dataset's COG and prod copies, then fit it again and release "
+                                  "(the publish cannot rebuild items the collection links)"))
     for k, r in rows.items():
         name, raw = "/".join(k), root.joinpath(*k)
         for tree, what, remedy in copies:
-            for tif in (DTM, DSM, ORTHO):
+            for tif in RASTERS:
                 pub = tree.joinpath(*k) / tif
                 if pub.is_file() and (raw / tif).is_file():
                     why = published_matches(raw / tif, pub, dataset_rng(k))
                     if why:
                         drift.append(f"{name}: {what} {tif.name} is not shown to be the raw tree's ({why}): {remedy}")
+        want = item_fields(r)
+        for j in (sorted(prod.joinpath(*k).rglob("*.json")) if prod.joinpath(*k).is_dir() else []):
+            have = {f: v for f, v in json.load(open(j)).get("properties", {}).items() if f.startswith("alignment:")}
+            if have != want:
+                drift.append(f"{name}: item {j.name} does not carry the row's alignment: fields (row {r['status']}): "
+                             "release, which rebuilds every item from the table")
+                break
         if not (raw / LAZ).is_file():
             if r["status"] != "no_cloud":
                 drift.append(f"{name}: cloud gone, row says {r['status']}: delete the row, or rename its item with the dataset")
@@ -837,14 +870,15 @@ def _selftest():
         check(len(stale) == 2 and any("COG dtm.tif is not shown" in d for d in stale), f"--check with a stale COG copy: {stale}")
         # Windows are drawn where the published copy holds data: a raster that is a
         # nodata collar around a small patch (a thin reach over its bounding box) is
-        # compared on the patch, and a changed patch is reported.
+        # compared on the patch (40 x 40 cells, over the floor), and a changed patch
+        # is reported.
         t = ("p", "q", "2024", "u")
         t_raw, t_pub = root.joinpath(*t), prod.joinpath(*t)
         (t_raw / LAZ).parent.mkdir(parents=True)
         las.write(str(t_raw / LAZ))
         again[t] = dict(zip(KEY, t), status="no_reference", **dict(zip(CLOUD, map(str, cloud_header(t_raw / LAZ)))))
         patch = np.full((n, n), -9999.0, dtype="float32")
-        patch[20:50, 20:50] = 500.0
+        patch[20:60, 20:60] = 500.0
         for d in (t_raw, t_pub):
             (d / DTM).parent.mkdir(parents=True, exist_ok=True)
             with rasterio.open(str(d / DTM), "w", driver="GTiff", height=n, width=n, count=1, dtype="float32",
@@ -865,6 +899,29 @@ def _selftest():
                 w.write(patch, 1)
         few = [d for d in check_table(again, root, prod, cog) if d.startswith("p/q/2024/u")]
         check(len(few) == 1 and "too few to tell" in few[0], f"--check on copies that agree on 25 cells: {few}")
+        # The items beside the published rasters are read back against the row: an
+        # item is written from the table once, so a row that changed after the build
+        # (a re-fit, a new default) needs a release, and --check says so.
+        jdir = s_pub / "odm_dem"
+        (jdir / "s-dtm.json").write_text(json.dumps({"properties": {"uav:stream_name": "x"}}))
+        check(not any("item s-dtm.json" in d for d in check_table(again, root, prod, cog)),
+              "--check on an item with no alignment: fields beside a no_reference row")
+        (jdir / "s-dtm.json").write_text(json.dumps({"properties": {"alignment:reference": "093/093g/2024"}}))
+        check(any("item s-dtm.json" in d for d in check_table(again, root, prod, cog)),
+              "--check blind to alignment: fields on an item whose row is not fitted")
+        v = ("r", "w", "2026", "v")
+        v_raw, v_pub = root.joinpath(*v), prod.joinpath(*v)
+        (v_raw / LAZ).parent.mkdir(parents=True)
+        las.write(str(v_raw / LAZ))
+        again[v] = dict(row, reference="093/093g/2024", model="quadratic", mask="none", **dict(zip(KEY, v)),
+                        **dict(zip(CLOUD, map(str, cloud_header(v_raw / LAZ)))))
+        (v_pub / "odm_dem").mkdir(parents=True)
+        (v_pub / "odm_dem" / "v-dtm.json").write_text(json.dumps({"properties": item_fields(again[v])}))
+        check(not any(d.startswith("r/w/2026/v") for d in check_table(again, root, prod, cog)),
+              "--check on an item carrying exactly the fitted row's fields")
+        again[v]["misfit_m"] = str(float(again[v]["misfit_m"]) + 0.5)
+        check(any(d.startswith("r/w/2026/v: item v-dtm.json") for d in check_table(again, root, prod, cog)),
+              "--check blind to a fitted row that changed after its items were built")
 
     # The fit's own DTM check: the dataset's DTM must sit on the cloud it is fitted
     # from (the items carry the fit beside that DTM), in the cloud's CRS.
@@ -892,7 +949,7 @@ def _selftest():
             print(f"  - {f}", file=sys.stderr)
         return 1
     print("ALIGN SELFTEST PASS: shift, offset and tilt recovered; masks; refusals; table round trip; "
-          "--check (cloud and published rasters); the DTM check")
+          "--check (cloud, published rasters, items); the DTM check")
     return 0
 
 
@@ -923,8 +980,8 @@ def main():
             print(line, file=sys.stderr)
         if drift:
             sys.exit(f"ALIGN CHECK FAILED: {len(drift)} row(s), each with its remedy above")
-        print(f"ALIGN CHECK OK: {len(rows)} rows, every published dataset has one, no cloud changed, "
-              "every published and COG-tree raster of a dataset with a row is the raw tree's")
+        print(f"ALIGN CHECK OK: {len(rows)} rows: every published dataset has one, no cloud changed, every "
+              "published and COG-tree raster is the raw tree's, every item carries its row's fields")
         sys.exit(0)
     keys = [project_key(a, root) for a in args.projects] or published_keys(prod)
     if not keys:

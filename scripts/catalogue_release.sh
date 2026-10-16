@@ -22,14 +22,16 @@ API=$(python3 -c 'import sys, tomllib; c = tomllib.load(open(sys.argv[1], "rb"))
 VERSION="${1:-$(git -C "$REPO" describe --tags --abbrev=0 | sed 's/^v//')}"
 echo "=== catalogue release v$VERSION"
 
-echo "=== alignment table against the trees"
-# A fitted row whose cloud was re-stitched since, or a published raster that is not the
-# raw tree's, would otherwise publish alignment: fields for another cloud (#41).
-# Reads the laz headers and samples each raster pair; laspy lives under uv.
-uv run "$REPO/scripts/dataset_align-lidarbc.py" --check || exit 1
-
 echo "=== rebuild items from sites.csv"
 conda run -n titiler python "$REPO/scripts/item_create.py" --rebuild --version "$VERSION"
+
+echo "=== alignment table against the trees and the rebuilt items"
+# A fitted row whose cloud was re-stitched since, or a published or COG-tree raster
+# that is not the raw tree's, would otherwise publish alignment: fields for another
+# cloud (#41); runs after the rebuild, so its items arm reads the items this release
+# wrote from the table, and still stops a stale cloud or raster before the sync.
+# Reads the laz headers, samples each raster pair, reads each item; laspy lives under uv.
+uv run "$REPO/scripts/dataset_align-lidarbc.py" --check || exit 1
 
 echo "=== validate + audit (gate)"
 # Paths on stdin, because --dir does not recurse and the prod tree is nested. Given
