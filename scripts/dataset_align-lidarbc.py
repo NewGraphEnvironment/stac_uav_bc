@@ -47,7 +47,8 @@
 # downstream can read a guess. A run merges its rows into the table by key and
 # writes after every dataset, so an interrupted run keeps what it did. Rows
 # record the cloud's point count and date; --check reports rows whose cloud has
-# since changed and published datasets with no row.
+# since changed, published datasets with no row, and published rasters that are
+# not the raw tree's (dataset_publish.sh and catalogue_release.sh run it first).
 #
 # uv resolves the dependencies from the header above (no conda env has laspy):
 #   uv run scripts/dataset_align-lidarbc.py --selftest         # the gate: no network, no laz
@@ -78,6 +79,7 @@ SEARCH_LIMIT = 200  # the API pages past this; a flight under more tiles than th
 LAZ = pathlib.Path("odm_georeferencing") / "odm_georeferenced_model.laz"
 DTM = pathlib.Path("odm_dem") / "dtm.tif"
 DSM = pathlib.Path("odm_dem") / "dsm.tif"
+ORTHO = pathlib.Path("odm_orthophoto") / "odm_orthophoto.tif"
 TIMEOUT = 60  # s, on every fetch: a hung read must fail loud, not stall the run
 KEY = ["region", "watershed", "year", "item"]
 COLUMNS = KEY + ["status", "reference", "reference_crs", "dem_ids", "model", "mask", "shift_x_m",
@@ -103,6 +105,7 @@ MIN_COVERAGE = 0.5  # share of the ground points the DEM must cover, or the tilt
 SAMPLE, SEARCH_SAMPLE = 200_000, 20_000  # points read per cloud; points per sample scoring each shift
 PAD = 25  # m of DEM read beyond the points: room for the shift search
 DTM_SAMPLE, DTM_TOL = 2000, 0.1  # the dataset's own DTM must sit on its cloud's ground
+DTM_WINDOWS, DTM_WINDOW = 5, 64  # windows of the published DTM compared with the raw tree's by --check
 
 
 class Refused(Exception):
@@ -532,18 +535,50 @@ def project_key(arg, root):
     return rel.parts
 
 
+def published_matches(raw, pub, rng):
+    """None when the published raster is the raw tree's (same grid, DTM_WINDOWS windows
+    of DTM_WINDOW cells of band 1 equal), else what differs. The COG conversion keeps
+    grid and values."""
+    import rasterio
+    from rasterio.windows import Window
+    with rasterio.open(raw) as a, rasterio.open(pub) as b:
+        if ((a.width, a.height, a.crs.to_epsg()) != (b.width, b.height, b.crs.to_epsg())
+                or not a.transform.almost_equals(b.transform)):
+            return "grid differs"
+        n = 0
+        for _ in range(DTM_WINDOWS):
+            c = int(rng.integers(0, max(1, a.width - DTM_WINDOW)))
+            r = int(rng.integers(0, max(1, a.height - DTM_WINDOW)))
+            w = Window(c, r, min(DTM_WINDOW, a.width - c), min(DTM_WINDOW, a.height - r))
+            va, vb = a.read(1, window=w, masked=True), b.read(1, window=w, masked=True)
+            ma, mb = np.ma.getmaskarray(va), np.ma.getmaskarray(vb)
+            n += int((ma != mb).sum() + ((~ma & ~mb) & (np.abs(va.filled(0) - vb.filled(0)) > 0.01)).sum())
+    return f"{n} cells differ" if n else None
+
+
 def check_table(rows, root, prod):
-    """Rows whose cloud changed since the fit, and published datasets with no row."""
-    drift = [f"{'/'.join(k)}: published, no row" for k in published_keys(prod) if k not in rows]
+    """Rows whose cloud changed since the fit, published datasets with no row, and
+    published rasters that are not the raw tree's: a row describes the raw cloud, whose
+    DTM the fit checked, and the items that carry it sit beside the published DTM, DSM
+    and orthophoto, which a re-stitch replaces together. Each line ends with its
+    remedy; a run writes rows and never deletes one."""
+    drift = [f"{'/'.join(k)}: published, no row: run the script on it" for k in published_keys(prod) if k not in rows]
     for k, r in rows.items():
-        laz = root.joinpath(*k) / LAZ
-        if not laz.is_file():
+        name, raw = "/".join(k), root.joinpath(*k)
+        if not (raw / LAZ).is_file():
             if r["status"] != "no_cloud":
-                drift.append(f"{'/'.join(k)}: cloud gone, row says {r['status']}")
+                drift.append(f"{name}: cloud gone, row says {r['status']}: delete the row, or rename its item with the dataset")
             continue
-        n, d = cloud_header(laz)
+        n, d = cloud_header(raw / LAZ)
         if (str(n), d) != (r["cloud_points"], r["cloud_date"]):
-            drift.append(f"{'/'.join(k)}: cloud is {n} points of {d}, row fitted {r['cloud_points']} of {r['cloud_date']}")
+            drift.append(f"{name}: cloud is {n} points of {d}, row has {r['cloud_points']} of {r['cloud_date']}: run the script on it again")
+        for tif in (DTM, DSM, ORTHO):
+            pub = prod.joinpath(*k) / tif
+            if pub.is_file() and (raw / tif).is_file():
+                why = published_matches(raw / tif, pub, dataset_rng(k))
+                if why:
+                    drift.append(f"{name}: published {tif.name} is not the raw tree's ({why}): "
+                                 "delete the dataset's COG and prod copies and publish it again")
     return drift
 
 
@@ -734,19 +769,59 @@ def _selftest():
         # Three drifts: a published dataset with no row, a row whose cloud changed,
         # and a fitted row whose cloud is gone.
         drift = check_table(again, root, prod)
-        check(len(drift) == 3 and drift[0].startswith("d/e/2024/f: published, no row")
-              and "r/w/2025/h: cloud is 12 points of" in drift[1]
-              and drift[2].startswith("r/w/2026/i: cloud gone"), f"--check: {drift}")
+        want = ("d/e/2024/f: published, no row", "r/w/2025/h: cloud is 12 points of", "r/w/2026/i: cloud gone")
+        check(len(drift) == 3 and all(any(w in d for d in drift) for w in want), f"--check: {drift}")
         again[("r", "w", "2025", "h")].update(zip(("cloud_points", "cloud_date"), map(str, cloud_header(h))))
         check(check_table(again, root, prod) == [d for d in drift if not d.startswith("r/w/2025/h")],
               "--check after the row was refreshed")
+        # A fourth: a published DTM that is not the raw tree's. The row describes the
+        # raw cloud, whose DTM the fit checked; the items carry it beside the published one.
+        import rasterio
+        s = ("p", "q", "2024", "s")
+        s_raw, s_pub = root.joinpath(*s), prod.joinpath(*s)
+        (s_raw / LAZ).parent.mkdir(parents=True)
+        las.write(str(s_raw / LAZ))
+        again[s] = dict(zip(KEY, s), status="no_reference", **dict(zip(("cloud_points", "cloud_date"), map(str, cloud_header(s_raw / LAZ)))))
+        dtm_s = (np.arange(40 * 40, dtype="float32") / 100).reshape(40, 40)
+        for d, a in ((s_raw, dtm_s), (s_pub, dtm_s)):
+            (d / DTM).parent.mkdir(parents=True, exist_ok=True)
+            with rasterio.open(str(d / DTM), "w", driver="GTiff", height=40, width=40, count=1, dtype="float32",
+                               crs="EPSG:32610", transform=Affine(1.0, 0.0, x0, 0.0, -1.0, y1), nodata=-9999.0) as w:
+                w.write(a, 1)
+        clean = check_table(again, root, prod)
+        check(not any(d.startswith("p/q/2024/s") for d in clean), f"--check with the published DTM the raw tree's: {clean}")
+        with rasterio.open(str(s_pub / DTM), "r+") as w:
+            w.write(dtm_s + 1.0, 1)
+        stale = [d for d in check_table(again, root, prod) if d.startswith("p/q/2024/s")]
+        check(len(stale) == 1 and "published dtm.tif is not the raw tree's" in stale[0], f"--check with a stale published DTM: {stale}")
+
+    # The fit's own DTM check: the dataset's DTM must sit on the cloud it is fitted
+    # from (the items carry the fit beside that DTM), in the cloud's CRS.
+    with tempfile.TemporaryDirectory() as td:
+        import rasterio
+        from pyproj import CRS
+        dtm_path = pathlib.Path(td) / "dtm.tif"
+        for epsg in (32610, 32609):
+            with rasterio.open(str(dtm_path), "w", driver="GTiff", height=n, width=n, count=1, dtype="float32",
+                               crs=f"EPSG:{epsg}", transform=Affine(1.0, 0.0, x0, 0.0, -1.0, y1), nodata=-9999.0) as w:
+                w.write(tiles_of(ramp)[0][0].astype("float32"), 1)
+            xx, yy, zz, _ = cloud(ramp, 5000, 0.0, 0.0, 0.0, 0.0, 0.0)
+            for dz, want in ((0.0, None), (0.5, "dtm_cloud_disagree")):
+                try:
+                    check_dtm(dtm_path, xx, yy, zz + dz, CRS.from_epsg(32610), np.random.default_rng(3))
+                    got = None
+                except Refused as e:
+                    got = str(e).split(":")[0]
+                want = want if epsg == 32610 else "dtm_crs_differs"
+                check(got == want, f"check_dtm on EPSG:{epsg}, cloud {dz} m above: {got}, wanted {want}")
 
     if fails:
         print(f"ALIGN SELFTEST FAILED: {len(fails)} check(s)", file=sys.stderr)
         for f in fails:
             print(f"  - {f}", file=sys.stderr)
         return 1
-    print("ALIGN SELFTEST PASS: shift, offset and tilt recovered; masks; refusals; table round trip; --check")
+    print("ALIGN SELFTEST PASS: shift, offset and tilt recovered; masks; refusals; table round trip; "
+          "--check (cloud and published rasters); the DTM check")
     return 0
 
 
@@ -766,6 +841,8 @@ def main():
     args = p.parse_args()
     if args.selftest:
         sys.exit(_selftest())
+    if args.check and args.projects:
+        p.error("--check checks the whole table against the trees; give it no project")
     root, prod, out = pathlib.Path(args.root), pathlib.Path(args.base), pathlib.Path(args.out)
     rows = read_table(out)
     if args.check:
@@ -773,8 +850,9 @@ def main():
         for line in drift:
             print(line, file=sys.stderr)
         if drift:
-            sys.exit(f"ALIGN CHECK FAILED: {len(drift)} row(s): re-run the script on them")
-        print(f"ALIGN CHECK OK: {len(rows)} rows, every published dataset has one and no cloud changed")
+            sys.exit(f"ALIGN CHECK FAILED: {len(drift)} row(s), each with its remedy above")
+        print(f"ALIGN CHECK OK: {len(rows)} rows, every published dataset has one, no cloud changed, "
+              "every published raster is the raw tree's")
         sys.exit(0)
     keys = [project_key(a, root) for a in args.projects] or published_keys(prod)
     if not keys:

@@ -64,6 +64,8 @@ Two commands with a human QC gate between them:
 3. Fit to LidarBC — `uv run scripts/dataset_align-lidarbc.py <project-dir>...` (~30 s per dataset; writes the dataset's row to `data/alignment_lidarbc.csv`, which the publish commits with the registry row; `item_create.py` refuses a dataset with no row)
 4. Publish — `scripts/dataset_publish.sh <project-dir>...` (COG convert + validate → prod tree → items with flight datetimes → whole-tree `stacs validate` + `audit --expect` → durable S3 upload → collection extent → `stacs register --mode drift` → `stacs verify`; idempotent, safe to re-run)
 
+**Re-stitching a published dataset:** delete its COG and prod copies (`imagery_uav_bc/<key>` and `stac/prod/imagery_uav_bc/<key>`) before step 4, because the publish keeps a COG that exists; then steps 2–4 again. `--check` refuses a published raster that is not the raw tree's, so a re-stitch that skipped the delete stops at step 4 rather than carrying the new cloud's fit beside the old rasters.
+
 The underlying single-purpose tools these orchestrate, for one-off use:
 
 - `scripts/item_create.py <tifs relative to prod tree>` — items + collection.json (conda env `titiler`)
@@ -96,7 +98,7 @@ matters, and two steps are easy to miss:
 2. **Delete the old-id JSONs from the renamed prod dir.** `item_create.py --rebuild` writes
    `<new-id>.json` beside each tif but never removes JSONs whose id no longer matches, so the stale
    ones survive the rebuild and get pushed to S3 alongside the new ones.
-3. Update the row's `item` in `data/sites.csv` — the registry key is `(region, watershed, year, item)`.
+3. Update the row's `item` in `data/sites.csv` **and in `data/alignment_lidarbc.csv`** — both are keyed `(region, watershed, year, item)`. The fit does not change with a name, and `--check` (which the publish and release run first) refuses a row whose cloud is gone; re-running the fitter on the old path would write a phantom `no_cloud` row, not remove the stale one.
 4. `item_unregister.sh` the old ids **before** the publish or release, whose closing `stacs verify`
    otherwise fails on them. The final `aws s3 sync --delete` clears the old S3 prefix on its
    own (prod is authoritative for the bucket), but pgstac is not driven by the sync — and stacs is

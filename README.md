@@ -140,10 +140,11 @@ rstac::stac("https://images.a11s.one/") |>
 UAV elevations in this catalogue are GPS-referenced. No flight used
 ground control, so each DTM and DSM sits where the drone’s own GPS
 placed it, and so does the orthophoto. Measured against the LidarBC 1 m
-DEM for the 49 datasets that have one under them, the published rasters
-sit a median of 8.3 m from LidarBC vertically (from −97 to +92 m) and
-3.2 m horizontally (up to 12.4 m). The geoid (−8 to −15 m here) does not
-explain it; the drone’s altitude does. The measurements are in
+DEM over the 46 datasets that have one under them and could be fitted,
+the published rasters sit a median of 8.3 m from LidarBC vertically
+(from −97 to +92 m) and 3.2 m horizontally (up to 12.4 m). The geoid (−8
+to −15 m here) does not explain it; the drone’s altitude does. The
+measurements are in
 [`research/uav_pointclouds.md`](research/uav_pointclouds.md).
 
 The rasters are published as they are. Instead, every item of a dataset

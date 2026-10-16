@@ -191,6 +191,29 @@ Round 1 (`review-round1.md`): no defect in a shipped path; three fragile points 
 | `alignment:reference` can carry two deliveries `;`-joined (the two moose flights) | README field table says so |
 | a comment named the href path as `<bucket>/<region>/…`; the code takes four segments under the virtual-hosted URL | comment fixed |
 
+Round 2 (`review-round2.md`): no defect in a shipped path; two fragile points, both inside round 1's `--check` closure, and two minor notes. All fixed:
+
+| finding | fix |
+|---|---|
+| the new gate breaks the documented rename recipe: the old key's fitted row stays with its cloud gone, `--check` refuses, and its remedy ("re-run the script") writes a phantom `no_cloud` row (the fitter never deletes) | rename recipe step 3 renames the alignment row too; every `--check` line ends with its own remedy; `--check <project>` is refused instead of silently checking the whole table |
+| round 1 tied the row to the raw cloud; nothing tied it to the published raster: re-stitch, re-fit, publish without deleting the COG keeps the old rasters beside the new fit, every gate green (latent: all 46 published DTMs equal the raw ones today) | `--check` compares every published raster (DTM, DSM, orthophoto) with the raw tree's: grid, then five 64-cell windows of band 1; 7 s over the 80 datasets; the recipe says to delete the COG and prod copies before re-publishing a re-stitch |
+| the three page-full guards were `assert`s, stripped under `PYTHONOPTIMIZE` | `sys.exit` |
+| the README named 49 datasets for numbers over the 46 fitted | "the 46 … that could be fitted" |
+
+The gate's scope (the whole table, so an unrelated in-flight re-stitch blocks another dataset's publish until refitted) is accepted: loud, and the remedy is on the line.
+
+**Enumeration of the chain the fields claim** (what ends the inside-a-fix pattern, `code-check.md`): an item's `alignment:` fields say "the ground of this dataset's published rasters, shifted and corrected as stated, lands on LidarBC delivery R with misfit m". The artifacts between the claim and the rasters, and what ties each pair:
+
+| link | tie | proved red |
+|---|---|---|
+| table row ↔ raw cloud (`.laz`) | `cloud_points`/`cloud_date` recorded at the fit; `--check` compares the header, run first by `dataset_publish.sh` and `catalogue_release.sh` | planted +1 point stops the publish; `check_blind` mutant |
+| raw cloud ↔ raw DTM | `check_dtm` at fit time: same EPSG, median within 0.1 m over 2000 ground points, else `refused:dtm_*` and no numbers | selftest (new in round 2): 0.5 m off → `dtm_cloud_disagree`, other EPSG → `dtm_crs_differs`; `dtm_tol_off`, `dtm_crs_off` mutants |
+| raw DTM, DSM, orthophoto ↔ published copies (prod tree) | `--check` grid + windows (new in round 2) | selftest: a published DTM one metre off is reported; `tie_blind`, `tie_values_blind` mutants |
+| published rasters ↔ items beside them | `item_create.py` builds items from the prod tree's tifs and joins the row by the path's key; refuses a dataset with no row, a fitted row that is unreadable or non-finite; mirror rebuild: fields on exactly the fitted datasets' three items, identical | 4 item mutants; `mirror_check.py` against a no-fit control |
+| prod tree ↔ live catalogue | `catalogue_release.sh`: `aws s3 sync` from prod (authoritative), `stacs register`/`verify`, and the live check that an item carries `alignment:reference` iff its row is fitted | reviewer ran the embedded check in both fail directions |
+
+Nothing sits above the table but the raw cloud, and every link down to the live item has a mechanical check that was shown to fire. What stays unchecked by design: the rasters' bytes on S3 against prod (the sync is the pipeline's, before #41), and whether the raw cloud is the right stitch for the images (`odm_qc.py`, before the fit).
+
 ## Errors Encountered
 
 | Error | Resolution |

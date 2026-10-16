@@ -23,8 +23,9 @@ VERSION="${1:-$(git -C "$REPO" describe --tags --abbrev=0 | sed 's/^v//')}"
 echo "=== catalogue release v$VERSION"
 
 echo "=== alignment table against the trees"
-# A fitted row whose cloud was re-stitched since would otherwise publish alignment:
-# fields for another cloud (#41). Reads the laz headers; laspy lives under uv.
+# A fitted row whose cloud was re-stitched since, or a published raster that is not the
+# raw tree's, would otherwise publish alignment: fields for another cloud (#41).
+# Reads the laz headers and samples each raster pair; laspy lives under uv.
 uv run "$REPO/scripts/dataset_align-lidarbc.py" --check || exit 1
 
 echo "=== rebuild items from sites.csv"
@@ -57,7 +58,7 @@ VERIFY_DIR=$(mktemp -d "${TMPDIR:-/tmp}/stacs_verify.XXXXXX")
 echo "=== verify (this catalogue: version stamp, registry coverage)"
 live_version=$(curl -s "$API" | python3 -c "import json,sys; print(json.load(sys.stdin).get('version','MISSING'))")
 n_items=$(curl -s -X POST "${API%/collections/*}/search" -H "Content-Type: application/json" \
-  -d "{\"collections\":[\"${API##*/}\"],\"limit\":1000}" | python3 -c "import json,sys; f = json.load(sys.stdin)['features']; assert len(f) < 1000, 'search page full: the checks below would see part of the catalogue'; print(len(f))")
+  -d "{\"collections\":[\"${API##*/}\"],\"limit\":1000}" | python3 -c "import json,sys; f = json.load(sys.stdin)['features']; len(f) < 1000 or sys.exit('search page full: the checks below would see part of the catalogue'); print(len(f))")
 echo "live collection version: $live_version | items: $n_items"
 [ "$live_version" = "$VERSION" ] || { echo "RELEASE INCOMPLETE: live version != $VERSION" >&2; exit 1; }
 
@@ -92,7 +93,8 @@ tree = ast.parse(open(sys.argv[1]).read())
 declared = next(ast.literal_eval(n.value) for n in tree.body if isinstance(n, ast.Assign)
                 and any(getattr(t, 'id', None) == 'FIELD_PREFIXES' for t in n.targets))
 feats = json.load(sys.stdin)['features']
-assert len(feats) < 1000, 'search page full: this check would see part of the catalogue'
+if len(feats) >= 1000:
+    sys.exit('search page full: this check would see part of the catalogue')
 need = {'newgraph:region', 'uav:stream_name'}
 orphans = [f['id'] for f in feats if not need <= f.get('properties', {}).keys()]
 if orphans:
@@ -128,7 +130,8 @@ from urllib.parse import urlsplit, unquote
 fitted = {(r['region'], r['watershed'], r['year'], r['item']) for r in csv.DictReader(open(sys.argv[1]))
           if r['status'] == 'fitted'}
 feats = json.load(sys.stdin)['features']
-assert len(feats) < 1000, 'search page full: this check would see part of the catalogue'
+if len(feats) >= 1000:
+    sys.exit('search page full: this check would see part of the catalogue')
 wrong = []
 for f in feats:
     key = tuple(unquote(urlsplit(f['assets']['image']['href']).path).strip('/').split('/')[:4])
