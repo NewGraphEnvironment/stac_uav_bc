@@ -217,7 +217,8 @@ after the tag.
 
 332 `.qgs`/`.qgz` files under `~` (Library, Trash, node_modules and `.git` pruned; `.qgz`
 read through `unzip -p`): **0 name `imagery-uav-bc-prod`**. The issue's count was 301 of a
-narrower tree. Other machines: Al's counts, before the drop.
+narrower tree. Other machines, Al's counts: **m1** (2026-10-16) 141 projects, 0 of the `.qgs` name
+the old id (the simple one-liner he ran does not open `.qgz`).
 
 ## Code-check rounds (branch mode)
 

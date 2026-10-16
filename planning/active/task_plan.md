@@ -141,7 +141,8 @@ Decided with Al at the plan gate (2026-10-16): this session runs the cutover, an
 - [ ] The thirteen PRs merged (all MERGEABLE/CLEAN at 21:03Z; the auto-mode classifier refused
       `gh pr merge` as a merge without review, so Al merges them)
 - [ ] QGIS count on each other machine that holds projects (hand Al the one-liner; this machine:
-      0 of 301 name the id); each machine's number recorded before the drop
+      332 projects, 0 name the id; m1, 2026-10-16: 141 projects, 0 of the `.qgs` name it, `.qgz`
+      not read by the simple one-liner); each machine's number recorded before the drop
 
 ## Phase 6: Drop the old collection, release
 
