@@ -612,9 +612,8 @@ def check_table(rows, root, prod, cog):
     that changed after it needs a release). Each line ends with its remedy; a run
     writes rows and never deletes one."""
     drift = [f"{'/'.join(k)}: published, no row: run the script on it" for k in published_keys(prod) if k not in rows]
-    copies = ((cog, "COG", "delete the dataset's COG copy, then fit it again and release"),
-              (prod, "published", "delete the dataset's COG and prod copies, then fit it again and release "
-                                  "(the publish cannot rebuild items the collection links)"))
+    copies = ((cog, "COG", "follow the re-stitch recipe (scripts/config/README.md)"),
+              (prod, "published", "follow the re-stitch recipe (scripts/config/README.md)"))
     for k, r in rows.items():
         name, raw = "/".join(k), root.joinpath(*k)
         for tree, what, remedy in copies:
@@ -624,8 +623,17 @@ def check_table(rows, root, prod, cog):
                     why = published_matches(raw / tif, pub, dataset_rng(k))
                     if why:
                         drift.append(f"{name}: {what} {tif.name} is not shown to be the raw tree's ({why}): {remedy}")
+        # The dataset's items are the JSONs named for its rasters, as item_create.py
+        # names them; any other JSON under the dir is a leftover (an old id after a
+        # rename) that no rebuild rewrites, so its remedy is a delete, not a release.
         want = item_fields(r)
-        for j in (sorted(prod.joinpath(*k).rglob("*.json")) if prod.joinpath(*k).is_dir() else []):
+        pdir = prod.joinpath(*k)
+        items = {pdir / tif.parent / ("-".join(k + tif.parent.parts + (tif.stem,)) + ".json")
+                 for tif in RASTERS if (pdir / tif).is_file()}
+        for j in (sorted(pdir.rglob("*.json")) if pdir.is_dir() else []):
+            if j not in items:
+                drift.append(f"{name}: {j.name} is not an item of this dataset's rasters: delete it (rename recipe, step 2)")
+                break
             have = {f: v for f, v in json.load(open(j)).get("properties", {}).items() if f.startswith("alignment:")}
             if have != want:
                 drift.append(f"{name}: item {j.name} does not carry the row's alignment: fields (row {r['status']}): "
@@ -902,25 +910,37 @@ def _selftest():
         # The items beside the published rasters are read back against the row: an
         # item is written from the table once, so a row that changed after the build
         # (a re-fit, a new default) needs a release, and --check says so.
-        jdir = s_pub / "odm_dem"
-        (jdir / "s-dtm.json").write_text(json.dumps({"properties": {"uav:stream_name": "x"}}))
-        check(not any("item s-dtm.json" in d for d in check_table(again, root, prod, cog)),
+        jdir, s_item = s_pub / "odm_dem", "p-q-2024-s-odm_dem-dtm.json"  # named as item_create.py names it
+        (jdir / s_item).write_text(json.dumps({"properties": {"uav:stream_name": "x"}}))
+        check(not any(f"item {s_item}" in d for d in check_table(again, root, prod, cog)),
               "--check on an item with no alignment: fields beside a no_reference row")
-        (jdir / "s-dtm.json").write_text(json.dumps({"properties": {"alignment:reference": "093/093g/2024"}}))
-        check(any("item s-dtm.json" in d for d in check_table(again, root, prod, cog)),
+        (jdir / s_item).write_text(json.dumps({"properties": {"alignment:reference": "093/093g/2024"}}))
+        check(any(f"item {s_item}" in d for d in check_table(again, root, prod, cog)),
               "--check blind to alignment: fields on an item whose row is not fitted")
+        (jdir / s_item).write_text(json.dumps({"properties": {}}))
+        # A JSON named for no raster of the dataset (an old id after a rename) is a
+        # leftover to delete, not a stale item a release would rewrite.
+        (jdir / "p-q-2024-s_OLD-odm_dem-dtm.json").write_text(json.dumps({"properties": {}}))
+        stray = [d for d in check_table(again, root, prod, cog) if "p-q-2024-s_OLD" in d]
+        check(len(stray) == 1 and "delete it" in stray[0], f"--check on a leftover JSON under a dataset: {stray}")
+        (jdir / "p-q-2024-s_OLD-odm_dem-dtm.json").unlink()
         v = ("r", "w", "2026", "v")
         v_raw, v_pub = root.joinpath(*v), prod.joinpath(*v)
         (v_raw / LAZ).parent.mkdir(parents=True)
         las.write(str(v_raw / LAZ))
         again[v] = dict(row, reference="093/093g/2024", model="quadratic", mask="none", **dict(zip(KEY, v)),
                         **dict(zip(CLOUD, map(str, cloud_header(v_raw / LAZ)))))
-        (v_pub / "odm_dem").mkdir(parents=True)
-        (v_pub / "odm_dem" / "v-dtm.json").write_text(json.dumps({"properties": item_fields(again[v])}))
+        for d in (v_raw, v_pub):
+            (d / DTM).parent.mkdir(parents=True)
+            with rasterio.open(str(d / DTM), "w", driver="GTiff", height=40, width=40, count=1, dtype="float32",
+                               crs="EPSG:32610", transform=Affine(1.0, 0.0, x0, 0.0, -1.0, y1), nodata=-9999.0) as w:
+                w.write(dtm_s, 1)
+        v_item = "r-w-2026-v-odm_dem-dtm.json"
+        (v_pub / "odm_dem" / v_item).write_text(json.dumps({"properties": item_fields(again[v])}))
         check(not any(d.startswith("r/w/2026/v") for d in check_table(again, root, prod, cog)),
               "--check on an item carrying exactly the fitted row's fields")
         again[v]["misfit_m"] = str(float(again[v]["misfit_m"]) + 0.5)
-        check(any(d.startswith("r/w/2026/v: item v-dtm.json") for d in check_table(again, root, prod, cog)),
+        check(any(d.startswith(f"r/w/2026/v: item {v_item}") for d in check_table(again, root, prod, cog)),
               "--check blind to a fitted row that changed after its items were built")
 
     # The fit's own DTM check: the dataset's DTM must sit on the cloud it is fitted
