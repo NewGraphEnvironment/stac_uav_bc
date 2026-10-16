@@ -21,9 +21,10 @@
 #
 # Guards, each refusing toward not deleting:
 #   - the id stacs.toml names is never a target (the live collection)
-#   - --yes refuses unless the API serves the configured collection and pgstac holds at
-#     least as many items in it as in the target: the new collection is live before the
-#     old one goes, never the reverse
+#   - --yes refuses unless the API serves the configured collection and every item id in
+#     the target has an item in it: the new collection is live and holds what the old one
+#     holds before the old one goes, never the reverse (a count would also pass a sibling
+#     catalogue on the shared database; id containment passes only the renamed one)
 #   - an id outside [A-Za-z0-9_-] or a db outside [A-Za-z0-9_] refuses (both reach SQL)
 #   - a count that does not read as a number refuses
 # An absent collection is "nothing to do" (exit 0); a row with no items is said as such.
@@ -47,13 +48,19 @@ pg_query() {  # SQL on stdin -> rows on stdout
   ssh "$HOST" "docker exec -i geoserv-db psql -U stac -d $DB -tA -v ON_ERROR_STOP=1"
 }
 ssh_probe() { ssh -o BatchMode=yes -o ConnectTimeout=10 "$HOST" true 2>/dev/null; }
-api_status() { curl -s -o /dev/null -w '%{http_code}' --max-time 30 "$1"; }
+# curl prints 000 and exits non-zero on a transport failure; without the fallback the
+# assignment ends the script under set -e with no message, after the delete as well as before.
+api_status() { curl -s -o /dev/null -w '%{http_code}' --max-time 30 "$1" || echo 000; }
 
 count_items() {
   printf "select count(*) from pgstac.items where collection = '%s';\n" "$1" | pg_query | tr -d '[:space:]'
 }
 count_rows() {
   printf "select count(*) from pgstac.collections where id = '%s';\n" "$1" | pg_query | tr -d '[:space:]'
+}
+count_missing() {  # target, live: target item ids with no item of that id in live
+  printf "select count(*) from pgstac.items t where t.collection = '%s' and not exists (select 1 from pgstac.items l where l.collection = '%s' and l.id = t.id);\n" "$1" "$2" \
+    | pg_query | tr -d '[:space:]'
 }
 
 main() {
@@ -116,14 +123,16 @@ print(tr["host"], tr["db"], c["api"].rstrip("/"), c["collection_id"])' "$CONFIG"
   fi
 
   # Never delete first, as a check rather than a rule: the configured collection is
-  # served, and holds at least as many items as the one about to go.
-  local LIVE_STATUS LIVE_COUNT
+  # served, and holds an item for every item id the one about to go holds. A count would
+  # pass any smaller sibling on the shared database; containment passes the renamed one.
+  local LIVE_STATUS MISSING
   LIVE_STATUS=$(api_status "$API/collections/$LIVE_ID")
   [ "$LIVE_STATUS" = "200" ] \
     || refuse "$API/collections/$LIVE_ID answers HTTP $LIVE_STATUS, not 200: register the live collection before dropping $TARGET"
-  LIVE_COUNT=$(count_items "$LIVE_ID" || true); numeric "the item count of $LIVE_ID" "$LIVE_COUNT"
-  [ "$LIVE_COUNT" -ge "$COUNT" ] \
-    || refuse "$LIVE_ID holds $LIVE_COUNT item(s), fewer than $TARGET's $COUNT: the live collection is not complete"
+  MISSING=$(count_missing "$TARGET" "$LIVE_ID" || true)
+  numeric "the count of $TARGET item ids absent from $LIVE_ID" "$MISSING"
+  [ "$MISSING" -eq 0 ] \
+    || refuse "$MISSING of $TARGET's $COUNT item id(s) have no item in $LIVE_ID: the live collection does not hold what $TARGET holds"
 
   echo "deleting $TARGET ($COUNT items) ..."
   printf "select pgstac.delete_collection('%s');\n" "$TARGET" | pg_query > /dev/null
@@ -158,22 +167,26 @@ db = "stac"
 TOML
   LOG="$td/sql.log"
   # Stubs: nothing leaves this machine. pg_query answers from the SQL it is given and
-  # records every statement; once a delete_collection has been seen, the target is gone.
+  # records every statement; once a delete_collection has been seen, the target is gone,
+  # unless STUB_STICKY says the delete did not take (rows stay) or STUB_STICKY_API says
+  # the API still serves it, so the read-back guards have a case that can fail them.
   ssh_probe() { :; }
+  deleted() { [ "$STUB_STICKY" -eq 0 ] && grep -q delete_collection "$LOG"; }
   pg_query() {
     local sql; sql=$(cat); echo "$sql" >> "$LOG"
     case "$sql" in
       *delete_collection*) echo "" ;;
+      *"not exists"*) echo "$STUB_MISSING" ;;
       *"collection = '$STUB_LIVE'"*) echo "$STUB_LIVE_COUNT" ;;
-      *"collection = '"*) if grep -q delete_collection "$LOG"; then echo 0; else echo "$STUB_COUNT"; fi ;;
-      *"collections where id = '"*) if grep -q delete_collection "$LOG"; then echo 0; else echo "$STUB_ROWS"; fi ;;
+      *"collection = '"*) if deleted; then echo 0; else echo "$STUB_COUNT"; fi ;;
+      *"collections where id = '"*) if deleted; then echo 0; else echo "$STUB_ROWS"; fi ;;
       *) echo "" ;;
     esac
   }
   api_status() {
     case "$1" in
       */collections/"$STUB_LIVE") echo "$STUB_LIVE_STATUS" ;;
-      *) if grep -q delete_collection "$LOG"; then echo 404; else echo 200; fi ;;
+      *) if [ "$STUB_STICKY_API" -eq 0 ] && grep -q delete_collection "$LOG"; then echo 404; else echo 200; fi ;;
     esac
   }
   local fails=0
@@ -192,6 +205,7 @@ TOML
     fi
   }
   STUB_LIVE=stac-live-bc; STUB_LIVE_COUNT=245; STUB_LIVE_STATUS=200; STUB_COUNT=245; STUB_ROWS=1
+  STUB_MISSING=0; STUB_STICKY=0; STUB_STICKY_API=0
   run "a suspicious id refuses" 1 "suspicious collection id" 0 "bad;id"
   run "the configured (live) id refuses" 1 "is the collection" 0 "stac-live-bc"
   run "report mode deletes nothing" 0 "Nothing deleted" 0 "stac-old-bc"
@@ -207,10 +221,19 @@ TOML
   STUB_ROWS=1; STUB_COUNT=245
   STUB_LIVE_STATUS=404
   run "--yes refuses while the live collection is not served" 1 "not 200" 0 --yes "stac-old-bc"
-  STUB_LIVE_STATUS=200; STUB_LIVE_COUNT=10
-  run "--yes refuses while the live collection holds fewer items" 1 "fewer than" 0 --yes "stac-old-bc"
-  STUB_LIVE_COUNT=245
+  STUB_LIVE_STATUS=000
+  run "--yes refuses when the API cannot be reached" 1 "HTTP 000, not 200" 0 --yes "stac-old-bc"
+  STUB_LIVE_STATUS=200; STUB_MISSING=3
+  run "--yes refuses while the live collection lacks target ids" 1 "have no item in" 0 --yes "stac-old-bc"
+  STUB_MISSING="ERROR: relation"
+  run "--yes refuses an unreadable containment count" 1 "could not read" 0 --yes "stac-old-bc"
+  STUB_MISSING=0
   run "--yes deletes once and reads back 0, 0, 404" 0 "OK — deleted" 1 --yes "stac-old-bc"
+  STUB_STICKY=1
+  run "a delete that did not take is reported" 1 "still reads items=245" 1 --yes "stac-old-bc"
+  STUB_STICKY=0; STUB_STICKY_API=1
+  run "an API still serving the target after the delete is reported" 1 "not 404" 1 --yes "stac-old-bc"
+  STUB_STICKY_API=0
   printf '[catalogue]\napi = "https://api.example"\ncollection_id = "stac-live-bc"\n[transport]\nhost = "root@example"\ndb = "stac; drop"\n' > "$td/bad.toml"
   : > "$LOG"
   if (main --config "$td/bad.toml" "stac-old-bc") > /dev/null 2>&1; then

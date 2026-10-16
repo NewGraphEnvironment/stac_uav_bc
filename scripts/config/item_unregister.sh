@@ -31,10 +31,13 @@ for id in "$@"; do
   case "$id" in
     *[!A-Za-z0-9_-]*) echo "ERROR: suspicious item id: $id" >&2; exit 1 ;;
   esac
+  # The collection is passed: pgstac's delete_item deletes RETURNING ... INTO STRICT, so
+  # while two collections hold the same id (a rename's window, #48) the one-argument
+  # form matches two rows, raises, and the EXCEPTION arm reports it as missing.
   cat >> "$TMP" << SQL
 DO \$\$
 BEGIN
-  PERFORM pgstac.delete_item('$id');
+  PERFORM pgstac.delete_item('$id', '$CID');
   RAISE NOTICE 'deleted: $id';
 EXCEPTION WHEN OTHERS THEN
   RAISE WARNING 'not deleted (missing?): $id';

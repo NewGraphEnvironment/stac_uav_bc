@@ -56,10 +56,11 @@ Decided with Al at the plan gate (2026-10-16): this session runs the cutover, an
       from `stacs.toml`; header states the cascade cost and that the old id has no recovery after
       the cutover (the new id's is `catalogue_release.sh`)
 - [x] Guards: id and db allowlists (`[A-Za-z0-9_-]`, `[A-Za-z0-9_]`); refuses the id the toml names;
-      `--yes` refuses unless `<api>/collections/<toml id>` answers 200 and pgstac holds at least
-      the target's count in it; ssh reachability probe (`BatchMode`); an unreadable count refuses,
-      toward not deleting; an absent collection is "nothing to do", exit 0, and a row with no items
-      is said as such; the count printed is read before asking
+      `--yes` refuses unless `<api>/collections/<toml id>` answers 200 and every target item id has
+      an item in the live collection (round 1: a count would pass a smaller sibling); ssh
+      reachability probe (`BatchMode`); an unreadable count refuses, toward not deleting; an
+      absent collection is "nothing to do", exit 0, and a row with no items is said as such; the
+      count printed is read before asking; a curl transport failure reports `000` (round 1)
 - [x] After `--yes`: re-read both counts (items 0, row 0) and curl the old id for 404, exit
       non-zero on anything else; `item_unregister.sh`'s verify line reads api and collection id from
       `stacs.toml` (no literal)

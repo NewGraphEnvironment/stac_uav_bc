@@ -213,6 +213,37 @@ after the tag.
   that one case fails. Report mode on the real database: `imagery-uav-bc-prod` 245 items,
   nothing deleted; `stac-imagery-uav-bc` refused as the configured collection.
 
+### QGIS projects, this machine (2026-10-16 20:08Z)
+
+332 `.qgs`/`.qgz` files under `~` (Library, Trash, node_modules and `.git` pruned; `.qgz`
+read through `unzip -p`): **0 name `imagery-uav-bc-prod`**. The issue's count was 301 of a
+narrower tree. Other machines: Al's counts, before the drop.
+
+## Code-check rounds (branch mode)
+
+### Round 1 (spawned 20:05Z, delivered 20:16Z; `review-round1.md`)
+
+Four findings, all fixed; the first was the sharpest.
+
+- `item_unregister.sh` called `pgstac.delete_item('<id>')` with one argument. During the window
+  both collections hold the same 245 ids, and the function deletes `RETURNING * INTO STRICT`
+  (read off the host, pgstac 0.9.8), so two rows raise, the DO block's `EXCEPTION` arm swallows
+  it, and the script prints "not deleted (missing?)" with exit 0. Every retraction and re-stitch
+  recipe would have been inert until the drop. Fixed: the collection id from `stacs.toml` is
+  passed, so it deletes from the live collection only.
+- The `--yes` guard compared counts (`live >= target`), which a smaller sibling on the shared
+  database would pass. Replaced by id containment: the number of target item ids with no item in
+  the live collection must read 0. Probed on the real database: 245 of the old id's items are
+  absent from the (unregistered) new collection today, and 23 of 23 floodplains items are absent
+  from the old one, so the guard refuses both.
+- The selftest could not see a delete that did not take (the stub answered 0/0/404 after any
+  logged delete): three mutants stayed green. Added sticky stubs and four cases (unreachable API,
+  unreadable containment count, rows that survive the delete, an API that still serves the
+  target). Now 15 cases; five mutants (read-back, 404 check, `numeric` on the containment count,
+  the configured-id guard, the containment compare) each go red on exactly one case.
+- `api_status` let curl's transport failure end the script under `set -e` with no message, after
+  the delete as well as before; it now prints `000` and the comparison reports it.
+
 ## Errors Encountered
 
 | Error | Resolution |

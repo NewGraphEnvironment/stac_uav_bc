@@ -130,8 +130,8 @@ zero items on 2026-08-29.
    id keeps serving meanwhile.
 4. `scripts/config/collection_unregister.sh <old-id>` reports the count, which must be the whole
    catalogue (anything else means something still writes to the old id); then `--yes`, which
-   refuses unless the configured collection is served with at least as many items, deletes, and
-   checks items 0, row 0 and a 404 from the API. pgstac's cached `/search` bodies naming the old
+   refuses unless the configured collection is served and holds an item for every item id the old
+   one holds, deletes, and checks items 0, row 0 and a 404 from the API. pgstac's cached `/search` bodies naming the old
    id are harmless and stay.
 5. Release commit on main: NEWS heading, `git tag`, and `curl <api>/collections/<id>` reads the
    version.
@@ -150,7 +150,8 @@ ODM carves the flight into ~250-image submodels (100 m overlap), processes each 
 
 - **s3://imagery-uav-bc has ACLs disabled** — public read comes from the bucket policy. Never pass `--acl`; `put-object-acl` fails with `AccessControlListNotSupported`.
 - **TiTiler caches failed lookups**: if a COG is probed before its upload finishes, GDAL caches the 403 and the URL stays broken. Fix: `ssh root@146.190.12.8 docker restart geoserv-titiler`.
-- Collection deletion is `scripts/config/collection_unregister.sh` (#48), the one script here that destroys a collection: it reports first, deletes with `--yes`, refuses the collection `stacs.toml` names, and refuses `--yes` while the configured collection is not served with at least as many items. A full rebuild from the registry and the bucket is `scripts/catalogue_release.sh`.
+- Collection deletion is `scripts/config/collection_unregister.sh` (#48), the one script here that destroys a collection: it reports first, deletes with `--yes`, refuses the collection `stacs.toml` names, and refuses `--yes` while the configured collection is not served or lacks an item for any item id the target holds. A full rebuild from the registry and the bucket is `scripts/catalogue_release.sh`.
+- `item_unregister.sh` passes the collection to `pgstac.delete_item`: while two collections hold the same item ids (a rename's window), the one-argument form matches two rows, raises, and reports the item as missing.
 
 ---
 

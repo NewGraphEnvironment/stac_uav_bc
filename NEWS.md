@@ -25,8 +25,9 @@ ids, the S3 bucket, every asset href and download link, and the asset key `image
 - The rename rides on `catalogue_release.sh`: `stacs.toml` is the id's one source,
   `item_create.py --rebuild` stamps it, and a publish refuses a prod tree that names another id.
   The drop is `scripts/config/collection_unregister.sh`, which reports before it deletes, refuses
-  the live collection, and refuses while the live collection is not served with at least as many
-  items (the recipe is in `scripts/config/README.md`).
+  the live collection, and refuses while the live collection is not served or lacks an item for
+  any item id the old one holds (the recipe is in `scripts/config/README.md`). While both
+  collections serve, `item_unregister.sh` deletes from the live one only.
 
 ### Item fields move off `nge:` (#38)
 

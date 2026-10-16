@@ -22,3 +22,5 @@
 - Phase 3: README.Rmd (new id in the prose and the three searches, QGIS note, figure caption,
   scripts table), qmd and research doc, NEWS v2.0.0 entry (rename, #38 pairs, registry
   corrections, #41). README.md and index.html render after the cutover
+- Draft PR #50 opened (phases 4–6 pending); round 1 of `/code-check branch` spawned 20:05Z
+- Round 1 (4 findings, all fixed, see findings): delete_item gets the collection; containment guard; sticky-stub selftest cases (15); api_status 000
