@@ -175,8 +175,9 @@ Eight stream-name corrections: `125000_parsnip_trib_arctic` (case), `125179_miss
 name_source cleared), `buck_bob_buc78` (+ "Bob Creek"), `maxan_foxy_confluence` (+ "Foxy Creek"),
 `198000_mcbride_nanikafsr` (+ "McBride Lake"), `8478_mcdonell_trib` ("Tributary to McDonell
 Lake"), `8525_coal_trib` ("Tributary to Coal Creek"). The spreadsheet save also upper-cased every
-`published` cell and dropped the trailing newline; both normalised in the Phase 0 commit
-(`item_create.py` lower-cases `published` and `csv.DictReader` reads either). The two `199663`
+`published` cell, wrote LF line endings where the committed file has CRLF, and dropped the trailing
+newline; all three normalised back in the Phase 0 commit (`item_create.py` lower-cases
+`published` and `csv.DictReader` reads either), so the diff is the eight rows. The two `199663`
 rows keep "Tributary to Parsnip River" as Al saved them.
 
 ### Plan review (one Plan agent, 2026-10-16, synchronous)

@@ -8,3 +8,5 @@
 - Scaffolded PWF baseline from issue #48 with approved phases
 - Phase 0 baseline verify of the old id: IN SYNC 245 (19:50Z), log under `evidence/`
 - Next: Phase 0 (commit sites.csv, record findings, file the viewer.html issue), then Phase 1
+- Phase 0: committed Al's eight `sites.csv` stream-name corrections (booleans, CRLF and trailing
+  newline restored so the diff is the eight rows); `item_create.py --selftest` PASS

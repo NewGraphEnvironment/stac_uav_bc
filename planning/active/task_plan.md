@@ -17,13 +17,13 @@ Decided with Al at the plan gate (2026-10-16): this session runs the cutover, an
 
 ## Phase 0: Baseline, before anything moves
 
-- [ ] `scripts/stacs.sh verify --config stacs.toml --out-dir <dir>` on the old id prints
+- [x] `scripts/stacs.sh verify --config stacs.toml --out-dir <dir>` on the old id prints
       `IN SYNC: 245` (before `stacs.toml` changes; path in `findings.md`), so "the rename lost
       items" and "already behind" stay distinguishable
-- [ ] Commit Al's `data/sites.csv` edits: `published` back to lower case and the trailing newline
-      restored (the file's convention; `item_create.py` reads either), leaving the eight stream-name
-      corrections as the diff; `item_create.py --selftest` green
-- [ ] Record in `findings.md`: the live title in both places, the 320 cached searches (0 with
+- [x] Commit Al's `data/sites.csv` edits: `published` back to lower case, CRLF and the trailing
+      newline restored (the file's convention; `item_create.py` reads either), leaving the eight
+      stream-name corrections as the diff; `item_create.py --selftest` green
+- [x] Record in `findings.md`: the live title in both places, the 320 cached searches (0 with
       metadata), the GitHub hit list, items by collection (245), the tile route measured
 - [ ] File the `scripts/viewer.html` pre-2.0 titiler route as its own issue (side finding)
 
