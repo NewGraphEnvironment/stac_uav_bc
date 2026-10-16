@@ -64,7 +64,7 @@ Two commands with a human QC gate between them:
 3. Fit to LidarBC — `uv run scripts/dataset_align-lidarbc.py <project-dir>...` (~30 s per dataset; writes the dataset's row to `data/alignment_lidarbc.csv`, which the publish commits with the registry row; `item_create.py` refuses a dataset with no row)
 4. Publish — `scripts/dataset_publish.sh <project-dir>...` (COG convert + validate → prod tree → items with flight datetimes → whole-tree `stacs validate` + `audit --expect` → durable S3 upload → collection extent → `stacs register --mode drift` → `stacs verify`; idempotent, safe to re-run)
 
-**Re-stitching a published dataset:** delete its COG and prod copies (`imagery_uav_bc/<key>` and `stac/prod/imagery_uav_bc/<key>`) before step 4, because the publish keeps a COG that exists; then steps 2–4 again. `--check` refuses a published raster that is not the raw tree's, so a re-stitch that skipped the delete stops at step 4 rather than carrying the new cloud's fit beside the old rasters.
+**Re-stitching a published dataset:** delete its COG and prod copies (`imagery_uav_bc/<key>` and `stac/prod/imagery_uav_bc/<key>`) before step 4, because the publish keeps a COG that exists; then steps 2–4 again. `--check` refuses a published or COG-tree raster that is not the raw tree's, so a re-stitch that skipped either delete stops at step 4 rather than carrying the new cloud's fit beside the old rasters.
 
 The underlying single-purpose tools these orchestrate, for one-off use:
 

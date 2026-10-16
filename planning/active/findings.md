@@ -214,6 +214,19 @@ The gate's scope (the whole table, so an unrelated in-flight re-stitch blocks an
 
 Nothing sits above the table but the raw cloud, and every link down to the live item has a mechanical check that was shown to fire. What stays unchecked by design: the rasters' bytes on S3 against prod (the sync is the pipeline's, before #41), and whether the raw cloud is the right stitch for the images (`odm_qc.py`, before the fit).
 
+Round 3 (`review-round3.md`) checked that enumeration against the code and the live trees and found it wrong twice and short one copy. The mechanism it named: each round pinned one adjacent pair of copies through a proxy chosen for cheapness, which closed the pair in front and left open the next copy and the states the proxy cannot tell apart. Its findings, all fixed:
+
+| finding | fix | proof |
+|---|---|---|
+| **bug, inside round 2's fix:** the five windows were drawn over the bounding box; on a thin diagonal reach they all fall in the nodata collar and the comparison passes on zero cells. `bulkley_dickson_BR1-2021_BR2-2021` (fitted; DTM 13 894 × 22 976, 7 % valid): a copy of its raw DTM with every valid cell raised 1 m passed | windows drawn where the published copy holds data (its mask at an overview shape, centred on valid coarse cells); the valid cells compared are counted and fewer than 1000 is reported as its own line, not a pass | on that dataset: old placement 0 valid cells, new 20 480; the +1 m copy now reports 20 480 cells differ; fewest valid cells compared over all 243 published rasters 16 314; selftest fixture of a 600-cell collar around a 30-cell patch; `bbox_windows`, `floor_off` mutants |
+| the COG tree (`imagery_uav_bc/<key>`, which a publish reuses when the file exists) was not in the chain: delete the prod copy but not the COG copy after a re-stitch and the stale COG reaches prod under the new row | `--check` compares the COG tree's copies with the raw tree as well (`--cog`), with its own remedy | selftest: a stale COG copy is a second line; `cog_unchecked` mutant; the real check now covers 480 pairs in 18 s |
+| the row ↔ cloud tie was point count + creation date, and the date is only the processing year on ODM's files (two values over 80); ODM reclassifies the laz in place when its DEM stage is re-run, same count and date | the row records the laz size too (`cloud_bytes`, backfilled on the 80 rows with a cloud; a PDAL rewrite changes a LAZ's compressed length) | selftest: same count and date, other size → reported; `bytes_blind` mutant |
+| the three `no_cloud` datasets' rasters were skipped (`continue` before the loop) while the OK line said every published raster | rasters compared before the cloud check; the OK line says what it checked | real check OK over 83 rows |
+
+Mutants for round 3's guards (`mutants_r3.log`): eight red. Two needed a second pass: `floor_off` was green until a fixture reached the floor (copies that agree on a 25-cell patch are reported "too few to tell"), and the first `cog_unchecked` mutation was malformed and crashed instead of failing (rewritten to skip the COG entry; red on the stale COG copy).
+
+The enumeration, corrected: the copies are raw `.laz` → raw DTM/DSM/orthophoto → COG tree → prod → S3 → API. Ties: row ↔ laz by count, date and size; laz ↔ raw DTM by `check_dtm` at fit time; raw ↔ COG tree and raw ↔ prod by grid and five data-bearing windows with a floor on the cells compared; prod ↔ items by the path-key join and its refusals; prod ↔ S3 ↔ API by the pipeline's sync, register, verify and the live presence check. Each tie reads content or an identity the producer cannot keep, and each was shown to fire on the state it separates.
+
 ## Errors Encountered
 
 | Error | Resolution |

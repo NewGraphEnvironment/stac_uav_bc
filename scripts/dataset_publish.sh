@@ -40,8 +40,8 @@ TIFS="odm_orthophoto/odm_orthophoto.tif odm_dem/dtm.tif odm_dem/dsm.tif"
 [ $# -ge 1 ] || { echo "usage: $(basename "$0") project-dir [project-dir ...]" >&2; exit 1; }
 
 # The alignment table must match the trees before anything is built from it (#41):
-# a cloud re-stitched since its fit, or a published raster that is not the raw tree's
-# (the COG step below skips a COG that exists), would otherwise publish alignment:
+# a cloud re-stitched since its fit, or a published or COG-tree raster that is not
+# the raw tree's (the COG step below reuses a COG that exists), would otherwise publish alignment:
 # fields that describe another cloud, with every gate below green. Reads the laz
 # headers and samples each raster pair (seconds); laspy lives under uv, so this cannot
 # be the python3 block below.

@@ -46,9 +46,10 @@
 # refused:<reason>; a row that is not fitted carries no numbers, so nothing
 # downstream can read a guess. A run merges its rows into the table by key and
 # writes after every dataset, so an interrupted run keeps what it did. Rows
-# record the cloud's point count and date; --check reports rows whose cloud has
-# since changed, published datasets with no row, and published rasters that are
-# not the raw tree's (dataset_publish.sh and catalogue_release.sh run it first).
+# record the cloud's point count, date and size; --check reports rows whose cloud
+# has since changed, published datasets with no row, and published or COG-tree
+# rasters that are not the raw tree's (dataset_publish.sh and catalogue_release.sh
+# run it first).
 #
 # uv resolves the dependencies from the header above (no conda env has laspy):
 #   uv run scripts/dataset_align-lidarbc.py --selftest         # the gate: no network, no laz
@@ -72,6 +73,7 @@ import numpy as np
 REPO = pathlib.Path(__file__).resolve().parent.parent
 ROOT = pathlib.Path("/Users/airvine/Projects/gis/uav_imagery")  # raw tree (dataset_publish.sh's ROOT)
 PROD = ROOT / "stac" / "prod" / "imagery_uav_bc"  # published tree (item_create.py's --base)
+COG = ROOT / "imagery_uav_bc"  # COG tree (dataset_publish.sh's COG_TREE), reused by a publish when a file exists
 TABLE = REPO / "data" / "alignment_lidarbc.csv"
 API = "https://images.a11s.one/search"
 COLLECTION = "stac-elevation-bc"
@@ -85,7 +87,8 @@ KEY = ["region", "watershed", "year", "item"]
 COLUMNS = KEY + ["status", "reference", "reference_crs", "dem_ids", "model", "mask", "shift_x_m",
                  "shift_y_m", "shift_spread_m", "offset_m", "tilt_m_per_100m", "surface", "centre_x",
                  "centre_y", "dz_raw_m", "misfit_m", "misfit_masked_m", "points", "coverage",
-                 "outlier_frac", "cloud_points", "cloud_date", "run_date"]
+                 "outlier_frac", "cloud_points", "cloud_date", "cloud_bytes", "run_date"]
+CLOUD = ("cloud_points", "cloud_date", "cloud_bytes")  # what cloud_header() gives, what --check compares
 TRIAL_COLUMNS = KEY + ["model", "mask", "status", "reference", "shift_x_m", "shift_y_m", "shift_spread_m",
                        "offset_m", "tilt_m_per_100m", "misfit_m", "misfit_masked_m", "points", "outlier_frac"]
 MODELS = ("plane", "quadratic")
@@ -105,7 +108,10 @@ MIN_COVERAGE = 0.5  # share of the ground points the DEM must cover, or the tilt
 SAMPLE, SEARCH_SAMPLE = 200_000, 20_000  # points read per cloud; points per sample scoring each shift
 PAD = 25  # m of DEM read beyond the points: room for the shift search
 DTM_SAMPLE, DTM_TOL = 2000, 0.1  # the dataset's own DTM must sit on its cloud's ground
-DTM_WINDOWS, DTM_WINDOW = 5, 64  # windows of the published DTM compared with the raw tree's by --check
+# --check compares a published raster with the raw tree's on DTM_WINDOWS windows of
+# DTM_WINDOW cells drawn where the published copy holds data; fewer valid cells than
+# DTM_MIN_VALID under them is reported, not passed.
+DTM_WINDOWS, DTM_WINDOW, DTM_MIN_VALID = 5, 64, 1000
 
 
 class Refused(Exception):
@@ -304,9 +310,13 @@ def mask_points(mask, x, y, X, Y, tiles, proj_raw, proj_prod):
 # --- IO: the cloud, its DTM, the reference, the table ------------------------
 
 def cloud_header(path):
+    """Point count, creation date and file size: the row's identity for its cloud.
+    The date is only the processing year on ODM's files, and ODM reclassifies a laz
+    in place (same count, same date) when its DEM stage is re-run, so the size is
+    the one of the three a rewrite cannot keep."""
     import laspy
     with laspy.open(path) as f:
-        return int(f.header.point_count), str(f.header.creation_date or "")
+        return int(f.header.point_count), str(f.header.creation_date or ""), path.stat().st_size
 
 
 def load_cloud(path, rng):
@@ -422,7 +432,7 @@ def prepare(key, root, rng):
     proj = root.joinpath(*key)
     if not (proj / LAZ).is_file():
         return None, "no_cloud", {}
-    header = dict(zip(("cloud_points", "cloud_date"), cloud_header(proj / LAZ)))
+    header = dict(zip(CLOUD, cloud_header(proj / LAZ)))
     try:
         x, y, z, crs = load_cloud(proj / LAZ, rng)
         check_dtm(proj / DTM, x, y, z, crs, rng)
@@ -536,49 +546,66 @@ def project_key(arg, root):
 
 
 def published_matches(raw, pub, rng):
-    """None when the published raster is the raw tree's (same grid, DTM_WINDOWS windows
-    of DTM_WINDOW cells of band 1 equal), else what differs. The COG conversion keeps
-    grid and values."""
+    """None when the published raster is the raw tree's: same grid, and DTM_WINDOWS
+    windows of DTM_WINDOW cells of band 1 equal. Else what differs, or that too few
+    valid cells were compared to tell. The windows are drawn where the published copy
+    holds data (its mask at an overview shape): a thin diagonal reach is mostly nodata
+    collar, and windows over the bounding box can all fall in it and compare nothing
+    (one of the 46 fitted datasets, measured). The COG conversion keeps grid and values."""
     import rasterio
     from rasterio.windows import Window
     with rasterio.open(raw) as a, rasterio.open(pub) as b:
         if ((a.width, a.height, a.crs.to_epsg()) != (b.width, b.height, b.crs.to_epsg())
                 or not a.transform.almost_equals(b.transform)):
             return "grid differs"
-        n = 0
-        for _ in range(DTM_WINDOWS):
-            c = int(rng.integers(0, max(1, a.width - DTM_WINDOW)))
-            r = int(rng.integers(0, max(1, a.height - DTM_WINDOW)))
-            w = Window(c, r, min(DTM_WINDOW, a.width - c), min(DTM_WINDOW, a.height - r))
+        f = max(1, max(b.width, b.height) // 256)
+        shape = (max(1, b.height // f), max(1, b.width // f))
+        cells = np.flatnonzero(b.dataset_mask(out_shape=shape) > 0)
+        n = valid = 0
+        for idx in rng.choice(cells, size=min(DTM_WINDOWS, len(cells)), replace=False):
+            r0, c0 = divmod(int(idx), shape[1])
+            c = min(max(0, int((c0 + 0.5) * b.width / shape[1]) - DTM_WINDOW // 2), max(0, b.width - DTM_WINDOW))
+            r = min(max(0, int((r0 + 0.5) * b.height / shape[0]) - DTM_WINDOW // 2), max(0, b.height - DTM_WINDOW))
+            w = Window(c, r, min(DTM_WINDOW, b.width - c), min(DTM_WINDOW, b.height - r))
             va, vb = a.read(1, window=w, masked=True), b.read(1, window=w, masked=True)
             ma, mb = np.ma.getmaskarray(va), np.ma.getmaskarray(vb)
-            n += int((ma != mb).sum() + ((~ma & ~mb) & (np.abs(va.filled(0) - vb.filled(0)) > 0.01)).sum())
-    return f"{n} cells differ" if n else None
+            both = ~ma & ~mb
+            valid += int(both.sum())
+            n += int((ma != mb).sum() + (both & (np.abs(va.filled(0) - vb.filled(0)) > 0.01)).sum())
+    if n:
+        return f"{n} cells differ"
+    if valid < DTM_MIN_VALID:
+        return f"only {valid} valid cells under the windows, too few to tell"
+    return None
 
 
-def check_table(rows, root, prod):
+def check_table(rows, root, prod, cog):
     """Rows whose cloud changed since the fit, published datasets with no row, and
-    published rasters that are not the raw tree's: a row describes the raw cloud, whose
-    DTM the fit checked, and the items that carry it sit beside the published DTM, DSM
-    and orthophoto, which a re-stitch replaces together. Each line ends with its
-    remedy; a run writes rows and never deletes one."""
+    published or COG-tree rasters that are not the raw tree's: a row describes the raw
+    cloud, whose DTM the fit checked; the items that carry it sit beside the published
+    DTM, DSM and orthophoto, which a re-stitch replaces together; and a publish reuses
+    a COG copy that exists. Each line ends with its remedy; a run writes rows and never
+    deletes one."""
     drift = [f"{'/'.join(k)}: published, no row: run the script on it" for k in published_keys(prod) if k not in rows]
+    copies = ((cog, "COG", "delete the dataset's COG copy and publish it again"),
+              (prod, "published", "delete the dataset's COG and prod copies and publish it again"))
     for k, r in rows.items():
         name, raw = "/".join(k), root.joinpath(*k)
+        for tree, what, remedy in copies:
+            for tif in (DTM, DSM, ORTHO):
+                pub = tree.joinpath(*k) / tif
+                if pub.is_file() and (raw / tif).is_file():
+                    why = published_matches(raw / tif, pub, dataset_rng(k))
+                    if why:
+                        drift.append(f"{name}: {what} {tif.name} is not shown to be the raw tree's ({why}): {remedy}")
         if not (raw / LAZ).is_file():
             if r["status"] != "no_cloud":
                 drift.append(f"{name}: cloud gone, row says {r['status']}: delete the row, or rename its item with the dataset")
             continue
-        n, d = cloud_header(raw / LAZ)
-        if (str(n), d) != (r["cloud_points"], r["cloud_date"]):
-            drift.append(f"{name}: cloud is {n} points of {d}, row has {r['cloud_points']} of {r['cloud_date']}: run the script on it again")
-        for tif in (DTM, DSM, ORTHO):
-            pub = prod.joinpath(*k) / tif
-            if pub.is_file() and (raw / tif).is_file():
-                why = published_matches(raw / tif, pub, dataset_rng(k))
-                if why:
-                    drift.append(f"{name}: published {tif.name} is not the raw tree's ({why}): "
-                                 "delete the dataset's COG and prod copies and publish it again")
+        head = tuple(map(str, cloud_header(raw / LAZ)))
+        if head != tuple(r[c] for c in CLOUD):
+            drift.append(f"{name}: cloud is {head[0]} points of {head[1]}, {head[2]} bytes; row has "
+                         f"{r['cloud_points']} of {r['cloud_date']}, {r['cloud_bytes']} bytes: run the script on it again")
     return drift
 
 
@@ -743,7 +770,7 @@ def _selftest():
         p = pathlib.Path(td) / "t.csv"
         refused_row = dict(zip(KEY, ("r", "w", "2025", "h")), status="refused:too_few_points:12",
                            model="plane", mask="none", cloud_points=12, cloud_date="2025-06-01",
-                           run_date="2026-10-15")
+                           cloud_bytes=1234, run_date="2026-10-15")
         rows = {tuple(row[k] for k in KEY): row, tuple(refused_row[k] for k in KEY): refused_row}
         write_table(p, rows)
         back = read_table(p)
@@ -756,7 +783,7 @@ def _selftest():
               f"merge: {list(again)}")
         check(p.read_bytes().count(b"\r") == 0, "table written with CR")
         # --check: a row whose cloud changed, and a published dataset with no row.
-        root, prod = pathlib.Path(td) / "raw", pathlib.Path(td) / "prod"
+        root, prod, cog = pathlib.Path(td) / "raw", pathlib.Path(td) / "prod", pathlib.Path(td) / "cog"
         for k in (("a", "b", "2024", "c"), ("d", "e", "2024", "f")):
             (prod.joinpath(*k) / "odm_dem").mkdir(parents=True)
             (prod.joinpath(*k) / "odm_dem" / "dtm.tif").touch()
@@ -768,12 +795,18 @@ def _selftest():
         las.write(str(h))
         # Three drifts: a published dataset with no row, a row whose cloud changed,
         # and a fitted row whose cloud is gone.
-        drift = check_table(again, root, prod)
+        drift = check_table(again, root, prod, cog)
         want = ("d/e/2024/f: published, no row", "r/w/2025/h: cloud is 12 points of", "r/w/2026/i: cloud gone")
         check(len(drift) == 3 and all(any(w in d for d in drift) for w in want), f"--check: {drift}")
-        again[("r", "w", "2025", "h")].update(zip(("cloud_points", "cloud_date"), map(str, cloud_header(h))))
-        check(check_table(again, root, prod) == [d for d in drift if not d.startswith("r/w/2025/h")],
+        again[("r", "w", "2025", "h")].update(zip(CLOUD, map(str, cloud_header(h))))
+        check(check_table(again, root, prod, cog) == [d for d in drift if not d.startswith("r/w/2025/h")],
               "--check after the row was refreshed")
+        # A laz rewritten in place with the same count and date (ODM's reclassification)
+        # changes its size, which the row carries.
+        again[("r", "w", "2025", "h")]["cloud_bytes"] = str(int(again[("r", "w", "2025", "h")]["cloud_bytes"]) + 1)
+        check(any(d.startswith("r/w/2025/h: cloud is") for d in check_table(again, root, prod, cog)),
+              "--check blind to a laz of the same count and date but another size")
+        again[("r", "w", "2025", "h")]["cloud_bytes"] = str(h.stat().st_size)
         # A fourth: a published DTM that is not the raw tree's. The row describes the
         # raw cloud, whose DTM the fit checked; the items carry it beside the published one.
         import rasterio
@@ -781,19 +814,57 @@ def _selftest():
         s_raw, s_pub = root.joinpath(*s), prod.joinpath(*s)
         (s_raw / LAZ).parent.mkdir(parents=True)
         las.write(str(s_raw / LAZ))
-        again[s] = dict(zip(KEY, s), status="no_reference", **dict(zip(("cloud_points", "cloud_date"), map(str, cloud_header(s_raw / LAZ)))))
+        again[s] = dict(zip(KEY, s), status="no_reference", **dict(zip(CLOUD, map(str, cloud_header(s_raw / LAZ)))))
         dtm_s = (np.arange(40 * 40, dtype="float32") / 100).reshape(40, 40)
         for d, a in ((s_raw, dtm_s), (s_pub, dtm_s)):
             (d / DTM).parent.mkdir(parents=True, exist_ok=True)
             with rasterio.open(str(d / DTM), "w", driver="GTiff", height=40, width=40, count=1, dtype="float32",
                                crs="EPSG:32610", transform=Affine(1.0, 0.0, x0, 0.0, -1.0, y1), nodata=-9999.0) as w:
                 w.write(a, 1)
-        clean = check_table(again, root, prod)
+        clean = check_table(again, root, prod, cog)
         check(not any(d.startswith("p/q/2024/s") for d in clean), f"--check with the published DTM the raw tree's: {clean}")
         with rasterio.open(str(s_pub / DTM), "r+") as w:
             w.write(dtm_s + 1.0, 1)
-        stale = [d for d in check_table(again, root, prod) if d.startswith("p/q/2024/s")]
-        check(len(stale) == 1 and "published dtm.tif is not the raw tree's" in stale[0], f"--check with a stale published DTM: {stale}")
+        stale = [d for d in check_table(again, root, prod, cog) if d.startswith("p/q/2024/s")]
+        check(len(stale) == 1 and "published dtm.tif is not shown to be the raw tree's" in stale[0],
+              f"--check with a stale published DTM: {stale}")
+        # The COG copy a publish would reuse is checked too, prod copy or not.
+        (cog.joinpath(*s) / DTM).parent.mkdir(parents=True)
+        with rasterio.open(str(cog.joinpath(*s) / DTM), "w", driver="GTiff", height=40, width=40, count=1, dtype="float32",
+                           crs="EPSG:32610", transform=Affine(1.0, 0.0, x0, 0.0, -1.0, y1), nodata=-9999.0) as w:
+            w.write(dtm_s + 2.0, 1)
+        stale = [d for d in check_table(again, root, prod, cog) if d.startswith("p/q/2024/s")]
+        check(len(stale) == 2 and any("COG dtm.tif is not shown" in d for d in stale), f"--check with a stale COG copy: {stale}")
+        # Windows are drawn where the published copy holds data: a raster that is a
+        # nodata collar around a small patch (a thin reach over its bounding box) is
+        # compared on the patch, and a changed patch is reported.
+        t = ("p", "q", "2024", "u")
+        t_raw, t_pub = root.joinpath(*t), prod.joinpath(*t)
+        (t_raw / LAZ).parent.mkdir(parents=True)
+        las.write(str(t_raw / LAZ))
+        again[t] = dict(zip(KEY, t), status="no_reference", **dict(zip(CLOUD, map(str, cloud_header(t_raw / LAZ)))))
+        patch = np.full((n, n), -9999.0, dtype="float32")
+        patch[20:50, 20:50] = 500.0
+        for d in (t_raw, t_pub):
+            (d / DTM).parent.mkdir(parents=True, exist_ok=True)
+            with rasterio.open(str(d / DTM), "w", driver="GTiff", height=n, width=n, count=1, dtype="float32",
+                               crs="EPSG:32610", transform=Affine(1.0, 0.0, x0, 0.0, -1.0, y1), nodata=-9999.0) as w:
+                w.write(patch, 1)
+        check(not any(d.startswith("p/q/2024/u") for d in check_table(again, root, prod, cog)),
+              "--check on a collar around a small patch, published copy equal")
+        with rasterio.open(str(t_pub / DTM), "r+") as w:
+            w.write(np.where(patch > -9999.0, patch + 1.0, patch).astype("float32"), 1)
+        stale = [d for d in check_table(again, root, prod, cog) if d.startswith("p/q/2024/u")]
+        check(len(stale) == 1 and "cells differ" in stale[0], f"--check on a collar raster with its patch changed: {stale}")
+        # Too little data under the windows to tell is reported, never passed: a raster
+        # whose copies agree on a 5-cell patch has been compared on 25 cells.
+        patch[:] = -9999.0
+        patch[20:25, 20:25] = 500.0
+        for d in (t_raw, t_pub):
+            with rasterio.open(str(d / DTM), "r+") as w:
+                w.write(patch, 1)
+        few = [d for d in check_table(again, root, prod, cog) if d.startswith("p/q/2024/u")]
+        check(len(few) == 1 and "too few to tell" in few[0], f"--check on copies that agree on 25 cells: {few}")
 
     # The fit's own DTM check: the dataset's DTM must sit on the cloud it is fitted
     # from (the items carry the fit beside that DTM), in the cloud's CRS.
@@ -837,6 +908,7 @@ def main():
     p.add_argument("--mask", choices=MASKS, default="none")
     p.add_argument("--root", default=str(ROOT), help="raw imagery tree")
     p.add_argument("--base", default=str(PROD), help="published tree, enumerated when no project is given")
+    p.add_argument("--cog", default=str(COG), help="COG tree a publish reuses; --check compares its copies with the raw tree")
     p.add_argument("--out", default=str(TABLE), help="table to merge into")
     args = p.parse_args()
     if args.selftest:
@@ -846,13 +918,13 @@ def main():
     root, prod, out = pathlib.Path(args.root), pathlib.Path(args.base), pathlib.Path(args.out)
     rows = read_table(out)
     if args.check:
-        drift = check_table(rows, root, prod)
+        drift = check_table(rows, root, prod, pathlib.Path(args.cog))
         for line in drift:
             print(line, file=sys.stderr)
         if drift:
             sys.exit(f"ALIGN CHECK FAILED: {len(drift)} row(s), each with its remedy above")
         print(f"ALIGN CHECK OK: {len(rows)} rows, every published dataset has one, no cloud changed, "
-              "every published raster is the raw tree's")
+              "every published and COG-tree raster of a dataset with a row is the raw tree's")
         sys.exit(0)
     keys = [project_key(a, root) for a in args.projects] or published_keys(prod)
     if not keys:
