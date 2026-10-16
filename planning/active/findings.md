@@ -71,6 +71,102 @@ A shift plus a tilt, fitted robustly to LidarBC ground, brings the misfit to a m
   `rmd_on = FALSE`) and `index.html` (`rmd_on = TRUE`); the query is cached in
   `data/stac_result.rds` unless `update_query = TRUE`.
 
+## Plan review (Plan agent, 2026-10-16, 30 findings)
+
+Verified and adopted in `scripts/dataset_align-lidarbc.py` before the first full run:
+
+| finding | what changed |
+|---|---|
+| the prod tree holds **83** datasets, not 81: two Maps Made Easy datasets publish only `ortho.tif` | enumerate by any tif; those two are `no_cloud` |
+| nearest-cell DEM sampling adds slope × U(−0.5, 0.5) m per point and makes the 0.25 m search a step function | bilinear sampling, cell values at centres |
+| the fitter (L2 + trim) is not the score (NMAD): 10 research rows got worse from shift-only to shift + tilt | Huber IRLS, k = 1.345 robust scales, 5 iterations |
+| a flat site has no horizontal signal: the moose post flight gave 18.8/8.0 vs 16.5/9.3 m on two samples | the search runs on two disjoint 20k samples; > 1 m apart is `refused:shift_unstable` |
+| `n_compared >= 2000` of 200 000 is 1 % coverage; a tilt fitted on a sliver is extrapolated | `coverage` recorded; < 0.5 refused, after falling back to an older delivery |
+| the newest-year filter drops tiles (`199174_necr_trib` 2 × 2024 + 1 × 2019) | deliveries tried newest first until one covers half |
+| the shift's frame: tiles are NAD83(CSRS) UTM, clouds WGS 84 UTM, PROJ applies ~1 m between them | the shift is carried back into the cloud's CRS through the centre (exact for a translation); `reference_crs` recorded |
+| the module-level rng made every row depend on the rows before it | seeded per dataset key (crc32) |
+| the plane's centre was the mean of sampled points, unrecoverable by a reader | `surface` (all coefficients) and `centre` published |
+| geoid call silently returns 0 without the grid | dropped; the fit never used it |
+| unclassified clouds fit canopy (research: 3.3 m median) | an ODM cloud with no class 2 is `refused:no_ground_class`; Maps Made Easy clouds are not fitted |
+| nothing ties a row to the cloud it was fitted on | `cloud_points`, `cloud_date` recorded; `--check` reports drift and published datasets with no row |
+| the DTM carries the fields, the cloud is what is fitted | gate: laz CRS = DTM CRS, and median DTM − cloud ground within 0.1 m over 2000 points |
+| STAC search `limit=200` with no paging | a full page raises |
+| NaN into items: `json.dumps` writes it, pystac accepts it, pgstac does not | `item_create.py` requires every number finite |
+| the "no row" refusal belongs in the pre-loop check, filtered on `published` | done there, over the rebuild glob or the requested tifs |
+| random halves of a 50 pts/m² cloud are twins | the held-out split is a 50 m checkerboard; masks apply to the fit points only and every arm is scored on the same unmasked points |
+
+Not adopted: widening the search window once before refusing (cost ×4; no ODM flight hit the bound in the research); a report/`--write` split (a run writes the rows it computed, that is the point of running it); the Accuracy extension (plan gate). The datum step inside the shift (reviewer's blocker 3) was already handled by the inverse transform through the centre.
+
+## Gates, with each defect restored (2026-10-16)
+
+`uv run scripts/dataset_align-lidarbc.py --selftest`, 32 s, on a scratchpad copy with one line changed:
+
+| defect planted | result |
+|---|---|
+| shift sign flipped (`X - dx`) | red: shift (−3.5, 2.25) against truth (3.5, −2.25) |
+| Huber reweighting removed | red: offset 13.15 against 12.3 (the planted tenth of outliers) |
+| at-bound refusal removed | red: a 30 m shift was fitted |
+| spread refusal removed | red: a flat site was fitted |
+| coverage refusal removed | red: a flight half off the DEM was fitted |
+| table written CRLF | red |
+| `--check` blind to a changed cloud | red (after fixing the selftest, which first crashed on the shorter drift list instead of failing) |
+| nearest-cell sampling instead of bilinear | **green**: a quality choice the tolerances cannot see, not a guard |
+| mask not applied to the fit points | red: the masked fit still sees the planted outliers; 500 kept points fitted |
+| slope mask inverted (`>=`) | red: keeps 0.45 of the hill but the wrong half |
+| open mask inverted | red: keeps the half under the trees |
+| mask minimum removed | red: a mask keeping 500 points was fitted |
+
+`conda run -n titiler python scripts/item_create.py --selftest`: `alignment` removed from `FIELD_PREFIXES` (red, 4 checks), fields written for every status (red, 3), finite check removed (red, 2: `nan` and `Infinity` pass), `published=false` ignored by the no-row check (red, 2).
+
+## First fit, one dataset (2026-10-16)
+
+`fraser/cottonwood/2026/198285_pedley_lake_creek_rd`, 30 s: `dz_raw` +69.81 m (research +69.83), shift (3.0, −4.88) ± 0.25 (research 3.0, −3.75), tilt 1.27 (research 1.29), misfit 0.98 held-out (research 1.09 in-sample). The y shift moved 1.1 m with bilinear sampling and the Huber fitter; the full-set comparison is below.
+
+## First full run, and the checkerboard (2026-10-16)
+
+The first run of all 83 datasets (26 min; plane, no mask; the fit on one half of a 50 m checkerboard, the misfit scored on the other half) gave 37 fitted, 31 `no_reference`, 3 `no_cloud`, 12 refused. Against the research table, `dz_raw` reproduced to 0.03 m on every dataset, but 16 of 37 shifts differed by more than 1 m and four of those scored **worse** than the research's shift would (`8530_sandstone_mcdonell` 8.9 m apart, misfit 2.5 against 1.68).
+
+Probed by scoring the plane at both shifts with the same code (`probe_score.py`):
+
+| dataset | shift | score on the fit's own 20k sample | score on every point |
+|---|---|---|---|
+| sandstone_mcdonell | table (−1.5, 1.5) | 0.56 | **2.65** |
+| sandstone_mcdonell | research (7, −1) | 1.55 | 1.66 |
+| helps_lawson | table (−5.4, 5.5) | 0.40 | 0.48 |
+| helps_lawson | research (−2.25, 1.25) | 0.42 | 0.39 |
+| simpson_nielson | table (17.9, −19.9), at the bound | 1.33 | 1.51 |
+| simpson_nielson | research (0.75, −3.75) | 1.41 | 1.45 |
+
+The two "independent" search samples both came from the black cells, so they shared the black half's bias and the spread test could not see it; the misfit scored on the white half then reported the damage honestly. A spatial split is the wrong instrument on a GPS-only reconstruction, whose error is itself spatially structured. With 10^5 points and 3 or 6 parameters a random held-out split tests nothing either. Dropped: the fit uses every point over the DEM (as the research did), the two search samples are random draws from all of them, and every arm of the trial is scored on every point. The refusal order also changed: both samples on the window's edge is `shift_at_bound`; otherwise a spread over the cut is `shift_unstable`.
+
+That run also refused 10 datasets as `shift_unstable` at spreads of 1.1–4.9 m, mostly flat Bulkley 2025 floodplain sites. The 1 m cut was a guess; the research called 2.6 m apart "not well determined". Settled from a scan with the cut lifted (`tableA.csv`), below.
+
+## Second full run, fit on every point, spread cut lifted (2026-10-16, 29 min)
+
+47 fitted, 2 refused (the moose post flight `shift_at_bound` at (19.5, 6.25); `table_ck` `low_coverage` 0.27, no delivery covers half of it), 31 `no_reference`, 3 `no_cloud`. Against the research on the same 49 published datasets:
+
+| | research | this run (47 fitted) |
+|---|---|---|
+| median misfit | 0.82 m | **0.79 m** |
+| within 1 m | 28 | 28 |
+| within 0.5 m | 12 | 12 |
+| `dz_raw`, per dataset | | identical to 0.03 m |
+| misfit, per dataset | | median −0.01, middle half −0.02 to 0.00, worst 0.18 m |
+| tilt, per dataset | | median +0.01, worst 0.62 m/100 m |
+| shift, per dataset | | median 0, middle half ±0.4 m; 9 datasets more than 1 m apart |
+
+The nine shifts over 1 m apart sit on near-flat score valleys: `sandstone_mcdonell` scores 1.63 m at the table's (−0.4, 4.9) and 1.68 at the research's (7, −1), 9 m apart. **A site with one linear feature (a road, a bank) determines the shift across the feature, not along it, and the two-sample spread sees only sampling noise, not that ambiguity.** The misfit reports the fit's quality honestly; the shift's uncertainty along a feature is not recorded. Noted in the research doc as a limit.
+
+**The spread cut.** Spreads of the 47: 41 at or under 1.0 m, four between 1.0 and 1.3 m (`track_ck` 1.03, `fern` 1.06, `buc87b` 1.06, `station_hwy16` 1.25), then 5.5 m (`maxan_mx1`: misfit 0.73, a flat site whose vertical fit is fine and whose shift is anyone's) and 8.5 m (the moose pre flight, misfit 5.9). `MAX_SHIFT_SPREAD = 2.0` sits in the gap and under the research's 2.6 m. Expected production result: 45 fitted, 4 refused.
+
+## Production table, plane model (2026-10-16, 26 min)
+
+`data/alignment_lidarbc.csv`: 83 rows; **45 fitted**, 4 refused (`199663…11000` `shift_unstable` 8.5 m, `…post_replacement` 3.2 m, `maxan_mx1` 5.5 m; `16701523_table_ck` `low_coverage` 0.27), 31 `no_reference`, 3 `no_cloud`. Identical to the lifted-cut scan except the three rows the cut turns. `--check` OK. Over the 45: raw vertical offset median +6.0 m (absolute median 7.2 m, −96.7 to +92.2 m); horizontal shift median 3.4 m (up to 10.9 m); misfit median 0.79 m, 27 within 1 m, 12 within 0.5 m. 49 datasets sit on LidarBC (45 + 4 refused).
+
+## Offline verification of the join (2026-10-16)
+
+Prod tree mirrored into the scratchpad (245 tifs symlinked, 246 JSONs copied), `item_create.py --rebuild --base <mirror> --version 0.0.0-test`: 245 items from 245 tifs, 245 links resolve; `stacs validate` 246 validated, 0 invalid; `stacs audit --expect 245` OK. A second rebuild of the same tree with a table in which every row is `no_reference` is the control: the two builds differ only in the `alignment:` fields; every fitted dataset's three items carry identical values; no other item carries any (`mirror_check.py`). Comparing against prod itself is not possible yet: prod's items still carry the pre-#38 `nge:` fields, which the #38 release will replace.
+
 ## Errors Encountered
 
 | Error | Resolution |
