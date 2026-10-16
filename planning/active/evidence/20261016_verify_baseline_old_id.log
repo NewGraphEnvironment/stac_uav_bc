@@ -1,0 +1,18 @@
+start 2026-10-16T19:50:16Z
+collection : imagery-uav-bc-prod
+mode       : verify
+asset audit: require=image forbid=-
+fetching published collection.json ...
+published  : 245
+fetching 245 item JSON(s) with 20 workers ...
+fetched    : 245 of 245 (0 failed)
+comparing every body with the API ...
+published  : 245
+registered : 245
+missing    : 0
+orphaned   : 0
+changed    : 0
+collection : same
+IN SYNC: 245 published, all registered with the published body, no orphans
+exit=0
+end 2026-10-16T19:50:20Z

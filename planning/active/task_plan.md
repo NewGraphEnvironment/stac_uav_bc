@@ -1,0 +1,152 @@
+# Task: Rename the collection to stac-imagery-uav-bc (#48)
+
+`imagery-uav-bc-prod` is the one collection on the API outside the `stac-<product>-bc` pattern
+(`stac-airphoto-bc`, `stac-elevation-bc`, `stac-floodplains-bc`, `stac-pointcloud-bc`), and #42
+adds `stac-pointcloud-uav-bc` beside it. The `-prod` suffix names a stage no other collection has.
+Renaming is cheap here (245 items) and has a precedent: stac_dem_bc renamed `stac-dem-bc` to
+`stac-elevation-bc` on 2026-09-01 (its #34, v2.0.0, 102,460 items, no downtime).
+
+New id `stac-imagery-uav-bc`; item ids, bucket, hrefs and the `image` asset key unchanged; ships
+as v2.0.0 with #38 and #41. Order: register the new collection, verify it, keep the old one live
+through the consumer sweep, then drop it with a new `collection_unregister.sh`. Never delete first.
+
+Decided with Al at the plan gate (2026-10-16): this session runs the cutover, and his saved
+`data/sites.csv` edits ride in v2.0.0. The collection title follows the sibling pattern
+(`UAV Imagery from British Columbia - stac-imagery-uav-bc`), one field beyond the issue's
+"nothing else".
+
+## Phase 0: Baseline, before anything moves
+
+- [ ] `scripts/stacs.sh verify --config stacs.toml --out-dir <dir>` on the old id prints
+      `IN SYNC: 245` (before `stacs.toml` changes; path in `findings.md`), so "the rename lost
+      items" and "already behind" stay distinguishable
+- [ ] Commit Al's `data/sites.csv` edits: `published` back to lower case and the trailing newline
+      restored (the file's convention; `item_create.py` reads either), leaving the eight stream-name
+      corrections as the diff; `item_create.py --selftest` green
+- [ ] Record in `findings.md`: the live title in both places, the 320 cached searches (0 with
+      metadata), the GitHub hit list, items by collection (245), the tile route measured
+- [ ] File the `scripts/viewer.html` pre-2.0 titiler route as its own issue (side finding)
+
+## Phase 1: The id has one source: `stacs.toml` → `item_create.py`
+
+- [ ] `stacs.toml`: `collection_id = "stac-imagery-uav-bc"`; header says `item_create.py` stamps it
+      on `--rebuild` and refuses a tree that disagrees (no longer "change them together")
+- [ ] `item_create.py`: read `[catalogue] collection_id` from `stacs.toml` (tomllib); on `--rebuild`
+      set `collection.id` and `collection.title` (`COLLECTION_TITLE = "UAV Imagery from British
+      Columbia - {id}"`) before any item is built; additive mode refuses when the tree's
+      `collection.json` id differs from the toml's, naming the release recipe; header comment
+      names the new id
+- [ ] `dataset_publish.sh`: the same toml-vs-tree id check beside the alignment pre-check
+      (`:62-69`), before the COG conversion spends its minutes
+- [ ] `--selftest`: the toml read, a rebuild-style stamp on a temp collection (id, title, root link
+      title, an item's `collection` and link titles), the additive refusal; restore-the-bug: drop
+      the stamp, selftest red
+- [ ] Offline mirror of the prod tree (symlinked tifs, copied JSONs, as #38 did):
+      `--rebuild --base <mirror> --version 2.0.0`, then `grep -rl imagery-uav-bc-prod <mirror>`
+      returns nothing and 246 files name the new id; items differ from prod only in `collection`,
+      the three link titles, the `alignment:` fields #41 added and the registry fields Al's edits
+      changed; `stacs validate` and `audit --config stacs.toml --expect 245` pass
+
+## Phase 2: `collection_unregister.sh`, the drop path (written now, run in Phase 6)
+
+- [ ] `scripts/config/collection_unregister.sh [--config <toml>] <id>` reports (item count,
+      collection row, which toml and id it read) and deletes nothing; `--yes <id>` runs
+      `pgstac.delete_collection` over the same ssh/psql path as `item_unregister.sh`; host and db
+      from `stacs.toml`; header states the cascade cost and that the old id has no recovery after
+      the cutover (the new id's is `catalogue_release.sh`)
+- [ ] Guards: id and db allowlists (`[A-Za-z0-9_-]`, `[A-Za-z0-9_]`); refuses the id the toml names;
+      `--yes` refuses unless `<api>/collections/<toml id>` answers 200 and its search count is at
+      least the target's; ssh reachability probe (`BatchMode`); an unreadable count refuses, toward
+      not deleting; an absent collection is "nothing to do", exit 0, and a row with no items is
+      said as such; the count printed is read before asking
+- [ ] After `--yes`: re-read both counts (items 0, row 0) and curl the old id for 404, exit
+      non-zero on anything else; `item_unregister.sh`'s verify line reads api and collection id from
+      `stacs.toml` (no literal)
+- [ ] `--selftest`: the one remote call sits behind a `pg_query` function, and the selftest
+      redefines it with a stub that returns canned counts and logs every SQL it receives; cases:
+      suspicious id, configured id, unreadable count, report mode sends no `delete_collection`,
+      `--yes` with the configured collection absent refuses; restore-the-bug on the configured-id
+      guard
+- [ ] `scripts/config/README.md`: the "collection deletion is server-side" gotcha names the script;
+      a "Renaming the collection" recipe (register new → verify → sweep → drop; the safe
+      invocation in the version window) beside the dataset-rename recipe; `CLAUDE.md`'s
+      `scripts/config/` line names the script
+
+## Phase 3: Docs, NEWS, README source (the render waits for Phase 4)
+
+- [ ] `README.Rmd`: the prose at line 75 and the three `collections =` → new id; QGIS section: a
+      saved connection re-adds the collection (listed by its new title) after the rename, layers
+      keep working; `fig/a11sone01.png` captioned as the pre-rename picker
+- [ ] `stac_create_collection.qmd:50` → new id, with a note that `--rebuild` stamps it from
+      `stacs.toml`; `research/uav_pointclouds.md:102` → new id
+- [ ] `NEWS.md` Unreleased becomes the v2.0.0 entry (heading dated at the release): the rename
+      first (old → new id and title; unchanged: item ids, bucket, hrefs, `image`; what a consumer
+      changes: `collections =`, QGIS re-add, anything reading an item's `collection` field; the
+      static S3 catalogue names the new id from the release date, the API serves both until the
+      drop date, the old frozen at 1.0.4; the drop date filled in Phase 6), then #38's old → new
+      field pairs, then the registry corrections from Al's edits (each a title and
+      `uav:stream_name` change), then #41's text
+- [ ] `/code-check branch`; open the PR as draft with Phases 4–6 listed as pending
+
+## Phase 4: Cutover: register the new collection, old stays live
+
+- [ ] Pre-flight: tree clean and committed; `item_create.py --selftest`,
+      `dataset_align-lidarbc.py --selftest`, `collection_unregister.sh --selftest` green;
+      `git fetch` and re-read `origin/main`
+- [ ] `EXPECT_ITEMS=245 scripts/catalogue_release.sh 2.0.0` from the branch: rebuild → `--check` →
+      validate + audit → sync → `stacs register --mode drift` (collection first, then 245) →
+      `stacs verify` IN SYNC → version 2.0.0, 245 items, registry, field and alignment coverage OK
+- [ ] Verify by hand, saved to `findings.md`: `/collections/stac-imagery-uav-bc` serves the new
+      title and 245 via search; the old id still serves 245 at 1.0.4; pgstac items by collection
+      245 + 245; an rstac query from R against the new id returns 245 features; the tile:
+      `/stac/WebMercatorQuad/tilejson.json?url=<new-collection item URL>&assets=image`, then one
+      tile at its minzoom, HTTP 200 `image/png`, bytes > 0
+- [ ] Render `README.Rmd` with `update_query = TRUE` (regenerates `data/stac_result.rds` from the
+      new collection: the client gate), then README.md and index.html; commit
+- [ ] Edit the issue body: the title deviation; the 320 cached searches are the API's query cache,
+      not mosaics, left as the 988 `stac-dem-bc` rows were; `restoration_wedzin_kwa_2024` added
+      to the sweep; the static-catalogue flip date
+
+## Phase 5: The consumer sweep (one PR per repo; merged after Phase 4, before Phase 6)
+
+- [ ] `git fetch` every cloned consumer first; clone `stac_floodplains_bc` and `stac_pointcloud_bc`
+      into a worktree dir
+- [ ] `fish_passage_template_reporting` first: `0400-results.Rmd:156`
+- [ ] Seven reports, one line each: `0400-results.Rmd` (fraser_2023, peace_2024, skeena_2024),
+      `0740-appendix-uav-imagery.Rmd` (fraser_2025, peace_2025, skeena_2025); `docs/*.html` is
+      rendered output and changes at the report's next render
+- [ ] `restoration_wedzin_kwa_2024`: `2042-Appendix-uav-imagery.Rmd:11`, `scripts/functions.R:582`
+- [ ] `spoke` and `logic`: the four `talks/2026-terrace-cop/scripts/*.R` each (logic from a worktree
+      off main; `_site`, `_freeze` and the ledger untouched, said in the PR)
+- [ ] `rtj`: register-all list (both the uav line and the stale `stac-dem-bc` line →
+      `stac-elevation-bc`), geoserv README counts, `docs/stac-endpoints.md`, the two unregister
+      comment lines; logs untouched
+- [ ] Sibling READMEs: `stac_dem_bc`, `stac_floodplains_bc` (+ `scripts/item_unregister.sh`),
+      `stac_pointcloud_bc`, `README.Rmd` and `README.md` each
+- [ ] Each PR body says the old id serves until the drop; R&D cross-reference where the repo's
+      `CLAUDE.md` configures one; public repos get no private pointers
+- [ ] Gate: the template's `0400-results.Rmd` chunk (BC bbox) run against the new id returns 245
+      features, equal to the same query against the old id taken before the drop
+- [ ] QGIS count on each other machine that holds projects (hand Al the one-liner; this machine:
+      0 of 301 name the id); each machine's number recorded before the drop
+
+## Phase 6: Drop the old collection, release
+
+- [ ] Every sweep PR merged; every machine's QGIS count recorded (non-zero → the infrastructure
+      repo's project surgeries, before the drop); `gh api search/code` for the old id returns only
+      archives, logs and sred evidence plus the by-design carve-out (NEWS, the config README recipe,
+      planning), and a clone-and-grep of each consumer repo, open template branches included, agrees
+- [ ] `scripts/config/collection_unregister.sh imagery-uav-bc-prod` reports **245** (anything else
+      means something still writes to it); then `--yes`, which prints items 0, row 0, API 404
+- [ ] New id serves 245; `stacs verify` IN SYNC; `collection_unregister.sh imagery-uav-bc-prod`
+      says "nothing to do"; drop date into NEWS and the issue body
+- [ ] `/planning-archive` (README with Measurement and Evidence); merge; release commit on main:
+      NEWS heading `## v2.0.0 (<date>)`, `git tag v2.0.0`, then `curl $API | jq .version` reads
+      2.0.0 and `stacs verify` IN SYNC; close #38, #41, #48
+
+## Validation
+
+- [ ] Selftests pass (`item_create.py`, `collection_unregister.sh`, `dataset_align-lidarbc.py`)
+- [ ] `/code-check` clean (each commit, or once over the branch with `/code-check branch`)
+- [ ] PWF checkboxes match landed work
+- [ ] `/planning-archive` on completion

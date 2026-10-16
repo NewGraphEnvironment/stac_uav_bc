@@ -1,0 +1,10 @@
+# Progress — Rename the collection to stac-imagery-uav-bc (#48)
+
+## Session 2026-10-16
+
+- Plan-mode exploration — phases approved by Al; cutover runs in this session; his saved
+  `data/sites.csv` edits ride in v2.0.0
+- Created branch `48-rename-the-collection-to-stac-imagery-ua` off main
+- Scaffolded PWF baseline from issue #48 with approved phases
+- Phase 0 baseline verify of the old id: IN SYNC 245 (19:50Z), log under `evidence/`
+- Next: Phase 0 (commit sites.csv, record findings, file the viewer.html issue), then Phase 1
