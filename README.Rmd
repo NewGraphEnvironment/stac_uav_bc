@@ -176,7 +176,7 @@ UAV elevations in this catalogue are GPS-referenced. No flight used ground contr
 
 The rasters are published as they are. Instead, every item of a dataset on LidarBC carries the dataset's fit as `alignment:` fields: a horizontal shift and a quadratic correction surface (vertical offset, tilt and curvature, the doming a GPS-only photogrammetric block has), fitted to LidarBC ground by [`scripts/dataset_align-lidarbc.py`](scripts/dataset_align-lidarbc.py), one row per dataset in [`data/alignment_lidarbc.csv`](data/alignment_lidarbc.csv). After the fit, the ground misfits LidarBC by a median of 0.42 m (NMAD over the ground points compared): 42 of 46 datasets within 1 m, 26 within 0.5 m. The 31 datasets with no LidarBC under them (mostly the Morice 2021–2026 and the upper Parsnip 2022–2024) , the 3 whose fit could not be determined (a flat site gives the shift no signal; a flight the DEM covers only partly) and the 3 with no ODM point cloud (two orthophoto-only datasets and one duplicate flight) carry no fields.
 
-`alignment:applied` is `false` on every item: the rasters are published as ODM wrote them, and the fields are there to be applied. [#46](https://github.com/NewGraphEnvironment/stac_uav_bc/issues/46) publishes them corrected and sets it `true`, and the fields then record what was applied.
+`alignment:applied` is `false` on every item that carries the fields: the rasters are published as ODM wrote them, and the fields are there to be applied. [#46](https://github.com/NewGraphEnvironment/stac_uav_bc/issues/46) publishes them corrected and sets it `true`, and the fields then record what was applied.
 
 To apply a fit, in the item's own CRS (`proj:epsg`):
 

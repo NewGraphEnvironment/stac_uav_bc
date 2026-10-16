@@ -51,3 +51,15 @@ with each defect restored, the review rounds and the chain they enumerated).
 
 Closed by: the PR from branch `41-fit-each-flight-to-lidarbc-our-uav-eleva` (final review commit
 1f382c8, archive commit after it). #41 itself closes at the release that publishes the fields.
+
+## Follow-up (2026-10-16, after the PR opened)
+
+Decided with Al: the fitted datasets' rasters will be published with the fit applied, replacing
+the raw copies (#46); the point clouds go to a sibling collection `stac-pointcloud-uav-bc` with
+the same transform (#42, body rewritten); the write-up with before-and-after figures is #47. So
+the items also carry `alignment:applied` (`false` here; #46 flips it per dataset), added in
+65ff0e4 and reviewed by round 7 (`review-round7.md`: the chain walked for the new field, no link
+blind to it; one false quantifier in the README and NEWS wording, fixed in the commit after).
+Verified again: both selftests, `item_fields` against `alignment_props` on all 83 rows, and the
+mirror rebuilt with the new builder (`--check`, the 245-item field audit, stacs validate 246 with
+0 invalid, audit).

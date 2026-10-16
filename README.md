@@ -163,8 +163,9 @@ determined (a flat site gives the shift no signal; a flight the DEM
 covers only partly) and the 3 with no ODM point cloud (two
 orthophoto-only datasets and one duplicate flight) carry no fields.
 
-`alignment:applied` is `false` on every item: the rasters are published
-as ODM wrote them, and the fields are there to be applied.
+`alignment:applied` is `false` on every item that carries the fields:
+the rasters are published as ODM wrote them, and the fields are there to
+be applied.
 [\#46](https://github.com/NewGraphEnvironment/stac_uav_bc/issues/46)
 publishes them corrected and sets it `true`, and the fields then record
 what was applied.
