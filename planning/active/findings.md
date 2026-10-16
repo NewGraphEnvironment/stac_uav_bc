@@ -143,19 +143,19 @@ to `stac-elevation-bc` on 2026-09-01 (its #34, v2.0.0, 102,460 items, no downtim
 
 | repo | files naming the old id | action |
 |---|---|---|
-| fish_passage_template_reporting | `0400-results.Rmd:156` | PR, first |
+| the report template repo | `0400-results.Rmd:156` | PR, first |
 | fish_passage_{fraser_2023,peace_2024,skeena_2024}_reporting | `0400-results.Rmd` | PR each |
 | fish_passage_{fraser_2025,peace_2025,skeena_2025}_reporting | `0740-appendix-uav-imagery.Rmd` (+ rendered `docs/app-uav.html`) | PR each; html at next render |
 | restoration_wedzin_kwa_2024 (not in the issue) | `2042-Appendix-uav-imagery.Rmd:11`, `scripts/functions.R:582` (+ `docs/app-uav-imagery.html`) | PR |
-| spoke, logic (private; logic outside the search index) | `talks/2026-terrace-cop/scripts/{airphoto_pair-site,uav_crop-site,uav_logjam-morice,uav_panels-compare}.R` | PR each; `_site`, `_freeze`, `logic/.../ledger.md:93` (figure provenance) untouched |
-| rtj | `scripts/geoserv/stac_register-all.sh:31` (list also still has `stac-dem-bc` at `:28`), `scripts/geoserv/README.md:47-49`, `docs/stac-endpoints.md:12`, comment lines in `scripts/geoserv/stac_unregister.sh:10` and `modules/droplet/scripts/config/stac_unregister.sh:4`; logs | PR; logs untouched |
+| the two talk repos (private; the second outside the search index) | the four UAV scripts of the 2026 Terrace talk | PR each; rendered site, freeze cache and the figure ledger (provenance) untouched |
+| the infrastructure repo (private) | the register-all list (which also still has `stac-dem-bc` from before the 2026-09 rename), the geoserv README, the endpoints doc, comment lines in its two unregister scripts; logs | PR; logs untouched |
 | stac_dem_bc | `README.Rmd:174`, `README.md` (origin/main; the local clone is behind) | PR |
 | stac_floodplains_bc | `README.Rmd`, `README.md`, `scripts/item_unregister.sh` | PR (not cloned here) |
 | stac_pointcloud_bc | `README.Rmd`, `README.md` | PR (not cloned here) |
-| sred | `evidence/fy2025_2026/dumps/*/logs.csv` | evidence, untouched |
-| a second template checkout on a branch (`fish_passage_template_reporting_issue-165`) | `0400-results.Rmd` | the final grep covers open template branches |
+| the evidence repo (private) | its dump logs | evidence, untouched |
+| a second checkout of the report template, on a branch | `0400-results.Rmd` | the final grep covers open template branches |
 
-Local checkouts (2026-10-16): logic on `5-scaffold-the-terrace-cop-presentation-se` with 2 dirty
+Local checkouts (2026-10-16): the second talk repo on a feature branch with 2 dirty
 files; restoration_wedzin_kwa_2024 on `cabin-sites-source`, 1 dirty; template main, 1 dirty;
 peace_2025 main, 4 dirty; the rest on main and clean. QGIS projects on this machine: 0 of 301
 name the id (issue measurement).
@@ -188,7 +188,7 @@ ssh probe, db allowlist, no-items distinction, recovery line, post-delete re-rea
 and the 404 check, an API-derived never-delete-first guard, a `--config` parameter for the
 selftest stub; NEWS facts (title, `collection` field, both collections in the window, the static
 catalogue flipping at the release date, drop date); `fig/a11sone01.png` caption; consumer fetch
-before edit; rtj's stale `stac-dem-bc` line; open template branches in the final grep; the tile
+before edit; the infrastructure repo's stale `stac-dem-bc` line; open template branches in the final grep; the tile
 check through titiler's `/stac` route; the template query measured as 245; the by-design
 carve-out for NEWS and the recipe; QGIS counts recorded before the drop; no full release re-run
 after the tag.
@@ -243,6 +243,29 @@ Four findings, all fixed; the first was the sharpest.
   the configured-id guard, the containment compare) each go red on exactly one case.
 - `api_status` let curl's transport failure end the script under `set -e` with no message, after
   the delete as well as before; it now prints `000` and the comparison reports it.
+
+### Round 2 (spawned 20:19Z, delivered 20:33Z; `review-round2.md`)
+
+Five findings, two of them inside round 1's fixes, all fixed. That pattern means the loop ends
+by enumeration, not by a quiet round.
+
+- `api_status`'s `|| echo 000` doubled curl's own `000` (curl prints it via `-w` and exits
+  non-zero), so a transport failure after the delete read `HTTP 000000, not 404`. Now assigned
+  then defaulted; measured on an unresolvable host: `000`.
+- Round 1's two fixes interact: `item_unregister.sh` deletes from the live collection only, so a
+  retraction during the window leaves the retired id in the old collection, and the containment
+  guard then refuses the drop with no way out but hand SQL. `item_unregister.sh` takes
+  `--collection <id>`; the refusal lists the first ten missing ids and names that command; both
+  recipes say so.
+- The stub answered the containment query whatever its argument order, so a swapped
+  `count_missing` call passed all cases. The stub now answers from the SQL's own text (target →
+  live is `STUB_MISSING`, live → target is `STUB_MISSING_REVERSED`), with one case where the two
+  differ each way; the swapped mutant fails three cases. The dead count-guard arm is gone.
+- Under `/bin/bash` 3.2 an unbound-variable read inside `selftest()` ended the run with status 0
+  and no verdict. The verdict is now a flag (`SELFTEST_DONE`) the EXIT trap checks; the
+  injected-unbound mutant prints "ended before its verdict" and exits 1.
+- The committed planning files named five private repos and their internal paths in a public
+  repo; now described generically (the report repos themselves are public).
 
 ## Errors Encountered
 

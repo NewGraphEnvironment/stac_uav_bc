@@ -52,7 +52,7 @@ Beside it, `data/alignment_lidarbc.csv` holds each dataset's fit to the LidarBC 
 1. Flip its `data/sites.csv` row to `published=false` with a dated note
 2. Remove the dataset dir from the prod tree and the `imagery_uav_bc` COG tree
 3. `aws s3 rm s3://imagery-uav-bc/<region>/<wsg>/<year>/<item> --recursive --profile airvine`
-4. `scripts/config/item_unregister.sh <item-id>...` (idempotent; API 404s confirm). Skip it and the release's `stacs verify` fails, reporting the id as orphaned: registered but no longer published
+4. `scripts/config/item_unregister.sh <item-id>...` (idempotent; API 404s confirm; while an old collection still serves the same ids, a rename's window, run it again with `--collection <old-id>`, or the old collection serves the retired item until its drop). Skip it and the release's `stacs verify` fails, reporting the id as orphaned: registered but no longer published
 5. Release as usual (NEWS + tag + `catalogue_release.sh`) — the rebuild drops the collection links
 
 ## Adding New Imagery — the Recipe
@@ -128,11 +128,14 @@ zero items on 2026-08-29.
    API from one of its items. Then the consumer sweep: every `collections =` in the report and
    talk repos, the sibling catalogue READMEs, the infrastructure repo's register-all list. The old
    id keeps serving meanwhile.
-4. `scripts/config/collection_unregister.sh <old-id>` reports the count, which must be the whole
-   catalogue (anything else means something still writes to the old id); then `--yes`, which
-   refuses unless the configured collection is served and holds an item for every item id the old
-   one holds, deletes, and checks items 0, row 0 and a 404 from the API. pgstac's cached `/search` bodies naming the old
-   id are harmless and stay.
+4. `scripts/config/collection_unregister.sh <old-id>` reports the count: the whole catalogue as
+   it was at the cutover, less any dataset retracted since (a larger count means something still
+   writes to the old id). Then `--yes`, which refuses unless the configured collection is served
+   and holds an item for every item id the old one holds, deletes, and checks items 0, row 0 and
+   a 404 from the API. A retraction during the window leaves its item in the old collection
+   (`item_unregister.sh` deletes from the live one), so the refusal names those ids and the
+   command that clears them, `item_unregister.sh --collection <old-id> <item-id>...`; re-run after
+   it. pgstac's cached `/search` bodies naming the old id are harmless and stay.
 5. Release commit on main: NEWS heading, `git tag`, and `curl <api>/collections/<id>` reads the
    version.
 

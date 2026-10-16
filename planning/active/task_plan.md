@@ -63,7 +63,9 @@ Decided with Al at the plan gate (2026-10-16): this session runs the cutover, an
       count printed is read before asking; a curl transport failure reports `000` (round 1)
 - [x] After `--yes`: re-read both counts (items 0, row 0) and curl the old id for 404, exit
       non-zero on anything else; `item_unregister.sh`'s verify line reads api and collection id from
-      `stacs.toml` (no literal)
+      `stacs.toml` (no literal); it passes the collection to `delete_item` (round 1: the
+      one-argument form raises on two rows during the window) and takes `--collection <id>` for
+      the old copy (round 2), which the drop's refusal names beside the missing ids
 - [x] `--selftest`: the three remote calls sit behind functions the selftest redefines with stubs
       (canned counts, every SQL logged); 11 cases: suspicious id, configured id, report mode sends
       no `delete_collection`, row with no items, unreadable count, absent collection, items with no
@@ -116,15 +118,15 @@ Decided with Al at the plan gate (2026-10-16): this session runs the cutover, an
 
 - [ ] `git fetch` every cloned consumer first; clone `stac_floodplains_bc` and `stac_pointcloud_bc`
       into a worktree dir
-- [ ] `fish_passage_template_reporting` first: `0400-results.Rmd:156`
+- [ ] the report template repo first: `0400-results.Rmd:156`
 - [ ] Seven reports, one line each: `0400-results.Rmd` (fraser_2023, peace_2024, skeena_2024),
       `0740-appendix-uav-imagery.Rmd` (fraser_2025, peace_2025, skeena_2025); `docs/*.html` is
       rendered output and changes at the report's next render
 - [ ] `restoration_wedzin_kwa_2024`: `2042-Appendix-uav-imagery.Rmd:11`, `scripts/functions.R:582`
-- [ ] `spoke` and `logic`: the four `talks/2026-terrace-cop/scripts/*.R` each (logic from a worktree
+- [ ] the two talk repos: the four UAV scripts of the 2026 Terrace talk, each (the second from a worktree
       off main; `_site`, `_freeze` and the ledger untouched, said in the PR)
-- [ ] `rtj`: register-all list (both the uav line and the stale `stac-dem-bc` line →
-      `stac-elevation-bc`), geoserv README counts, `docs/stac-endpoints.md`, the two unregister
+- [ ] the infrastructure repo: register-all list (both the uav line and the stale `stac-dem-bc` line →
+      `stac-elevation-bc`), geoserv README counts, `the endpoints doc`, the two unregister
       comment lines; logs untouched
 - [ ] Sibling READMEs: `stac_dem_bc`, `stac_floodplains_bc` (+ `scripts/item_unregister.sh`),
       `stac_pointcloud_bc`, `README.Rmd` and `README.md` each
@@ -139,7 +141,7 @@ Decided with Al at the plan gate (2026-10-16): this session runs the cutover, an
 
 - [ ] Every sweep PR merged; every machine's QGIS count recorded (non-zero → the infrastructure
       repo's project surgeries, before the drop); `gh api search/code` for the old id returns only
-      archives, logs and sred evidence plus the by-design carve-out (NEWS, the config README recipe,
+      archives, logs and the evidence repo's dumps plus the by-design carve-out (NEWS, the config README recipe,
       planning), and a clone-and-grep of each consumer repo, open template branches included, agrees
 - [ ] `scripts/config/collection_unregister.sh imagery-uav-bc-prod` reports **245** (anything else
       means something still writes to it); then `--yes`, which prints items 0, row 0, API 404

@@ -24,3 +24,4 @@
   corrections, #41). README.md and index.html render after the cutover
 - Draft PR #50 opened (phases 4–6 pending); round 1 of `/code-check branch` spawned 20:05Z
 - Round 1 (4 findings, all fixed, see findings): delete_item gets the collection; containment guard; sticky-stub selftest cases (15); api_status 000
+- Round 2 (5 findings, 2 inside round 1's fixes, all fixed): api_status 000 (not 000000); item_unregister.sh --collection + the drop's refusal names the ids; direction-aware stub; verdict flag under bash 3.2; private repo names out of the planning files
