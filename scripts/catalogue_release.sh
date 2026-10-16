@@ -25,6 +25,14 @@ echo "=== catalogue release v$VERSION"
 echo "=== rebuild items from sites.csv"
 conda run -n titiler python "$REPO/scripts/item_create.py" --rebuild --version "$VERSION"
 
+echo "=== alignment table against the trees and the rebuilt items"
+# A fitted row whose cloud was re-stitched since, or a published or COG-tree raster
+# that is not the raw tree's, would otherwise publish alignment: fields for another
+# cloud (#41); runs after the rebuild, so its items arm reads the items this release
+# wrote from the table, and still stops a stale cloud or raster before the sync.
+# Reads the laz headers, samples each raster pair, reads each item; laspy lives under uv.
+uv run "$REPO/scripts/dataset_align-lidarbc.py" --check || exit 1
+
 echo "=== validate + audit (gate)"
 # Paths on stdin, because --dir does not recurse and the prod tree is nested. Given
 # on stdin, collection.json is validated too (--dir would skip it).
@@ -52,7 +60,7 @@ VERIFY_DIR=$(mktemp -d "${TMPDIR:-/tmp}/stacs_verify.XXXXXX")
 echo "=== verify (this catalogue: version stamp, registry coverage)"
 live_version=$(curl -s "$API" | python3 -c "import json,sys; print(json.load(sys.stdin).get('version','MISSING'))")
 n_items=$(curl -s -X POST "${API%/collections/*}/search" -H "Content-Type: application/json" \
-  -d "{\"collections\":[\"${API##*/}\"],\"limit\":1000}" | python3 -c "import json,sys; print(len(json.load(sys.stdin)['features']))")
+  -d "{\"collections\":[\"${API##*/}\"],\"limit\":1000}" | python3 -c "import json,sys; f = json.load(sys.stdin)['features']; len(f) < 1000 or sys.exit('search page full: the checks below would see part of the catalogue'); print(len(f))")
 echo "live collection version: $live_version | items: $n_items"
 [ "$live_version" = "$VERSION" ] || { echo "RELEASE INCOMPLETE: live version != $VERSION" >&2; exit 1; }
 
@@ -87,6 +95,8 @@ tree = ast.parse(open(sys.argv[1]).read())
 declared = next(ast.literal_eval(n.value) for n in tree.body if isinstance(n, ast.Assign)
                 and any(getattr(t, 'id', None) == 'FIELD_PREFIXES' for t in n.targets))
 feats = json.load(sys.stdin)['features']
+if len(feats) >= 1000:
+    sys.exit('search page full: this check would see part of the catalogue')
 need = {'newgraph:region', 'uav:stream_name'}
 orphans = [f['id'] for f in feats if not need <= f.get('properties', {}).keys()]
 if orphans:
@@ -110,5 +120,33 @@ if stray:
 print('    registry coverage OK: %d/%d items carry newgraph:region + uav:stream_name, '
       'no undeclared fields' % (len(feats), len(feats)))
 " "$REPO/scripts/item_create.py" || exit 1
+
+# And the alignment fields (#41): a live item carries alignment:reference exactly when
+# its dataset's row in data/alignment_lidarbc.csv is fitted. The table is the one
+# source; the dataset is read off the asset href, whose path under the virtual-hosted
+# bucket URL (https://<bucket>.s3.amazonaws.com/) is <region>/<wsg>/<year>/<item>/...
+curl -s -X POST "${API%/collections/*}/search" -H "Content-Type: application/json" \
+  -d "{\"collections\":[\"${API##*/}\"],\"limit\":1000}" | python3 -c "
+import csv, json, sys
+from urllib.parse import urlsplit, unquote
+fitted = {(r['region'], r['watershed'], r['year'], r['item']) for r in csv.DictReader(open(sys.argv[1]))
+          if r['status'] == 'fitted'}
+feats = json.load(sys.stdin)['features']
+if len(feats) >= 1000:
+    sys.exit('search page full: this check would see part of the catalogue')
+wrong = []
+for f in feats:
+    key = tuple(unquote(urlsplit(f['assets']['image']['href']).path).strip('/').split('/')[:4])
+    has = 'alignment:reference' in f.get('properties', {})
+    if has != (key in fitted):
+        wrong.append('%s: %s' % (f['id'], 'carries alignment fields, row not fitted' if has else 'row fitted, no alignment fields'))
+if wrong:
+    print('RELEASE INCOMPLETE: %d live item(s) disagree with %s:' % (len(wrong), sys.argv[1]), file=sys.stderr)
+    for w in wrong[:10]:
+        print('   ', w, file=sys.stderr)
+    sys.exit(1)
+n = sum('alignment:reference' in f.get('properties', {}) for f in feats)
+print('    alignment coverage OK: %d/%d items carry alignment: fields, matching %d fitted rows' % (n, len(feats), len(fitted)))
+" "$REPO/data/alignment_lidarbc.csv" || exit 1
 
 echo "RELEASE COMPLETE: v$VERSION"

@@ -2,8 +2,10 @@
 # Create or rebuild STAC items for the imagery-uav-bc-prod catalog.
 #
 # Registry-driven: data/sites.csv is the source of truth for stream names,
-# watershed groups, site ids, aliases (#16). Item geometry is the true
-# valid-data outline from gdal_footprint (bbox remains the raster extent).
+# watershed groups, site ids, aliases (#16); data/alignment_lidarbc.csv carries
+# each dataset's fit to LidarBC, and every dataset built needs a row there (#41).
+# Item geometry is the true valid-data outline from gdal_footprint (bbox remains
+# the raster extent).
 #
 # Modes:
 #   item_create.py <tifs relative to base>   additive — skip ids already in the collection
@@ -22,6 +24,7 @@ import argparse
 import csv
 import datetime
 import json
+import math
 import pathlib
 import subprocess
 import sys
@@ -38,9 +41,10 @@ PRODUCT_LABEL = {"odm_orthophoto": "orthophoto", "dtm": "DTM", "dsm": "DSM", "or
 # Every field prefix an item may carry (#38). Each names what its fields describe:
 # proj: from rio_stac; fwa: the BC Freshwater Atlas; bcfishpass: its crossing ids;
 # uav: this catalogue's registry judgment; newgraph: New Graph's own regions, aliases
-# and projects. None has a published schema yet: crate publishes one only once a
-# second catalogue writes the prefix. Anything else (an old nge: key) is refused.
-FIELD_PREFIXES = {"proj", "fwa", "bcfishpass", "uav", "newgraph"}
+# and projects; alignment: the dataset's fit to LidarBC (#41). None has a published
+# schema yet: crate publishes one only once a second catalogue writes the prefix.
+# Anything else (an old nge: key) is refused.
+FIELD_PREFIXES = {"proj", "fwa", "bcfishpass", "uav", "newgraph", "alignment"}
 
 def flight_datetime(path, path_year):
     # ODM propagates capture time from image EXIF into TIFFTAG_DATETIME but in
@@ -123,6 +127,58 @@ def registry_conflicts(registry):
             by_code.setdefault(code, set()).add(name)
     return [f"code {c} has names {sorted(n)}" for c, n in sorted(by_code.items()) if len(n) > 1]
 
+# The dataset's fit to LidarBC, one row per dataset in data/alignment_lidarbc.csv,
+# written by scripts/dataset_align-lidarbc.py (#41). Only a `fitted` row reaches the
+# items; the other statuses (no_cloud, no_reference, refused:*) carry no numbers.
+# Every item of the dataset carries the same fields: the flight was placed once, and
+# the horizontal shift applies to the orthophoto as much as to the DEMs.
+ALIGN_NUMBERS = [("alignment:shift_x_m", "shift_x_m"), ("alignment:shift_y_m", "shift_y_m"),
+                 ("alignment:offset_m", "offset_m"), ("alignment:tilt_m_per_100m", "tilt_m_per_100m"),
+                 ("alignment:misfit_m", "misfit_m")]
+
+def load_alignment(path):
+    with open(path, newline="") as f:
+        return {(r["region"], r["watershed"], r["year"], r["item"]): r for r in csv.DictReader(f)}
+
+def alignment_props(row):
+    if not row or row.get("status") != "fitted":
+        return {}
+    props = {"alignment:reference": row["reference"], "alignment:model": row["model"]}
+    try:
+        for k, col in ALIGN_NUMBERS:
+            props[k] = float(row[col])
+        props["alignment:surface"] = [float(c) for c in json.loads(row["surface"])]
+        props["alignment:centre"] = [float(row["centre_x"]), float(row["centre_y"])]
+        props["alignment:points"] = int(row["points"])
+    except (KeyError, ValueError, TypeError) as e:
+        sys.exit(f"REFUSED: alignment row for {'/'.join(row.get(k, '?') for k in ('region', 'watershed', 'year', 'item'))} "
+                 f"is fitted but not readable: {e}")
+    # The rasters are published as ODM wrote them, so the fields are there to be
+    # applied. #46 publishes them corrected and sets this true per dataset, read from
+    # the corrected raster; until then no raster is corrected and the table has no
+    # column for it, so it is a constant here and in dataset_align-lidarbc.py's
+    # item_fields(), which restates this join for --check.
+    props["alignment:applied"] = False
+    # json.dumps writes NaN and Infinity, item.validate() accepts them as numbers,
+    # pgstac does not: a fitted row has to be finite everywhere.
+    numbers = [v for v in props.values() if isinstance(v, float)] + props["alignment:surface"] + props["alignment:centre"]
+    if not all(math.isfinite(v) for v in numbers):
+        sys.exit(f"REFUSED: alignment row for {row['item']} is fitted with a non-finite number: {props}")
+    return props
+
+def alignment_problems(keys, registry, alignment):
+    # Every dataset being built needs a row, whatever its status, so a dataset that
+    # skipped scripts/dataset_align-lidarbc.py cannot publish as if it had been fitted
+    # and found wanting. Retracted datasets are not built, so they need none.
+    out = []
+    for key in sorted(set(keys)):
+        row = registry.get(key)
+        if row and row.get("published", "true").strip().lower() == "false":
+            continue
+        if key not in alignment:
+            out.append("/".join(key))
+    return out
+
 def item_title(props, dir_name, year, stem):
     stream = props.get("uav:stream_name", dir_name)
     product = PRODUCT_LABEL.get(stem, stem)
@@ -151,7 +207,7 @@ def tree_undeclared(base):
             out[str(f.relative_to(base))] = bad
     return out
 
-def build_item(path_item, base, s3_url, collection, registry):
+def build_item(path_item, base, s3_url, collection, registry, alignment):
     href_item = path_item.relative_to(base)
     parts = href_item.parts
     item_id = "-".join(parts[:-1] + (path_item.stem,))
@@ -162,6 +218,7 @@ def build_item(path_item, base, s3_url, collection, registry):
 
     props = registry_props(row) if row else {}
     props["title"] = item_title(props, parts[3], parts[2], path_item.stem)
+    props.update(alignment_props(alignment.get(parts[:4])))
 
     item = rio_stac.stac.create_stac_item(
         str(path_item),
@@ -281,7 +338,39 @@ def _selftest():
     t = item_title({}, "198285_pedley", "2026", "dtm")
     check(t == "198285_pedley — 2026 DTM", f"title without registry: {t!r}")
 
-    ok = {"properties": {"datetime": "x", "title": "x", "proj:epsg": 1, **want},
+    # The alignment join (#41): a fitted row becomes exactly these fields, every
+    # other status none, and a fitted row that cannot be read as numbers refuses.
+    fitted = {"region": "skeena", "watershed": "peace_arm", "year": "2026", "item": "198285_pedley",
+              "status": "fitted", "reference": "093/093g/2024", "model": "plane", "shift_x_m": "3.0",
+              "shift_y_m": "-4.88", "offset_m": "69.823", "tilt_m_per_100m": "1.273",
+              "surface": "[69.8227, -0.6341, 1.1037]", "centre_x": "529546.71", "centre_y": "5915090.51",
+              "misfit_m": "0.982", "points": "200000"}
+    want_align = {"alignment:reference": "093/093g/2024", "alignment:model": "plane",
+                  "alignment:shift_x_m": 3.0, "alignment:shift_y_m": -4.88, "alignment:offset_m": 69.823,
+                  "alignment:tilt_m_per_100m": 1.273, "alignment:misfit_m": 0.982,
+                  "alignment:surface": [69.8227, -0.6341, 1.1037],
+                  "alignment:centre": [529546.71, 5915090.51], "alignment:points": 200000,
+                  "alignment:applied": False}
+    got_align = alignment_props(fitted)
+    check(got_align == want_align, f"alignment_props: got {got_align}, want {want_align}")
+    check(not fields_undeclared({"properties": got_align}), "alignment: prefix is undeclared")
+    for status in ("no_reference", "no_cloud", "refused:too_few_points:12"):
+        check(alignment_props({**fitted, "status": status}) == {}, f"a {status} row carried fields")
+    check(alignment_props(None) == {}, "a dataset with no row carried fields")
+    for bad in ({**fitted, "misfit_m": "nan"}, {**fitted, "surface": "[1, Infinity, 2]"}, {**fitted, "shift_x_m": ""}):
+        try:
+            alignment_props(bad)
+            check(False, f"an unreadable fitted row passed: {bad}")
+        except SystemExit:
+            pass
+    keys = [("a", "b", "2024", "c"), ("a", "b", "2024", "c"), ("d", "e", "2024", "f"), ("g", "h", "2024", "i")]
+    reg = {("g", "h", "2024", "i"): {**row, "published": "false"}}
+    check(alignment_problems(keys, reg, {("a", "b", "2024", "c"): fitted}) == ["d/e/2024/f"],
+          f"alignment_problems: {alignment_problems(keys, reg, {('a', 'b', '2024', 'c'): fitted})}")
+    check(alignment_problems(keys, reg, {("a", "b", "2024", "c"): fitted, ("d", "e", "2024", "f"): {"status": "no_cloud"}}) == [],
+          "a no_cloud row does not count as a row")
+
+    ok = {"properties": {"datetime": "x", "title": "x", "proj:epsg": 1, **want, **want_align},
           "assets": {"image": {"href": "x", "type": "x", "roles": ["data"]}}}
     check(fields_undeclared(ok) == [], f"guard refuses a valid item: {fields_undeclared(ok)}")
     check(fields_undeclared({"properties": {"nge:region": "x"}}) == ["nge:region"],
@@ -304,7 +393,7 @@ def _selftest():
         for f in fails:
             print(f"  - {f}", file=sys.stderr)
         return 1
-    print("ITEM SELFTEST PASS: registry mapping, title and prefix guards")
+    print("ITEM SELFTEST PASS: registry mapping, alignment join, title and prefix guards")
     return 0
 
 def main():
@@ -315,6 +404,7 @@ def main():
     p.add_argument("--base", default="/Users/airvine/Projects/gis/uav_imagery/stac/prod/imagery_uav_bc")
     p.add_argument("--s3-url", default="https://imagery-uav-bc.s3.amazonaws.com/")
     p.add_argument("--sites", default=str(REPO / "data" / "sites.csv"))
+    p.add_argument("--alignment", default=str(REPO / "data" / "alignment_lidarbc.csv"))
     p.add_argument("--version", default=None, help="override version stamp (default: latest git tag)")
     args = p.parse_args()
     if args.selftest:
@@ -324,6 +414,7 @@ def main():
 
     base = pathlib.Path(args.base)
     registry = load_registry(args.sites)
+    alignment = load_alignment(args.alignment)
     # Registry checks run here, before the build loop: refusing per item would leave
     # the items already saved rewritten in the prod tree with collection.json not,
     # which the next publish's sync would push.
@@ -336,6 +427,17 @@ def main():
     if conflicts:
         sys.exit(f"REFUSED: {args.sites} watershed group code/name pairs disagree: {conflicts}; "
                  "run scripts/sites_fill-wsg_name.py --write")
+    # The datasets this run builds: every one in the tree, or the requested tifs'.
+    # Checked here with the registry, before anything is written (#41).
+    if args.rebuild:
+        tifs = sorted(t for t in base.rglob("*.tif") if not t.name.endswith(".original.tif"))
+        keys = [t.relative_to(base).parts[:4] for t in tifs]
+    else:
+        keys = [pathlib.Path(rel).parts[:4] for rel in args.tifs]
+    missing = alignment_problems(keys, registry, alignment)
+    if missing:
+        sys.exit(f"REFUSED: {len(missing)} dataset(s) have no row in {args.alignment}, e.g. {missing[:3]}; "
+                 "run: uv run scripts/dataset_align-lidarbc.py <project-dir>")
     collection = pystac.Collection.from_file(str(base / "collection.json"))
     collection.set_self_href(f"{args.s3_url}collection.json")
     # The file's root link is the published S3 URL, so without this add_item()
@@ -345,14 +447,13 @@ def main():
     collection.set_root(collection)
 
     if args.rebuild:
-        tifs = sorted(t for t in base.rglob("*.tif") if not t.name.endswith(".original.tif"))
         collection.clear_items()
         # Build every item before saving any: a refusal or error partway (a guard in
         # build_item, a footprint failure) then leaves the prod tree as it was,
         # rather than part-rewritten for the next publish's sync to push (#38).
         pending = []
         for t in tifs:
-            item = build_item(t, base, args.s3_url, collection, registry)
+            item = build_item(t, base, args.s3_url, collection, registry, alignment)
             if item:
                 collection_add(collection, item)
                 pending.append((item, t.parent / f"{item.id}.json"))
@@ -396,7 +497,7 @@ def main():
         if item_id in existing:
             print(f"SKIP (already in collection): {item_id}")
             continue
-        item = build_item(path_item, base, args.s3_url, collection, registry)
+        item = build_item(path_item, base, args.s3_url, collection, registry, alignment)
         if item:
             collection_add(collection, item)
             pending.append((item, path_item.parent / f"{item_id}.json"))

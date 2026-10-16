@@ -31,7 +31,7 @@ Both read the **published** catalogue (`collection.json` on the bucket and the i
 
 The item links have only been correct since #35. Before that, every `rel: item` href was `<bucket>/<id>/<id>.json`, a key S3 never held, because `Collection.add_item()` re-homed each item under pystac's default layout. `item_create.py` now keeps the tree path and refuses to save a `collection.json` whose item links name no file in the prod tree. An additive `item_create.py` run (inside `dataset_publish.sh`) refuses until one `--rebuild` has rewritten the old links, so the first release after #35 has to come before the next publish.
 
-The same holds for #38's field rename: an additive run refuses while any item in the prod tree still carries an `nge:` field, so the first publish after #38 waits for a full release (NEWS entry naming each old → new field, tag, `catalogue_release.sh`). Until that release the API serves the `nge:` names. A tif copied into the prod tree by a refused publish is built and published by that release, so its `sites.csv` row has to exist first.
+The same holds for #38's field rename: an additive run refuses while any item in the prod tree still carries an `nge:` field, so the first publish after #38 waits for a full release (NEWS entry naming each old → new field, tag, `catalogue_release.sh`). Until that release the API serves the `nge:` names. A tif copied into the prod tree by a refused publish is built and published by that release, so its `sites.csv` row has to exist first. #41's `alignment:` fields follow the same rule: `--check`, which the publish runs first, refuses while any item in the prod tree does not carry its row's fields, so the first publish after #41 waits for the release too, and so does any publish after a re-fit.
 
 ## The Registry: data/sites.csv
 
@@ -39,9 +39,11 @@ The same holds for #38's field rename: an additive run refuses while any item in
 
 `watershed_group_name` is the atlas's name for `watershed_group_code`, not something to type: after adding or changing a row's code, run `python3 scripts/sites_fill-wsg_name.py` (reports) and then with `--write` (fills it in place from the public fwapg API). The `watershed` column is the tree's directory slug and stays as it is.
 
+Beside it, `data/alignment_lidarbc.csv` holds each dataset's fit to the LidarBC 1 m DEM (#41): the horizontal shift, vertical offset and tilt that put the flight's ground on LidarBC, and the misfit left. It is written only by `scripts/dataset_align-lidarbc.py`, keyed like the registry, and `item_create.py` carries a `fitted` row on the dataset's items as `alignment:` fields; a `no_reference`, `no_cloud` or `refused:*` row carries nothing. Every dataset built needs a row, whatever its status, so the publish cannot skip the step.
+
 **Releasing a registry change:**
 
-1. Edit `data/sites.csv` (and `scripts/sites_fill-wsg_name.py --write` if a watershed group code changed); add a `NEWS.md` entry; commit
+1. Edit `data/sites.csv` (and `scripts/sites_fill-wsg_name.py --write` if a watershed group code changed), or re-run `scripts/dataset_align-lidarbc.py` (a re-fit is a registry change too: `data/alignment_lidarbc.csv` reaches the items only here); add a `NEWS.md` entry; commit
 2. `git tag vX.Y.Z`
 3. `scripts/catalogue_release.sh` — rebuilds all items, validates + audits (`--expect` is the collection's link count, so a stray item JSON fails here), syncs, `stacs register --mode drift`, `stacs verify`, then checks the version stamp and registry coverage (~5 min, idempotent)
 
@@ -58,12 +60,16 @@ The same holds for #38's field rename: an additive run refuses while any item in
 Two commands with a human QC gate between them:
 
 1. Stitch — `caffeinate -s scripts/odm_process-batch.sh <project-dir>...` (skips already-processed dirs; resume-safe after interruption)
-2. QC the ortho — check `odm_report/stats.json` (all images reconstructed? reprojection error ~1-2 px?) and eyeball a preview
-3. Publish — `scripts/dataset_publish.sh <project-dir>...` (COG convert + validate → prod tree → items with flight datetimes → whole-tree `stacs validate` + `audit --expect` → durable S3 upload → collection extent → `stacs register --mode drift` → `stacs verify`; idempotent, safe to re-run)
+2. QC the ortho — `python3 scripts/odm_qc.py <project-dir>...` (fails on mixed input resolutions, a split reconstruction or reprojection error past 2 px), then eyeball a preview
+3. Fit to LidarBC — `uv run scripts/dataset_align-lidarbc.py <project-dir>...` (~30 s per dataset; writes the dataset's row to `data/alignment_lidarbc.csv`, which the publish commits with the registry row; `item_create.py` refuses a dataset with no row)
+4. Publish — `scripts/dataset_publish.sh <project-dir>...` (COG convert + validate → prod tree → items with flight datetimes → whole-tree `stacs validate` + `audit --expect` → durable S3 upload → collection extent → `stacs register --mode drift` → `stacs verify`; idempotent, safe to re-run)
+
+**Re-stitching a published dataset** is a retraction and a republish, because the publish keeps a COG that exists and cannot rebuild items the collection already links: delete its COG and prod copies (`imagery_uav_bc/<key>` and `stac/prod/imagery_uav_bc/<key>`) and the project's ODM outputs (step 1 skips a project that already has `odm_orthophoto/`), run steps 1–3 again, `item_unregister.sh` its three item ids (or the release's `stacs verify` reports them orphaned), **release** (`catalogue_release.sh`, which drops the dataset's links), then step 4 (publish) puts the new rasters and items back. **Re-fitting without a re-stitch** (a changed default, a newer LidarBC delivery) is a registry change: commit the table and release. `--check`, which the publish runs first, refuses a published or COG-tree raster that is not the raw tree's and an item that does not carry its row's fields, so a re-stitch or re-fit that skipped the release holds every publish until it happens.
 
 The underlying single-purpose tools these orchestrate, for one-off use:
 
 - `scripts/item_create.py <tifs relative to prod tree>` — items + collection.json (conda env `titiler`)
+- `uv run scripts/dataset_align-lidarbc.py --check` — every published dataset has an alignment row, no cloud changed since its fit, every published and COG-tree raster is the raw tree's, and every item carries its row's fields (`dataset_publish.sh` runs it first; `catalogue_release.sh` after its rebuild, so a re-stitch or re-fit holds every publish until it is released); `--selftest` is the script's gate, `--trial grid.csv` fits every model × mask per dataset
 - `scripts/stacs.sh register --config stacs.toml --mode drift` — upsert the collection, then every item the API lacks or serves stale (reads the published catalogue: sync first)
 - `scripts/stacs.sh verify --config stacs.toml --out-dir <dir>` — what the API serves against what is published
 - `find <prod tree> -name '*.json' ! -name collection.json | scripts/stacs.sh validate` (or `audit --config stacs.toml`) — pystac validation / collection + asset audit; `--dir` does not recurse, so pass paths on stdin
@@ -92,7 +98,7 @@ matters, and two steps are easy to miss:
 2. **Delete the old-id JSONs from the renamed prod dir.** `item_create.py --rebuild` writes
    `<new-id>.json` beside each tif but never removes JSONs whose id no longer matches, so the stale
    ones survive the rebuild and get pushed to S3 alongside the new ones.
-3. Update the row's `item` in `data/sites.csv` — the registry key is `(region, watershed, year, item)`.
+3. Update the row's `item` in `data/sites.csv` **and in `data/alignment_lidarbc.csv`** — both are keyed `(region, watershed, year, item)`. The fit does not change with a name, and `--check` (which the publish and release run first) refuses a row whose cloud is gone; re-running the fitter on the old path would write a phantom `no_cloud` row, not remove the stale one.
 4. `item_unregister.sh` the old ids **before** the publish or release, whose closing `stacs verify`
    otherwise fails on them. The final `aws s3 sync --delete` clears the old S3 prefix on its
    own (prod is authoritative for the bucket), but pgstac is not driven by the sync — and stacs is

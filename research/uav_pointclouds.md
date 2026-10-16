@@ -1,9 +1,12 @@
 # UAV point clouds: what we have, how far off they sit, and where the value is
 
-**Verified:** 2026-10-16 · **Issues:** spawned #41 (alignment), #42 (COPC publishing), #43 (change
-detection); added in #44 · **Produced by:** the probes in
-[`uav_pointclouds/`](uav_pointclouds/) (each says what it reads), run over the raw imagery tree;
-per-flight numbers in [`uav_pointclouds/uav_lidarbc_offsets.csv`](uav_pointclouds/uav_lidarbc_offsets.csv)
+**Verified:** 2026-10-16 · **Issues:** spawned #41 (alignment; built, see "Alignment in the
+pipeline"), #42 (COPC publishing), #43 (change detection); added in #44 · **Produced by:** the probes
+in [`uav_pointclouds/`](uav_pointclouds/) (each says what it reads), run over the raw imagery tree;
+per-flight numbers in [`uav_pointclouds/uav_lidarbc_offsets.csv`](uav_pointclouds/uav_lidarbc_offsets.csv);
+the pipeline's own fits in [`../data/alignment_lidarbc.csv`](../data/alignment_lidarbc.csv) and its
+model × mask trial in [`uav_pointclouds/trials/grid.csv`](uav_pointclouds/trials/grid.csv), both
+written by `scripts/dataset_align-lidarbc.py`
 
 The question was whether our UAV point clouds are worth putting in a STAC, whether they line up with
 LidarBC, and whether any of it supports change-over-time analysis. Short answers: the clouds are cheap
@@ -114,11 +117,97 @@ Ranked by value for the effort, cheapest first.
    checkerboards surveyed with a GNSS receiver) or an RTK/PPK drone, which would put each flight within
    centimetres without any of the fitting above. That is a field decision, not a processing one.
 
+## Alignment in the pipeline (#41)
+
+`scripts/dataset_align-lidarbc.py` promotes `uav_lidar_align.py`. For every published dataset it fits
+the ODM ground (class 2) to the newest LidarBC delivery that covers at least half the flight, writes
+one row to `data/alignment_lidarbc.csv`, and `item_create.py` carries a fitted row on every item of the
+dataset as `alignment:` fields (the README's "Elevations" section says how to apply them). The rasters
+are published as they are, and `alignment:applied` says so (`false`); #46 publishes them corrected and
+flips it, and #42 then publishes the clouds the same way. What changed from the probe, and why:
+
+- **Bilinear DEM sampling.** Nearest-cell added slope × U(−0.5, 0.5) m per point and made the
+  0.25 m search a step function.
+- **A Huber fit** (k = 1.345 robust scales) in place of least squares with a 3-NMAD trim, so the
+  fitter and the score (NMAD) share a loss; ten rows of the table above got worse from shift-only to
+  shift + tilt under the trimmed fit.
+- **The shift searched twice**, on two disjoint 20 000-point samples, which must agree within 2 m:
+  a flat site gives the shift no signal, and the probe's single search returned a number there all
+  the same. The cut was set from the plane run, where the 47 that fit agree within 1 m (41) or
+  1.3 m (four) and the next two sit at 5.5 m (`maxan_mx1`) and 8.5 m (the moose pre flight). The
+  quadratic table (the one shipped) is not as cleanly split: the quadratic fits both of those (spreads
+  0.5 and 0.8 m), its largest fitted spread is 1.95 m (`richfield_lower_RC3`, the one dataset it fits
+  worse than the plane) and its refusals sit at 2.6 m (`197912_roberthatch`) and 5.6 m.
+- **Coverage.** A delivery covering under half the flight is refused, after trying the older ones:
+  `16701523_table_ck` (27 %) is refused where the probe fitted it on a sliver.
+- **The dataset's own DTM checked** against its cloud (median within 0.1 m over 2000 ground points)
+  before fitting, since the DTM is what carries the fields.
+- **No geoid term.** It never entered the fit, and without the grid PROJ returns 0 silently.
+- **No held-out split.** One was built and dropped: fitting on one half of a 50 m checkerboard and
+  scoring on the other biased the search, because both "independent" samples then came from the same
+  half of the ground (`8530_sandstone_mcdonell`: 0.56 m on the fit's own sample, 2.65 m on every
+  point, at a shift 9 m from the probe's). A random split tests nothing at 10⁵ points and 3 or 6
+  parameters. The misfit is the NMAD over every ground point compared, as in the table above.
+
+**Result (2026-10-16).** Of the 83 published datasets, 46 fit (the quadratic, no mask: the trial
+below), 31 have no LidarBC under them, 3 have no ODM cloud, 3 are refused (`197912_roberthatch` and
+the moose post flight `shift_unstable`, their two shift searches 2.6 and 5.6 m apart;
+`16701523_table_ck` `low_coverage`, 27 %). Misfit of the fitted: median **0.42 m** (quartiles
+0.32–0.69), 42 within 1 m, 26 within 0.5 m. Fitted as a plane, the pipeline reproduces the table
+above on the same datasets: median 0.82 → 0.79 m, the same 28 within 1 m and 12 within 0.5 m, the
+per-dataset misfits within 0.18 m and the raw offsets within 0.03 m. Shifts agree to ±0.4 m for the
+middle half; nine differ by more than 1 m, all on near-flat score valleys (below).
+
+**Trial of models and masks.** `--trial` fits every model × mask on each dataset in one pass: the
+same cloud, reference and search samples, and every arm scored on every ground point compared, so a
+mask is judged on the ground it dropped as well as the ground it kept. `plane` or `quadratic`
+(u², uv, v² added); `none`, `slope` (LidarBC ground steeper than 15° left out of the fit), `open`
+(the dataset's own DSM − DTM over 0.5 m, canopy, left out), `slope+open`. The DSM and DTM are each
+sampled on their own grid: on 16 published datasets the two are a column, or a centimetre of origin,
+apart, and a first pass that demanded one grid refused them.
+
+| model | mask | fitted | misfit, median (quartiles) | ≤ 1 m | ≤ 0.5 m | paired with plane/none | lower / of |
+|---|---|---|---|---|---|---|---|
+| plane | none | 45 | 0.79 (0.47–1.17) | 27 | 12 | – | – |
+| plane | slope | 40 | 0.76 (0.46–1.25) | 25 | 11 | +0.010 m | 10 / 40 |
+| plane | open | 43 | 0.76 (0.45–1.17) | 27 | 12 | +0.000 m | 19 / 42 |
+| plane | slope+open | 34 | 0.57 (0.42–0.97) | 26 | 12 | +0.002 m | 15 / 34 |
+| quadratic | none | 46 | **0.42** (0.32–0.69) | 42 | 26 | −0.225 m | 42 / 44 |
+| quadratic | slope | 44 | 0.41 (0.28–0.70) | 40 | 25 | −0.228 m | 36 / 42 |
+| quadratic | open | 47 | 0.40 (0.29–0.67) | 43 | 30 | −0.237 m | 44 / 45 |
+| quadratic | slope+open | 46 | 0.41 (0.28–0.66) | 42 | 28 | −0.224 m | 41 / 45 |
+
+Misfit in metres (NMAD over every ground point compared) over the datasets the arm fitted; the
+paired columns are the median per-dataset difference from plane/none over the datasets both fitted,
+and on how many of them the arm is lower. Every refusal is `shift_unstable`: a mask thins the two
+search samples, and the plane's slope+open arm loses 14 datasets that way. The re-run of 16 datasets
+(below) reproduced the first pass cell for cell, the per-dataset random state being fixed.
+
+**Verdict: the quadratic, no mask.** The quadratic lowers the plane's misfit on 42 of the 44 datasets
+both fit, by a median of 0.225 m (0.78 → 0.42 m), and is worse only on `richfield_lower_RC3`
+(0.53 → 0.85 m); within 1 m goes from 27 datasets to 41, within 0.5 m from 12 to 25. The doming
+the moose pair showed is general: Pedley's correction surface bends by 2 m at 100 m from its centre
+in both directions. Within the quadratic the masks are a tie. Paired against no mask, `slope` moves
+the median by 0.000 m (lower on 19 of 42), `open` by −0.006 m (lower on 34 of 46; one dataset better
+by over 0.1 m, none worse) and `slope+open` by −0.006 m (27 of 45). What a mask buys is one dataset:
+`197912_roberthatch`, whose two shift searches disagree by 2.6 m on all its ground and agree on the
+open ground alone (`open` fits it at 0.15 m), is refused in the table. By the rule set at the plan
+gate (lowest median misfit over the same points, ties to the simpler) the default is `--model
+quadratic --mask none`; `--mask open` stays available and costs only the dataset's own DSM and DTM.
+
+**Limits.**
+
+- A site with one linear feature (a road, a bank) determines the shift across the feature, not along
+  it, and the two-sample test sees sampling noise, not that ambiguity: `8530_sandstone_mcdonell`
+  scores 1.63 m at (−0.4, 4.9) and 1.68 m at (7, −1). The misfit reports the fit; the shift's
+  uncertainty along such a feature is not recorded.
+- The 2019 LidarBC tiles carry no vertical CRS (2024 and later are CGVD2013); the fit takes the tiles
+  as they are.
+- A GPS-only scale error is representable by neither model.
+
 ## What is not known yet
 
-- How much of each flight's misfit is real change since the LiDAR rather than alignment error. A
-  stable-surface mask (roads, the LiDAR's own ground in open areas) would split the two.
-- Whether a quadratic per flight against LidarBC removes the doming as well as it does between the
-  moose flights. It is the next model to try in the alignment issue.
+- How much of each flight's misfit is real change since the LiDAR rather than alignment error. The
+  `open` and `slope` masks above split out canopy and steep ground, not change on open ground.
 - Whether `--pc-quality medium` or `high` changes any of this. It would raise density, not fix
   placement.

@@ -1,5 +1,34 @@
 # stac_uav_bc
 
+## Unreleased
+
+Every item of a dataset on a LidarBC DEM carries the dataset's fit to it as `alignment:` fields
+(#41). The rasters are unchanged.
+
+UAV elevations are GPS-referenced: no flight used ground control, and against the LidarBC 1 m DEM
+the published DTMs and DSMs sit a median of 8.3 m off vertically (−97 to +92 m) and 3.2 m
+horizontally. The fields give the horizontal shift and the quadratic surface
+(offset, tilt, curvature) that put the dataset's ground on LidarBC, and the misfit left (median
+0.42 m; 42 of 46 datasets within 1 m):
+
+- `alignment:reference`: the LidarBC delivery fitted against
+- `alignment:shift_x_m`, `alignment:shift_y_m`: add to the published coordinates, in the item's CRS
+- `alignment:offset_m`, `alignment:tilt_m_per_100m`: the vertical correction at the dataset's centre
+  and the tilt's size; `alignment:surface` and `alignment:centre` are the full fit (subtract
+  `surface(x - centre)` from the published z)
+- `alignment:misfit_m`, `alignment:points`, `alignment:model`: NMAD of the residual over the ground
+  points compared, how many, and `quadratic` (a plane, tried first, left a median of 0.78 m on the
+  same datasets)
+- `alignment:applied`: `false` on every item that carries the fields, the rasters being published as
+  ODM wrote them; #46
+  publishes them corrected and sets it `true`
+
+The README's "Elevations" section says how to apply them. `data/alignment_lidarbc.csv` is the table,
+`scripts/dataset_align-lidarbc.py` writes it, and a publish now needs the dataset's row; the first
+publish after this change waits for the release that carries the fields, as after #38. The 31
+datasets with no LidarBC under them, the 3 whose fit could not be determined and the 3 with no ODM
+point cloud carry no fields.
+
 ## v1.0.4 (2026-10-09)
 
 Registration and verification move to [`stacs`](https://github.com/NewGraphEnvironment/stacs), and

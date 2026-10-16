@@ -1,9 +1,11 @@
 #!/bin/bash
-# Publish ODM-processed projects to the STAC — run AFTER visual QC of the ortho.
+# Publish ODM-processed projects to the STAC — run AFTER visual QC of the ortho
+# and after scripts/dataset_align-lidarbc.py has written the dataset's row (#41).
 #
 # Per project: COG convert + validate → prod tree → create items (flight
-# datetimes) → S3 upload; then once per invocation: refresh the collection
-# temporal extent, final sync, register + verify with stacs (#35).
+# datetimes, registry and alignment fields) → S3 upload; then once per
+# invocation: refresh the collection temporal extent, final sync, register +
+# verify with stacs (#35).
 # Orchestrates the existing tools (item_create.py, scripts/stacs.sh with
 # stacs.toml); see scripts/config/README.md for the recipe.
 #
@@ -37,6 +39,14 @@ TIFS="odm_orthophoto/odm_orthophoto.tif odm_dem/dtm.tif odm_dem/dsm.tif"
 
 [ $# -ge 1 ] || { echo "usage: $(basename "$0") project-dir [project-dir ...]" >&2; exit 1; }
 
+# The alignment table must match the trees before anything is built from it (#41):
+# a cloud re-stitched since its fit, or a published or COG-tree raster that is not
+# the raw tree's (the COG step below reuses a COG that exists), would otherwise publish alignment:
+# fields that describe another cloud, with every gate below green. Reads the laz
+# headers and samples each raster pair (seconds); laspy lives under uv, so this cannot
+# be the python3 block below.
+uv run "$REPO/scripts/dataset_align-lidarbc.py" --check || exit 1
+
 rels=()
 new_tifs=()
 for proj in "$@"; do
@@ -49,6 +59,14 @@ for proj in "$@"; do
   for t in $TIFS; do
     [ -f "$proj/$t" ] || { echo "ERROR: missing $proj/$t — run ODM first" >&2; exit 1; }
   done
+  # The dataset's alignment row (#41). item_create.py refuses without one, but
+  # only after the COG conversion below; ask before the minutes are spent.
+  python3 -c '
+import csv, sys
+rows = {(r["region"], r["watershed"], r["year"], r["item"]) for r in csv.DictReader(open(sys.argv[1]))}
+if tuple(sys.argv[2].split("/")) not in rows:
+    sys.exit(f"ERROR: no row for {sys.argv[2]} in {sys.argv[1]}: run  uv run scripts/dataset_align-lidarbc.py {sys.argv[3]}")
+' "$REPO/data/alignment_lidarbc.csv" "$rel" "$proj" || exit 1
 
   echo "=== COG: $rel"
   for t in $TIFS; do
