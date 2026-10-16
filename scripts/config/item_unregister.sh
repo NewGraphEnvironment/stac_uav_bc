@@ -16,12 +16,12 @@ set -euo pipefail
 REPO="$(cd "$(dirname "$0")/../.." && pwd)"
 CFG=$(python3 -c '
 import sys, tomllib
-t = tomllib.load(open(sys.argv[1], "rb"))["transport"]
-print(t["host"], t["db"])' "$REPO/stacs.toml")
-HOST=${CFG% *}
-DB=${CFG#* }
-[ -n "$HOST" ] && [ -n "$DB" ] && [ "$HOST" != "$DB" ] \
-  || { echo "ERROR: could not read [transport] host/db from $REPO/stacs.toml" >&2; exit 1; }
+t = tomllib.load(open(sys.argv[1], "rb"))
+tr, c = t["transport"], t["catalogue"]
+print(tr["host"], tr["db"], c["api"].rstrip("/"), c["collection_id"])' "$REPO/stacs.toml")
+read -r HOST DB API CID <<< "$CFG"
+[ -n "$HOST" ] && [ -n "$DB" ] && [ -n "$API" ] && [ -n "$CID" ] \
+  || { echo "ERROR: could not read [transport] host/db and [catalogue] api/collection_id from $REPO/stacs.toml" >&2; exit 1; }
 
 [ $# -ge 1 ] || { echo "usage: $(basename "$0") item-id [item-id ...]" >&2; exit 1; }
 
@@ -45,4 +45,4 @@ done
 
 echo "unregistering $# item(s) from $DB db on $HOST"
 ssh "$HOST" "docker exec -i geoserv-db psql -U stac -d $DB -v ON_ERROR_STOP=1" < "$TMP"
-echo "OK — verify 404: curl -s -o /dev/null -w '%{http_code}' https://images.a11s.one/collections/imagery-uav-bc-prod/items/<item-id>"
+echo "OK — verify 404: curl -s -o /dev/null -w '%{http_code}' $API/collections/$CID/items/<item-id>"

@@ -50,25 +50,27 @@ Decided with Al at the plan gate (2026-10-16): this session runs the cutover, an
 
 ## Phase 2: `collection_unregister.sh`, the drop path (written now, run in Phase 6)
 
-- [ ] `scripts/config/collection_unregister.sh [--config <toml>] <id>` reports (item count,
+- [x] `scripts/config/collection_unregister.sh [--config <toml>] <id>` reports (item count,
       collection row, which toml and id it read) and deletes nothing; `--yes <id>` runs
       `pgstac.delete_collection` over the same ssh/psql path as `item_unregister.sh`; host and db
       from `stacs.toml`; header states the cascade cost and that the old id has no recovery after
       the cutover (the new id's is `catalogue_release.sh`)
-- [ ] Guards: id and db allowlists (`[A-Za-z0-9_-]`, `[A-Za-z0-9_]`); refuses the id the toml names;
-      `--yes` refuses unless `<api>/collections/<toml id>` answers 200 and its search count is at
-      least the target's; ssh reachability probe (`BatchMode`); an unreadable count refuses, toward
-      not deleting; an absent collection is "nothing to do", exit 0, and a row with no items is
-      said as such; the count printed is read before asking
-- [ ] After `--yes`: re-read both counts (items 0, row 0) and curl the old id for 404, exit
+- [x] Guards: id and db allowlists (`[A-Za-z0-9_-]`, `[A-Za-z0-9_]`); refuses the id the toml names;
+      `--yes` refuses unless `<api>/collections/<toml id>` answers 200 and pgstac holds at least
+      the target's count in it; ssh reachability probe (`BatchMode`); an unreadable count refuses,
+      toward not deleting; an absent collection is "nothing to do", exit 0, and a row with no items
+      is said as such; the count printed is read before asking
+- [x] After `--yes`: re-read both counts (items 0, row 0) and curl the old id for 404, exit
       non-zero on anything else; `item_unregister.sh`'s verify line reads api and collection id from
       `stacs.toml` (no literal)
-- [ ] `--selftest`: the one remote call sits behind a `pg_query` function, and the selftest
-      redefines it with a stub that returns canned counts and logs every SQL it receives; cases:
-      suspicious id, configured id, unreadable count, report mode sends no `delete_collection`,
-      `--yes` with the configured collection absent refuses; restore-the-bug on the configured-id
-      guard
-- [ ] `scripts/config/README.md`: the "collection deletion is server-side" gotcha names the script;
+- [x] `--selftest`: the three remote calls sit behind functions the selftest redefines with stubs
+      (canned counts, every SQL logged); 11 cases: suspicious id, configured id, report mode sends
+      no `delete_collection`, row with no items, unreadable count, absent collection, items with no
+      row, `--yes` with the live collection unserved, with fewer items, the happy path deleting
+      once and reading back 0/0/404, a suspicious db name; restore-the-bug: the configured-id
+      guard dropped, the selftest fails that one case. Report mode against the real database: old
+      id 245 items, nothing deleted; the configured id refused
+- [x] `scripts/config/README.md`: the "collection deletion is server-side" gotcha names the script;
       a "Renaming the collection" recipe (register new → verify → sweep → drop; the safe
       invocation in the version window) beside the dataset-rename recipe; `CLAUDE.md`'s
       `scripts/config/` line names the script

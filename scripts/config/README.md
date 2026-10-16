@@ -107,6 +107,35 @@ matters, and two steps are easy to miss:
 
 Check for external dependents first, exactly as in the retraction recipe above.
 
+### Renaming the collection
+
+The id has one source, `stacs.toml`'s `collection_id`: `item_create.py --rebuild` stamps it, and
+the title built from it, into `collection.json` and so into every item's `collection` field and
+link titles, and both `dataset_publish.sh` and an additive `item_create.py` refuse a prod tree that
+names another id. Item ids, the bucket and the asset hrefs do not change. The order below is the
+whole design (#48; stac_dem_bc's #34 before it): the reverse, delete then load, took the API to
+zero items on 2026-08-29.
+
+1. `stacs.toml`: the new `collection_id`; a NEWS entry naming the old and new id; commit.
+2. `scripts/catalogue_release.sh <version>` with the version **explicit**. The rebuild writes the
+   new id and title into the tree, the sync publishes it, and `stacs register --mode drift` finds
+   the new collection unregistered and loads it beside the old one, which stays live and
+   untouched (stacs never deletes). From here the bucket holds only the new id's bodies, so the
+   static catalogue already names the new id and pgstac's old rows are the last copy of the old
+   collection. Until the tag exists, a release run without the explicit version restamps the last
+   tag's number over the live one.
+3. Verify: `stacs verify` IN SYNC on the new id, a client query against it, one tile through the
+   API from one of its items. Then the consumer sweep: every `collections =` in the report and
+   talk repos, the sibling catalogue READMEs, the infrastructure repo's register-all list. The old
+   id keeps serving meanwhile.
+4. `scripts/config/collection_unregister.sh <old-id>` reports the count, which must be the whole
+   catalogue (anything else means something still writes to the old id); then `--yes`, which
+   refuses unless the configured collection is served with at least as many items, deletes, and
+   checks items 0, row 0 and a 404 from the API. pgstac's cached `/search` bodies naming the old
+   id are harmless and stay.
+5. Release commit on main: NEWS heading, `git tag`, and `curl <api>/collections/<id>` reads the
+   version.
+
 ### Large datasets (>~300 images)
 
 Single-pass ODM memory scales with the whole flight and the meshing stage can run 10+ hours or OOM (observed: 817 images → 20+ h, >70 GB RAM). Use split-merge instead:
@@ -121,7 +150,7 @@ ODM carves the flight into ~250-image submodels (100 m overlap), processes each 
 
 - **s3://imagery-uav-bc has ACLs disabled** — public read comes from the bucket policy. Never pass `--acl`; `put-object-acl` fails with `AccessControlListNotSupported`.
 - **TiTiler caches failed lookups**: if a COG is probed before its upload finishes, GDAL caches the 403 and the URL stays broken. Fix: `ssh root@146.190.12.8 docker restart geoserv-titiler`.
-- Full collection rebuild and collection deletion are **server-side operations** — that tooling lives with the server build in our internal infrastructure repo, not here.
+- Collection deletion is `scripts/config/collection_unregister.sh` (#48), the one script here that destroys a collection: it reports first, deletes with `--yes`, refuses the collection `stacs.toml` names, and refuses `--yes` while the configured collection is not served with at least as many items. A full rebuild from the registry and the bucket is `scripts/catalogue_release.sh`.
 
 ---
 

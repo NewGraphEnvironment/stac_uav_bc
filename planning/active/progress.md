@@ -15,3 +15,7 @@
   on 4 checks); `dataset_publish.sh` asks before the COG step. Mirror rebuild: 0 files name the
   old id, 246 the new; validate 246/0; audit OK on the new id; diff vs prod as predicted. Log under
   `evidence/20261016_mirror_rebuild_new_id.log`
+- Phase 2: `scripts/config/collection_unregister.sh` (report mode, `--yes`, `--selftest` with 11
+  stubbed cases; guard-dropped mutant red on the configured-id case; real report mode: old id 245,
+  nothing deleted, configured id refused); `item_unregister.sh` verify line from `stacs.toml`;
+  config README gotcha + "Renaming the collection" recipe; CLAUDE.md line

@@ -193,6 +193,26 @@ check through titiler's `/stac` route; the template query measured as 245; the b
 carve-out for NEWS and the recipe; QGIS counts recorded before the drop; no full release re-run
 after the tag.
 
+## Phase 1 and 2 measurements (2026-10-16)
+
+- `item_create.py --selftest` PASS; with the stamp dropped (`collection.id = cid` removed) it
+  fails 4 checks. A first version of the selftest let the additive refusal's `sys.exit` end the
+  run before printing them: the final check is now caught and reported as a failure.
+- Additive mode against the real prod tree (old id) with the new toml: REFUSED before any
+  write (0 prod JSONs modified). The publish pre-check block refuses the same way.
+- Mirror rebuild (`--rebuild --base <mirror> --version 2.0.0`, 245 tifs symlinked, 246 JSONs
+  copied): 0 files name the old id, 246 the new; `stacs validate` 246 validated, 0 invalid;
+  `stacs audit --config stacs.toml --expect 245` OK against `stac-imagery-uav-bc`. Diff against
+  prod, by key: `collection` on 245 items; collection.json `id`, `title`, `version`; the root,
+  parent and collection link titles on every item (hrefs identical, link order differs); the #38
+  renames (`nge:*` gone, `newgraph:`, `uav:`, `fwa:`, `bcfishpass:` present); `alignment:*` on
+  the fitted datasets' items (1,518 field differences); `title` on 15 items and `uav:stream_name*`
+  on the rows Al corrected; `newgraph:alias` on the 6 moose items (#22's aliases, never
+  released). Log: `evidence/20261016_mirror_rebuild_new_id.log`.
+- `collection_unregister.sh --selftest`: 11 cases PASS; with the configured-id guard removed,
+  that one case fails. Report mode on the real database: `imagery-uav-bc-prod` 245 items,
+  nothing deleted; `stac-imagery-uav-bc` refused as the configured collection.
+
 ## Errors Encountered
 
 | Error | Resolution |
