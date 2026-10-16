@@ -267,6 +267,53 @@ by enumeration, not by a quiet round.
 - The committed planning files named five private repos and their internal paths in a public
   repo; now described generically (the report repos themselves are public).
 
+### Round 3 (spawned 20:39Z, delivered 20:52Z; `review-round3.md`)
+
+Asked for the mechanism. Its answer: every round-1/2 defect was a guard, stub or message keyed
+on a **surrogate** for the state it decided on (item id for (id, collection); a count for
+containment; a logged delete for a delete that took; a SQL substring for the query's direction;
+curl's exit for its output; the shell's exit for the verdict), which agrees with the property in
+the steady state and parts company on exactly the state the script exists for; the stub answered
+from the request's text rather than a modelled state, so such a guard could be deleted green.
+Two more instances, both fixed, plus a wording:
+
+- `item_unregister.sh` took `--collection` only in position 1 and its id allowlist admitted
+  option-shaped tokens, so `id1 --collection <old>` deleted `id1` from the **live** collection
+  plus two phantom ids, exit 0, and `--colection` was accepted as an id. Now an option loop like
+  the drop script's, `-*` refused anywhere. Measured through an ssh shim (nothing reaches the
+  host): misplaced flag refused, misspelt flag refused, `-bad` refused, `--collection <old> id1`
+  sends `delete_item('id1', '<old>')`, a bare id sends the configured collection.
+- The `numeric` guard on the row count had no case under `--yes`: without it `[ "" -eq 0 ]`
+  exits 2, `if` reads false, and the delete runs. The ported case runs under `--yes` and expects
+  no delete.
+- NEWS said the old id "answers 404" after the drop. True of `/collections/<id>`; `/search` with
+  the old id answers 200 and no features (measured), so a consumer left on the old id renders an
+  empty table. NEWS and the issue body now say so.
+
+### Enumeration (the loop's end, after an inside-a-fix round)
+
+Two sets, both walked mechanically on 2026-10-16 (`scratchpad/enum/mutate.sh`):
+
+1. **Every guard site in `collection_unregister.sh`, with the selftest case that fails without
+   it.** 19 mutants, one per site (argument count, id allowlist, unreadable toml, blank setting,
+   db allowlist, configured id, ssh probe, numeric item count, numeric row count, items with no
+   row, the report-mode gate, live status, numeric containment count, containment, the
+   containment's direction, the post-delete read-back, the post-delete 404, the selftest's
+   verdict flag, the delete statement itself): every one RED. Five of those sites had no case
+   until this pass (argument count, unreadable toml, blank setting, unreachable host, unreadable
+   row count); the cases were written on a copy and are ported in round 3's commit. Two of the
+   new cases first failed for a reason of their own: `grep -q` closes the pipe on the first
+   match and, under `pipefail`, the subshell's SIGPIPE flips the verdict, so a case captures
+   before it greps, as `run` does.
+2. **Every `VAR=$(...)` whose command can fail**, in the three shell files the branch touches:
+   in the drop script each is defaulted (`|| c=000`), refused (`|| refuse`), or `|| true` into a
+   `numeric` or a compare; `mktemp` and the selftest's own substitutions end under `set -e`
+   into the verdict-flag trap. In `item_unregister.sh` the toml read is unguarded and ends the
+   script under `set -e` with python's traceback, toward not deleting. `dataset_publish.sh`'s
+   new block has none. Beside it, a blank value in the toml shifted the positional `read` of
+   the four settings (the refusal still fired, with mislabelled values): the python now
+   validates and prints tab-separated, and the reads use a tab IFS (round 3's commit).
+
 ## Errors Encountered
 
 | Error | Resolution |

@@ -89,13 +89,15 @@ main() {
 
   # Host, db, api and the live collection id are the write path's own (#35).
   local CFG
+  # Joined with a character no setting contains, so a blank one stays in its position (a
+  # whitespace IFS would collapse it and shift the rest into the wrong names).
   CFG=$(python3 -c '
 import sys, tomllib
 t = tomllib.load(open(sys.argv[1], "rb"))
 c, tr = t["catalogue"], t["transport"]
-print(tr["host"], tr["db"], c["api"].rstrip("/"), c["collection_id"])' "$CONFIG") \
+print("|".join([tr["host"], tr["db"], c["api"].rstrip("/"), c["collection_id"]]))' "$CONFIG") \
     || refuse "could not read [transport] host, db and [catalogue] api, collection_id from $CONFIG"
-  read -r HOST DB API LIVE_ID <<< "$CFG"
+  IFS='|' read -r HOST DB API LIVE_ID <<< "$CFG"
   [ -n "$HOST" ] && [ -n "$DB" ] && [ -n "$API" ] && [ -n "$LIVE_ID" ] \
     || refuse "a blank setting in $CONFIG (host='$HOST' db='$DB' api='$API' collection_id='$LIVE_ID')"
   case "$DB" in *[!A-Za-z0-9_]*) refuse "suspicious database name: '$DB'" ;; esac
@@ -196,7 +198,7 @@ TOML
   # records every statement; once a delete_collection has been seen, the target is gone,
   # unless STUB_STICKY says the delete did not take (rows stay) or STUB_STICKY_API says
   # the API still serves it, so the read-back guards have a case that can fail them.
-  ssh_probe() { :; }
+  ssh_probe() { [ "${STUB_SSH_DOWN:-0}" -eq 0 ]; }
   deleted() { [ "$STUB_STICKY" -eq 0 ] && grep -q delete_collection "$LOG"; }
   pg_query() {
     local sql; sql=$(cat); echo "$sql" >> "$LOG"
@@ -224,7 +226,7 @@ TOML
     local name=$1 want_rc=$2 want=$3 want_del=$4; shift 4
     : > "$LOG"
     local out rc dels
-    out=$(main --config "$td/stacs.toml" "$@" 2>&1) && rc=0 || rc=$?
+    out=$(main --config "${RUN_CONFIG:-$td/stacs.toml}" "$@" 2>&1) && rc=0 || rc=$?
     dels=$(grep -c delete_collection "$LOG" || true)
     if [ "$rc" -ne "$want_rc" ] || ! printf '%s' "$out" | grep -qF -- "$want" || [ "$dels" -ne "$want_del" ]; then
       echo "  FAIL: $name (rc=$rc want $want_rc; deletes=$dels want $want_del; want text: $want)"
@@ -237,6 +239,19 @@ TOML
   STUB_LIVE=stac-live-bc; STUB_LIVE_STATUS=200; STUB_COUNT=245; STUB_ROWS=1
   STUB_MISSING=0; STUB_MISSING_REVERSED=0; STUB_STICKY=0; STUB_STICKY_API=0
   run "a suspicious id refuses" 1 "suspicious collection id" 0 "bad;id"
+  run "two ids refuse with usage" 1 "usage:" 0 "stac-old-bc" "stac-older-bc"
+  RUN_CONFIG="$td/no-such.toml"
+  run "an unreadable toml refuses" 1 "could not read" 0 "stac-old-bc"
+  printf '[catalogue]\napi = "https://api.example"\ncollection_id = "stac-live-bc"\n[transport]\nhost = ""\ndb = "stac"\n' > "$td/blank.toml"
+  RUN_CONFIG="$td/blank.toml"
+  run "a blank setting refuses, under its own name" 1 "host=''" 0 "stac-old-bc"
+  RUN_CONFIG=""
+  STUB_SSH_DOWN=1
+  run "an unreachable host refuses" 1 "cannot reach" 0 "stac-old-bc"
+  STUB_SSH_DOWN=0
+  STUB_ROWS="ERROR: relation"
+  run "an unreadable row count refuses, even under --yes" 1 "could not read" 0 --yes "stac-old-bc"
+  STUB_ROWS=1
   run "the configured (live) id refuses" 1 "is the collection" 0 "stac-live-bc"
   run "report mode deletes nothing" 0 "Nothing deleted" 0 "stac-old-bc"
   STUB_COUNT=0

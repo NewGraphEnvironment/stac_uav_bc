@@ -67,12 +67,12 @@ Decided with Al at the plan gate (2026-10-16): this session runs the cutover, an
       one-argument form raises on two rows during the window) and takes `--collection <id>` for
       the old copy (round 2), which the drop's refusal names beside the missing ids
 - [x] `--selftest`: the three remote calls sit behind functions the selftest redefines with stubs
-      (canned counts, every SQL logged); 11 cases: suspicious id, configured id, report mode sends
-      no `delete_collection`, row with no items, unreadable count, absent collection, items with no
-      row, `--yes` with the live collection unserved, with fewer items, the happy path deleting
-      once and reading back 0/0/404, a suspicious db name; restore-the-bug: the configured-id
-      guard dropped, the selftest fails that one case. Report mode against the real database: old
-      id 245 items, nothing deleted; the configured id refused
+      (canned counts, every SQL logged, the containment query answered from its own text); 21
+      cases after three review rounds; the mutation table (`findings.md`, Enumeration) has one
+      mutant per guard site, 19 of them, every one red on a named case. Report mode against the
+      real database: old id 245 items, nothing deleted; the configured id refused.
+      `item_unregister.sh` refuses any option-shaped token as an id (round 3), measured through
+      an ssh shim
 - [x] `scripts/config/README.md`: the "collection deletion is server-side" gotcha names the script;
       a "Renaming the collection" recipe (register new → verify → sweep → drop; the safe
       invocation in the version window) beside the dataset-rename recipe; `CLAUDE.md`'s
@@ -93,7 +93,9 @@ Decided with Al at the plan gate (2026-10-16): this session runs the cutover, an
       drop date, the old frozen at 1.0.4; the drop date filled in Phase 6), then #38's old → new
       field pairs, then the registry corrections from Al's edits (five renames: 15 items retitled;
       three second streams: 9 items), then #41's text
-- [ ] `/code-check branch`; open the PR as draft with Phases 4–6 listed as pending
+- [x] `/code-check branch` (three rounds: 4, 5 and 2 findings, rounds 2 and 3 each inside the
+      previous round's fixes; ended by enumeration, 19 guard mutants all red); PR #50 open as
+      draft with Phases 4–6 listed as pending
 
 ## Phase 4: Cutover: register the new collection, old stays live
 

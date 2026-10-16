@@ -18,30 +18,39 @@ set -euo pipefail
 # Host and db are the write path's own: read from stacs.toml, so a host move
 # cannot leave the delete path pointing at the old machine (#35).
 REPO="$(cd "$(dirname "$0")/../.." && pwd)"
+# Joined with a character no setting contains, so a blank one stays in its position
+# (a whitespace IFS would collapse it and shift the rest).
 CFG=$(python3 -c '
 import sys, tomllib
 t = tomllib.load(open(sys.argv[1], "rb"))
 tr, c = t["transport"], t["catalogue"]
-print(tr["host"], tr["db"], c["api"].rstrip("/"), c["collection_id"])' "$REPO/stacs.toml")
-read -r HOST DB API CID <<< "$CFG"
+print("|".join([tr["host"], tr["db"], c["api"].rstrip("/"), c["collection_id"]]))' "$REPO/stacs.toml")
+IFS='|' read -r HOST DB API CID <<< "$CFG"
 [ -n "$HOST" ] && [ -n "$DB" ] && [ -n "$API" ] && [ -n "$CID" ] \
-  || { echo "ERROR: could not read [transport] host/db and [catalogue] api/collection_id from $REPO/stacs.toml" >&2; exit 1; }
+  || { echo "ERROR: a blank setting in $REPO/stacs.toml (host='$HOST' db='$DB' api='$API' collection_id='$CID')" >&2; exit 1; }
 
+usage() { echo "usage: $(basename "$0") [--collection <id>] item-id [item-id ...]" >&2; exit 1; }
 COLL="$CID"
-if [ "${1:-}" = "--collection" ]; then
-  [ $# -ge 2 ] || { echo "usage: $(basename "$0") [--collection <id>] item-id [item-id ...]" >&2; exit 1; }
-  COLL="$2"; shift 2
-fi
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --collection) [ $# -ge 2 ] || usage; COLL="$2"; shift 2 ;;
+    --) shift; break ;;
+    -*) echo "ERROR: unknown option: $1" >&2; usage ;;
+    *) break ;;
+  esac
+done
 case "$COLL" in
   ''|*[!A-Za-z0-9_-]*) echo "ERROR: suspicious collection id: '$COLL'" >&2; exit 1 ;;
 esac
-[ $# -ge 1 ] || { echo "usage: $(basename "$0") [--collection <id>] item-id [item-id ...]" >&2; exit 1; }
+[ $# -ge 1 ] || usage
 
 TMP=$(mktemp)
 trap 'rm -f "$TMP"' EXIT
 for id in "$@"; do
+  # An option-shaped token is never an id: a misplaced or misspelt --collection would
+  # otherwise be deleted as an item, and the real ids from the configured collection.
   case "$id" in
-    *[!A-Za-z0-9_-]*) echo "ERROR: suspicious item id: $id" >&2; exit 1 ;;
+    ''|-*|*[!A-Za-z0-9_-]*) echo "ERROR: suspicious item id: '$id'" >&2; exit 1 ;;
   esac
   # The collection is passed: pgstac's delete_item deletes RETURNING ... INTO STRICT, so
   # while two collections hold the same id (a rename's window, #48) the one-argument
