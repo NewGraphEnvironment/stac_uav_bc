@@ -82,9 +82,6 @@ SEARCH_LIMIT = 200  # the API pages past this; a flight under more tiles than th
 LAZ = pathlib.Path("odm_georeferencing") / "odm_georeferenced_model.laz"
 DTM = pathlib.Path("odm_dem") / "dtm.tif"
 DSM = pathlib.Path("odm_dem") / "dsm.tif"
-ORTHO = pathlib.Path("odm_orthophoto") / "odm_orthophoto.tif"
-MME_ORTHO = pathlib.Path("ortho.tif")  # the two Maps Made Easy datasets: an orthophoto, no cloud
-RASTERS = (DTM, DSM, ORTHO, MME_ORTHO)  # every raster a dataset publishes; --check ties each copy to the raw tree
 TIMEOUT = 60  # s, on every fetch: a hung read must fail loud, not stall the run
 KEY = ["region", "watershed", "year", "item"]
 COLUMNS = KEY + ["status", "reference", "reference_crs", "dem_ids", "model", "mask", "shift_x_m",
@@ -591,6 +588,13 @@ def published_matches(raw, pub, rng):
     return None
 
 
+def rasters_of(d):
+    """The rasters a dataset dir publishes, relative to it: every tif but ODM's
+    `.original.tif`, which is how item_create.py enumerates them (a literal list
+    would cover what the trees hold today and miss a product added later)."""
+    return sorted(p.relative_to(d) for p in d.rglob("*.tif") if not p.name.endswith(".original.tif")) if d.is_dir() else []
+
+
 def item_fields(row):
     """The alignment: fields a row puts on its dataset's items, as item_create.py
     writes them: none unless the row is fitted."""
@@ -617,9 +621,9 @@ def check_table(rows, root, prod, cog):
     for k, r in rows.items():
         name, raw = "/".join(k), root.joinpath(*k)
         for tree, what, remedy in copies:
-            for tif in RASTERS:
+            for tif in rasters_of(tree.joinpath(*k)):
                 pub = tree.joinpath(*k) / tif
-                if pub.is_file() and (raw / tif).is_file():
+                if (raw / tif).is_file():
                     why = published_matches(raw / tif, pub, dataset_rng(k))
                     if why:
                         drift.append(f"{name}: {what} {tif.name} is not shown to be the raw tree's ({why}): {remedy}")
@@ -628,9 +632,10 @@ def check_table(rows, root, prod, cog):
         # rename) that no rebuild rewrites, so its remedy is a delete, not a release.
         want = item_fields(r)
         pdir = prod.joinpath(*k)
-        items = {pdir / tif.parent / ("-".join(k + tif.parent.parts + (tif.stem,)) + ".json")
-                 for tif in RASTERS if (pdir / tif).is_file()}
+        items = {pdir / tif.parent / ("-".join(k + tif.parent.parts + (tif.stem,)) + ".json") for tif in rasters_of(pdir)}
         for j in (sorted(pdir.rglob("*.json")) if pdir.is_dir() else []):
+            if j.name.startswith("."):
+                continue  # a dotfile never ships: both S3 syncs exclude them
             if j not in items:
                 drift.append(f"{name}: {j.name} is not an item of this dataset's rasters: delete it (rename recipe, step 2)")
                 break

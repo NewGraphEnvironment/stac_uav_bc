@@ -23,4 +23,5 @@
 - Default set to `quadratic`/`none`; selftest green, 12 guards red again (and a 13th for the grid refusal); production table regenerated (46 fitted, median 0.42 m); `--check` OK; mirror rebuild validated, audited and checked against the control
 - Phase 4 docs filled from the table (`fill_numbers.py`), README re-rendered, issue body edited
 - Phase 2 and Phase 4 committed
-- Next: `/code-check branch`, `/planning-archive`, `/gh-pr-push`
+- `/code-check branch`: six rounds (7b122ef, 134202d, a711b19, 242f0b4, 82ac3f3, and the round-6 commit). Rounds 2–4 each found a defect inside the previous round's fix, all the same mechanism (a tie between two adjacent copies through a proxy that left the next copy open); `--check` now ties the table to the raw cloud (count, date, size), every published and COG-tree raster to the raw tree (data-bearing windows with a floor), and every item to its row, and both publish scripts run it. The chain was enumerated and checked by two rounds; round 6 found nothing real
+- Next: `/planning-archive`, `/gh-pr-push`

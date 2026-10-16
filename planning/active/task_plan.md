@@ -63,8 +63,8 @@ Sign convention is stated once, in the README, and the NEWS entry repeats it.
 
 ## Validation
 - [x] `uv run scripts/dataset_align-lidarbc.py --selftest` and `conda run -n titiler python scripts/item_create.py --selftest` pass, and fail with each guard's defect restored (12 and 4 guards red, `findings.md`)
-- [ ] `/code-check` clean (once over the branch with `/code-check branch`)
-- [ ] PWF checkboxes match landed work
+- [x] `/code-check` clean (once over the branch with `/code-check branch`) (six rounds; rounds 2–4 each found a defect inside the previous fix, one mechanism, ended by enumerating the chain of copies and having two rounds check it; `findings.md`)
+- [x] PWF checkboxes match landed work
 - [ ] `/planning-archive` on completion; the archive README carries Measurement (misfit distribution, trial grid) and Evidence (`research/uav_pointclouds/trials/`, `data/alignment_lidarbc.csv`)
 
 ## Verification, end to end
