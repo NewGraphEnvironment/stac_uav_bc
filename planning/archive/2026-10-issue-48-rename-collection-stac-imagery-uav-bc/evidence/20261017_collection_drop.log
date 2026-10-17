@@ -1,0 +1,64 @@
+# Drop of imagery-uav-bc-prod (#48), 2026-10-17, run from m4 on branch 48-rename-the-collection-to-stac-imagery-ua
+# Gate before the drop (00:49-00:53 UTC): 13 sweep PRs MERGED (template a6b2bf0, fraser_2023 e97e530,
+# peace_2024 8c7c824, skeena_2024 df365ba, fraser_2025 fcdad76, peace_2025 c9cf123, skeena_2025 8a3695e,
+# restoration_wedzin_kwa_2024 c7077e2, first talk repo cf55b67, infrastructure repo 77079a5,
+# stac_dem_bc 3465b09, stac_floodplains_bc 01059ad, stac_pointcloud_bc 02825da); git grep of each
+# consumer's fetched origin/main for the old id: only rendered output (docs/*.html, search_index.json,
+# a _freeze json, stac_dem_bc's README.html/index.html), logs and planning archives; the second talk
+# repo's feature branch (working tree and origin) no longer names it; QGIS projects: m4 332/0, m1 141/0.
+
+$ scripts/config/collection_unregister.sh imagery-uav-bc-prod
+Sat Oct 17 00:52:45 UTC 2026
+collection : imagery-uav-bc-prod
+database   : stac on root@146.190.12.8
+config     : /Users/airvine/Projects/repo/stac_uav_bc/stacs.toml (live collection: stac-imagery-uav-bc)
+items      : 245  <-- destroyed with the collection row
+
+Nothing deleted. Re-run with --yes to destroy the above:
+  scripts/config/collection_unregister.sh --yes imagery-uav-bc-prod
+exit=0
+
+$ scripts/config/collection_unregister.sh --yes imagery-uav-bc-prod
+Sat Oct 17 00:53:38 UTC 2026
+collection : imagery-uav-bc-prod
+database   : stac on root@146.190.12.8
+config     : /Users/airvine/Projects/repo/stac_uav_bc/stacs.toml (live collection: stac-imagery-uav-bc)
+items      : 245  <-- destroyed with the collection row
+deleting imagery-uav-bc-prod (245 items) ...
+OK — deleted imagery-uav-bc-prod (245 items); https://images.a11s.one/collections/imagery-uav-bc-prod answers 404
+No recovery for imagery-uav-bc-prod: the bucket publishes stac-imagery-uav-bc (scripts/catalogue_release.sh).
+exit=0
+Sat Oct 17 00:53:47 UTC 2026
+
+# After the drop (00:54-00:56 UTC)
+GET /collections/stac-imagery-uav-bc : id=stac-imagery-uav-bc version=2.0.0 title=UAV Imagery from British Columbia - stac-imagery-uav-bc
+GET /collections/imagery-uav-bc-prod : 404
+POST /search {"collections":["imagery-uav-bc-prod"],"limit":1} : HTTP 200, 0 features
+GET /collections : stac-airphoto-bc, stac-elevation-bc, stac-floodplains-bc, stac-imagery-uav-bc, stac-pointcloud-bc
+
+$ scripts/stacs.sh verify --config stacs.toml
+published  : 245
+registered : 245
+missing    : 0
+orphaned   : 0
+changed    : 0
+collection : same
+IN SYNC: 245 published, all registered with the published body, no orphans
+
+$ scripts/config/collection_unregister.sh imagery-uav-bc-prod
+items      : 0
+nothing to do: no such collection registered
+exit=0
+
+pgstac (psql on the droplet):
+items by collection: stac-airphoto-bc=10100, stac-elevation-bc=102460, stac-floodplains-bc=23, stac-imagery-uav-bc=245, stac-pointcloud-bc=174282
+collection rows naming uav: stac-imagery-uav-bc
+searches naming old id: 320   (the API's /search cache, left in place by design)
+
+titiler, one tile from the new collection:
+item: 200 https://images.a11s.one/collections/stac-imagery-uav-bc/items/skeena-zymoetz-2024-8530_sandstone_mcdonell-odm_dem-dsm
+tile z/x/y = 16/9518/20790
+tile: 200 image/png 693 bytes
+
+rstac from R (the README's query against the new id):
+collection=stac-imagery-uav-bc features=245

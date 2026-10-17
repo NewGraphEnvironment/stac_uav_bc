@@ -1,0 +1,555 @@
+start 2026-10-16T20:56:51Z
+=== catalogue release v2.0.0
+=== rebuild items from sites.csv
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:09:13 11:37:50+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:09:13 11:37:50+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:09:13 11:37:50+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:10:07 12:43:06+00:00: invalid literal for int() with base 10: b':10'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:10:07 12:43:06+00:00: invalid literal for int() with base 10: b':10'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:10:07 12:43:06+00:00: invalid literal for int() with base 10: b':10'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:10:04 11:33:25+00:00: invalid literal for int() with base 10: b':10'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:10:04 11:33:25+00:00: invalid literal for int() with base 10: b':10'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:10:04 11:33:25+00:00: invalid literal for int() with base 10: b':10'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:10:04 13:51:14+00:00: invalid literal for int() with base 10: b':10'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:10:04 13:51:14+00:00: invalid literal for int() with base 10: b':10'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:10:04 13:51:14+00:00: invalid literal for int() with base 10: b':10'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:09:15 16:52:17+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:09:15 16:52:17+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:09:15 16:52:17+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:10:05 12:54:21+00:00: invalid literal for int() with base 10: b':10'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:10:05 12:54:21+00:00: invalid literal for int() with base 10: b':10'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:10:05 12:54:21+00:00: invalid literal for int() with base 10: b':10'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2021:10:16 14:42:22+00:00: invalid literal for int() with base 10: b':10'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2021:10:16 14:42:22+00:00: invalid literal for int() with base 10: b':10'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2021:10:16 14:42:22+00:00: invalid literal for int() with base 10: b':10'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:10:22 16:40:50+00:00: invalid literal for int() with base 10: b':10'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:10:22 16:40:50+00:00: invalid literal for int() with base 10: b':10'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:10:22 16:40:50+00:00: invalid literal for int() with base 10: b':10'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:09:12 13:13:04+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:09:12 13:13:04+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:09:12 13:13:04+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2022:08:16 11:53:12+00:00: invalid literal for int() with base 10: b':08'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2022:08:16 11:53:12+00:00: invalid literal for int() with base 10: b':08'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2022:08:16 11:53:12+00:00: invalid literal for int() with base 10: b':08'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2022:08:16 14:26:44+00:00: invalid literal for int() with base 10: b':08'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2022:08:16 14:26:44+00:00: invalid literal for int() with base 10: b':08'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2022:08:16 14:26:44+00:00: invalid literal for int() with base 10: b':08'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:08:28 16:28:37+00:00: invalid literal for int() with base 10: b':08'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:08:28 16:28:37+00:00: invalid literal for int() with base 10: b':08'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:08:28 16:28:37+00:00: invalid literal for int() with base 10: b':08'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:08:29 14:05:10+00:00: invalid literal for int() with base 10: b':08'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:08:29 14:05:10+00:00: invalid literal for int() with base 10: b':08'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:08:29 14:05:10+00:00: invalid literal for int() with base 10: b':08'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:09:10 15:19:00+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:09:10 15:19:00+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:09:10 15:19:00+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:07:14 14:49:57+00:00: invalid literal for int() with base 10: b':07'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:07:14 14:49:57+00:00: invalid literal for int() with base 10: b':07'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:07:14 14:49:57+00:00: invalid literal for int() with base 10: b':07'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:09:15 15:08:41+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:09:15 15:08:41+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:09:15 15:08:41+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:07:17 11:51:22+00:00: invalid literal for int() with base 10: b':07'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:07:17 11:51:22+00:00: invalid literal for int() with base 10: b':07'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:07:17 11:51:22+00:00: invalid literal for int() with base 10: b':07'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:07:16 15:00:33+00:00: invalid literal for int() with base 10: b':07'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:07:16 15:00:33+00:00: invalid literal for int() with base 10: b':07'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:07:16 15:00:33+00:00: invalid literal for int() with base 10: b':07'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:07:14 19:02:05+00:00: invalid literal for int() with base 10: b':07'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:07:14 19:02:05+00:00: invalid literal for int() with base 10: b':07'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:07:14 19:02:05+00:00: invalid literal for int() with base 10: b':07'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:07:17 13:17:18+00:00: invalid literal for int() with base 10: b':07'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:07:17 13:17:18+00:00: invalid literal for int() with base 10: b':07'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:07:17 13:17:18+00:00: invalid literal for int() with base 10: b':07'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2022:08:28 12:40:03+00:00: invalid literal for int() with base 10: b':08'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2022:08:28 12:40:03+00:00: invalid literal for int() with base 10: b':08'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2022:08:28 12:40:03+00:00: invalid literal for int() with base 10: b':08'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2020:09:04 12:23:51+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2020:09:04 12:23:51+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2020:09:04 12:23:51+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2020:09:04 11:47:38+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2020:09:04 11:47:38+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2020:09:04 11:47:38+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2020:09:05 11:47:24+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2020:09:05 11:47:24+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2020:09:05 11:47:24+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2021:09:16 14:16:50+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2021:09:16 14:16:50+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2021:09:16 14:16:50+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2021:09:09 17:08:38+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2021:09:09 17:08:38+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2021:09:09 17:08:38+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2021:09:11 11:38:51+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2021:09:11 11:38:51+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2021:09:11 11:38:51+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2022:08:31 13:05:00+00:00: invalid literal for int() with base 10: b':08'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2022:08:31 13:05:00+00:00: invalid literal for int() with base 10: b':08'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2022:08:31 13:05:00+00:00: invalid literal for int() with base 10: b':08'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2022:09:03 14:50:15+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2022:09:03 14:50:15+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2022:09:03 14:50:15+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2022:08:31 17:27:34+00:00: invalid literal for int() with base 10: b':08'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2022:08:31 17:27:34+00:00: invalid literal for int() with base 10: b':08'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2022:08:31 17:27:34+00:00: invalid literal for int() with base 10: b':08'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2022:09:16 10:46:35+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2022:09:16 10:46:35+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2022:09:16 10:46:35+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2022:09:16 10:07:15+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2022:09:16 10:07:15+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2022:09:16 10:07:15+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2022:09:03 11:39:29+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2022:09:03 11:39:29+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2022:09:03 11:39:29+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:09:15 10:38:55+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:09:15 10:38:55+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:09:15 10:38:55+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:09:15 12:06:02+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:09:15 12:06:02+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:09:15 12:06:02+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:09:26 15:04:51+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:09:26 15:04:51+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:09:26 15:04:51+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:09:19 13:32:37+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:09:19 13:32:37+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:09:19 13:32:37+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:09:28 17:31:40+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:09:28 17:31:40+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:09:28 17:31:40+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:10:02 16:42:11+00:00: invalid literal for int() with base 10: b':10'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:10:02 16:42:11+00:00: invalid literal for int() with base 10: b':10'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:10:02 16:42:11+00:00: invalid literal for int() with base 10: b':10'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:09:23 14:22:19+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:09:23 14:22:19+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:09:23 14:22:19+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:10:04 10:18:22+00:00: invalid literal for int() with base 10: b':10'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:10:04 10:18:22+00:00: invalid literal for int() with base 10: b':10'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:10:04 10:18:22+00:00: invalid literal for int() with base 10: b':10'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:22 15:07:04+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:22 15:07:04+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:22 15:07:04+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:20 16:12:39+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:20 16:12:39+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:20 16:12:39+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:22 12:22:59+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:22 12:22:59+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:22 12:22:59+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:22 12:43:13+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:22 12:43:13+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:22 12:43:13+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:22 13:34:19+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:22 13:34:19+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:22 13:34:19+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:22 15:23:43+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:22 15:23:43+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:22 15:23:43+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:22 14:29:09+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:22 14:29:09+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:22 14:29:09+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:22 13:03:35+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:22 13:03:35+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:22 13:03:35+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:19 15:58:36+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:19 15:58:36+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:19 15:58:36+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:19 15:58:36+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:19 15:58:36+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:19 15:58:36+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:24 15:33:33+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:24 15:33:33+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:24 15:33:33+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:19 09:10:27+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:19 09:10:27+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:19 09:10:27+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:19 18:29:59+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:19 18:29:59+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:19 18:29:59+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:19 17:29:06+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:19 17:29:06+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:19 17:29:06+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:18 18:54:17+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:18 18:54:17+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:18 18:54:17+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:23 18:16:02+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:23 18:16:02+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:23 18:16:02+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:18 20:38:52+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:18 20:38:52+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:18 20:38:52+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:18 19:44:36+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:18 19:44:36+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:06:18 19:44:36+00:00: invalid literal for int() with base 10: b':06'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2022:09:10 14:18:29+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2022:09:10 14:18:29+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2022:09:10 14:18:29+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2021:09:07 16:09:01+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2021:09:07 16:09:01+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2021:09:07 16:09:01+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2021:09:08 13:08:10+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2021:09:08 13:08:10+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2021:09:08 13:08:10+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2021:09:06 18:46:16+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2021:09:06 18:46:16+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2021:09:06 18:46:16+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:09:27 14:15:40+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:09:27 14:15:40+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:09:27 14:15:40+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:09:27 12:52:23+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:09:27 12:52:23+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:09:27 12:52:23+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:09:16 12:52:08+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:09:16 12:52:08+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:09:16 12:52:08+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:09:16 13:49:00+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:09:16 13:49:00+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:09:16 13:49:00+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:09:16 15:05:57+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:09:16 15:05:57+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:09:16 15:05:57+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:09:16 14:10:44+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:09:16 14:10:44+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:09:16 14:10:44+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:09:16 13:15:33+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:09:16 13:15:33+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:09:16 13:15:33+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:10:03 14:21:24+00:00: invalid literal for int() with base 10: b':10'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:10:03 14:21:24+00:00: invalid literal for int() with base 10: b':10'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2025:10:03 14:21:24+00:00: invalid literal for int() with base 10: b':10'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:07:22 12:33:36+00:00: invalid literal for int() with base 10: b':07'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:07:22 12:33:36+00:00: invalid literal for int() with base 10: b':07'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:07:22 12:33:36+00:00: invalid literal for int() with base 10: b':07'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:07:21 16:35:49+00:00: invalid literal for int() with base 10: b':07'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:07:21 16:35:49+00:00: invalid literal for int() with base 10: b':07'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:07:21 16:35:49+00:00: invalid literal for int() with base 10: b':07'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:07:21 11:39:37+00:00: invalid literal for int() with base 10: b':07'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:07:21 11:39:37+00:00: invalid literal for int() with base 10: b':07'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:07:21 11:39:37+00:00: invalid literal for int() with base 10: b':07'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:09:23 16:08:31+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:09:23 16:08:31+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:09:23 16:08:31+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:07:22 10:56:54+00:00: invalid literal for int() with base 10: b':07'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:07:22 10:56:54+00:00: invalid literal for int() with base 10: b':07'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:07:22 10:56:54+00:00: invalid literal for int() with base 10: b':07'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:09:23 16:37:52+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:09:23 16:37:52+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:09:23 16:37:52+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:09:22 15:26:05+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:09:22 15:26:05+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2026:09:22 15:26:05+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:09:19 16:19:37+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:09:19 16:19:37+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:09:19 16:19:37+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:09:18 12:36:26+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:09:18 12:36:26+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2023:09:18 12:36:26+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:09:17 16:03:09+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:09:17 16:03:09+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+/opt/homebrew/Caskroom/miniconda/base/envs/titiler/lib/python3.11/site-packages/rio_stac/stac.py:363: UserWarning: Could not get parse date: 2024:09:17 16:03:09+00:00: invalid literal for int() with base 10: b':09'
+  warnings.warn(f"Could not get parse date: {dst_date}: {err}")
+
+REBUILD: 245 items from 245 tifs; collection v2.0.0, 245 links; bbox [-127.7411, 49.20881, -114.52941, 56.07826]
+links OK: 245 item links resolve under /Users/airvine/Projects/gis/uav_imagery/stac/prod/imagery_uav_bc
+
+=== alignment table against the trees and the rebuilt items
+ALIGN CHECK OK: 83 rows: every published dataset has one, no cloud changed, every published and COG-tree raster is the raw tree's, every item carries its row's fields
+=== validate + audit (gate)
+validated 246 item(s), 0 invalid
+checked 245 item(s) against stac-imagery-uav-bc (require=image forbid=-)
+OK: every item agrees with its collection (require=image forbid=-)
+=== sync JSONs to S3
+    sync OK
+=== register (stacs: collection first, then whatever the API lacks or serves stale)
+unknown PostgreSQL timezone: 'Canada/Pacific'; will use UTC
+collection : stac-imagery-uav-bc
+mode       : drift
+asset audit: require=image forbid=-
+fetching published collection.json ...
+published  : 245
+fetching 245 item JSON(s) with 20 workers ...
+fetched    : 245 of 245 (0 failed)
+comparing every body with the API ...
+published  : 245
+registered : 0
+missing    : 245
+orphaned   : 0
+changed    : 0
+collection : missing
+to register: 245
+audit      : 245 item(s) against stac-imagery-uav-bc (require=image forbid=-)
+collections: 1
+payload : 52356 bytes
+target  : stac db on root@146.190.12.8
+loaded   : 1 collections
+items   : 245
+payload : 769752 bytes
+target  : stac db on root@146.190.12.8
+loaded   : 245 items
+verifying by set equality and content ...
+OK: the collection is served with the published body
+OK: every published item is served with the published body
+DONE: 245 item(s) registered to stac-imagery-uav-bc
+=== verify (stacs: id sets both ways, every body by digest)
+collection : stac-imagery-uav-bc
+mode       : verify
+asset audit: require=image forbid=-
+fetching published collection.json ...
+published  : 245
+fetching 245 item JSON(s) with 20 workers ...
+fetched    : 245 of 245 (0 failed)
+comparing every body with the API ...
+published  : 245
+registered : 245
+missing    : 0
+orphaned   : 0
+changed    : 0
+collection : same
+IN SYNC: 245 published, all registered with the published body, no orphans
+=== verify (this catalogue: version stamp, registry coverage)
+live collection version: 2.0.0 | items: 245
+    item count OK: 245
+    registry coverage OK: 245/245 items carry newgraph:region + uav:stream_name, no undeclared fields
+    alignment coverage OK: 138/245 items carry alignment: fields, matching 46 fitted rows
+RELEASE COMPLETE: v2.0.0
+exit=0
+end 2026-10-16T20:58:24Z

@@ -47,7 +47,9 @@ path_collection = "/Users/airvine/Projects/gis/uav_imagery/stac/prod/imagery_uav
 path_s3_json = "https://imagery-uav-bc.s3.amazonaws.com/collection.json"
 # path_s3_json = "https://dev-imagery-uav-bc.s3.amazonaws.com/collection.json"
 
-collection_id = "imagery-uav-bc-prod"
+# The id's one source is stacs.toml (#48): scripts/item_create.py --rebuild stamps it, and
+# the title built from it, into collection.json. This notebook made the first collection.
+collection_id = "stac-imagery-uav-bc"
 # collection_id = "imagery-uav-bc-dev"
 
 path_cogs = list(Path(path_collection).parent.rglob("*.tif"))

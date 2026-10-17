@@ -47,6 +47,19 @@ TIFS="odm_orthophoto/odm_orthophoto.tif odm_dem/dtm.tif odm_dem/dsm.tif"
 # be the python3 block below.
 uv run "$REPO/scripts/dataset_align-lidarbc.py" --check || exit 1
 
+# The collection id has one source, stacs.toml (#48). item_create.py refuses a prod tree
+# whose collection.json names another id, but only after the COG conversion below has
+# spent its minutes; ask first. Only a full release renames.
+python3 - "$CONFIG" "$PROD/collection.json" <<'PYEOF'
+import json, sys, tomllib
+want = tomllib.load(open(sys.argv[1], "rb"))["catalogue"]["collection_id"]
+have = json.load(open(sys.argv[2])).get("id")
+if have != want:
+    sys.exit(f"ERROR: {sys.argv[2]} is collection {have!r} but {sys.argv[1]} names {want!r}: "
+             "only a full release renames; run scripts/catalogue_release.sh <version> first "
+             "(scripts/config/README.md, 'Renaming the collection')")
+PYEOF
+
 rels=()
 new_tifs=()
 for proj in "$@"; do

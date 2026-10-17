@@ -1,9 +1,11 @@
 #!/usr/bin/env python
-# Create or rebuild STAC items for the imagery-uav-bc-prod catalog.
+# Create or rebuild STAC items for the stac-imagery-uav-bc catalogue.
 #
 # Registry-driven: data/sites.csv is the source of truth for stream names,
 # watershed groups, site ids, aliases (#16); data/alignment_lidarbc.csv carries
 # each dataset's fit to LidarBC, and every dataset built needs a row there (#41).
+# The collection id is stacs.toml's: a rebuild stamps it into collection.json and
+# so into every item; an additive run refuses a tree that names another id (#48).
 # Item geometry is the true valid-data outline from gdal_footprint (bbox remains
 # the raster extent).
 #
@@ -11,9 +13,11 @@
 #   item_create.py <tifs relative to base>   additive — skip ids already in the collection
 #   item_create.py --rebuild                 regenerate EVERY item from the prod tree +
 #                                            sites.csv, rebuild collection links, stamp
-#                                            the version (from git tag or --version)
-#   item_create.py --selftest                the gate: registry mapping, title, prefix
-#                                            guards (no network, no tifs; non-zero on failure)
+#                                            the collection id (from stacs.toml) and the
+#                                            version (from git tag or --version)
+#   item_create.py --selftest                the gate: registry mapping, title, prefix and
+#                                            collection-id guards (no network, no tifs;
+#                                            non-zero on failure)
 #
 # Run inside the titiler conda env (pystac + rio_stac + rasterio):
 #   conda run -n titiler python scripts/item_create.py --rebuild
@@ -29,6 +33,7 @@ import pathlib
 import subprocess
 import sys
 import tempfile
+import tomllib
 from urllib.parse import unquote
 
 import pystac
@@ -37,6 +42,34 @@ import rio_stac
 
 REPO = pathlib.Path(__file__).resolve().parent.parent
 VERSION_EXT = "https://stac-extensions.github.io/version/v1.2.0/schema.json"
+# The collection id has one source, stacs.toml (#48). A full rebuild stamps it, and the
+# title built from it, into collection.json; pystac then writes the id into every item's
+# `collection` field and the title into its root, parent and collection link titles. An
+# additive run refuses a tree that names another id, because only a rebuild renames.
+STACS_TOML = REPO / "stacs.toml"
+COLLECTION_TITLE = "UAV Imagery from British Columbia - {id}"
+
+def toml_collection_id(path=STACS_TOML):
+    with open(path, "rb") as f:
+        cid = tomllib.load(f)["catalogue"]["collection_id"]
+    if not isinstance(cid, str) or not cid.strip():
+        sys.exit(f"REFUSED: [catalogue] collection_id in {path} is blank")
+    return cid
+
+def collection_stamp(collection, cid):
+    # Before any item is built: the items take their `collection` and link titles from
+    # the collection object as it is when they are serialised.
+    collection.id = cid
+    collection.title = COLLECTION_TITLE.format(id=cid)
+
+def collection_id_check(collection, cid, path):
+    # Additive mode: new items would otherwise be published under the tree's id beside
+    # a collection the toml, and so stacs, calls something else.
+    if collection.id != cid:
+        sys.exit(f"REFUSED: {path} is collection {collection.id!r} but {STACS_TOML} names "
+                 f"{cid!r}; only a full rebuild renames a collection. Release first: NEWS entry "
+                 "naming the old and new id, then scripts/catalogue_release.sh <version> "
+                 "(scripts/config/README.md, 'Renaming the collection').")
 PRODUCT_LABEL = {"odm_orthophoto": "orthophoto", "dtm": "DTM", "dsm": "DSM", "ortho": "orthophoto"}
 # Every field prefix an item may carry (#38). Each names what its fields describe:
 # proj: from rio_stac; fwa: the BC Freshwater Atlas; bcfishpass: its crossing ids;
@@ -388,12 +421,62 @@ def _selftest():
         check(tree_undeclared(base) == {"a/old.json": ["nge:stream_name"]},
               f"tree guard misses a pre-#38 item: {tree_undeclared(base)}")
 
+    # The collection id has one source (#48): the toml read, the rebuild stamp as the
+    # items see it, and the additive refusal.
+    with tempfile.TemporaryDirectory() as td:
+        toml = pathlib.Path(td) / "stacs.toml"
+        toml.write_text('[catalogue]\ncollection_id = "stac-x-bc"\n')
+        check(toml_collection_id(toml) == "stac-x-bc", "toml_collection_id misreads the toml")
+        toml.write_text('[catalogue]\ncollection_id = " "\n')
+        try:
+            toml_collection_id(toml)
+            check(False, "a blank collection_id passed")
+        except SystemExit:
+            pass
+    old_title = COLLECTION_TITLE.format(id="old-id")
+    new_title = COLLECTION_TITLE.format(id="new-id")
+    def temp_collection():
+        c = pystac.Collection(id="old-id", description="d", title=old_title,
+                              extent=pystac.Extent(pystac.SpatialExtent([[0, 0, 1, 1]]),
+                                                   pystac.TemporalExtent([[None, None]])))
+        c.set_self_href("https://b/collection.json")
+        c.set_root(c)
+        return c
+    c = temp_collection()
+    collection_stamp(c, "new-id")
+    it = pystac.Item(id="i", geometry=None, bbox=None, datetime=datetime.datetime(2020, 1, 1),
+                     properties={}, collection=c)
+    it.set_self_href("https://b/a/i.json")
+    collection_add(c, it)
+    d = it.to_dict()
+    titles = {l["rel"]: l.get("title") for l in d["links"]}
+    check(d["collection"] == "new-id", f"stamp missed the item's collection: {d['collection']!r}")
+    check(all(titles.get(r) == new_title for r in ("root", "parent", "collection")),
+          f"stamp missed an item link title: {titles}")
+    cd = c.to_dict()
+    check(cd["id"] == "new-id" and cd["title"] == new_title,
+          f"stamp missed the collection: {cd['id']!r}, {cd['title']!r}")
+    check(next(l.get("title") for l in cd["links"] if l["rel"] == "root") == new_title,
+          "stamp missed the collection's root link title")
+    check("old-id" not in json.dumps(cd) + json.dumps(d), "the old id survives the stamp")
+    try:
+        collection_id_check(temp_collection(), "new-id", "x/collection.json")
+        check(False, "additive mode accepted a tree naming another id")
+    except SystemExit:
+        pass
+    try:
+        collection_id_check(c, "new-id", "x/collection.json")
+    except SystemExit:
+        # Caught rather than propagated, or a dropped stamp would end the selftest here
+        # with the refusal's text in place of the failed checks above.
+        check(False, "additive mode refused a tree that matches the toml")
+
     if fails:
         print(f"ITEM SELFTEST FAILED: {len(fails)} check(s)", file=sys.stderr)
         for f in fails:
             print(f"  - {f}", file=sys.stderr)
         return 1
-    print("ITEM SELFTEST PASS: registry mapping, alignment join, title and prefix guards")
+    print("ITEM SELFTEST PASS: registry mapping, alignment join, title, prefix and collection-id guards")
     return 0
 
 def main():
@@ -445,6 +528,11 @@ def main():
     # collection and every item: a network dependency, and the published copy's
     # fields in place of the one being built (#35).
     collection.set_root(collection)
+    cid = toml_collection_id()
+    if args.rebuild:
+        collection_stamp(collection, cid)
+    else:
+        collection_id_check(collection, cid, base / "collection.json")
 
     if args.rebuild:
         collection.clear_items()
