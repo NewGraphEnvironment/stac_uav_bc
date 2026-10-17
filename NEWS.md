@@ -1,6 +1,6 @@
 # stac_uav_bc
 
-## Unreleased
+## v2.0.0 (2026-10-17)
 
 Three consumer-visible changes in one release, so that consumers absorb one break: the collection
 is renamed (#48), the item fields move off `nge:` (#38), and every item of a dataset fitted to
