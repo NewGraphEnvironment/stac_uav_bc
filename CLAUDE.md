@@ -420,7 +420,7 @@ which indexes **default branches only**: a file on a feature branch needs
 `gh api repos/<owner>/<repo>/contents/<path>?ref=<branch>`. `s3cmd ls` and `aws s3 ls` each
 list only their own provider's buckets; the backup script names the rest.
 
-*16 lines of evidence for this rule are in `conventions/agent-operations.md`.*
+*17 lines of evidence for this rule are in `conventions/agent-operations.md`.*
 
 #### The temporal version: what you build against may be about to change
 
@@ -516,7 +516,7 @@ It is not the secret-read clamp (`newgraph.md`, "Reading a secret clamps the res
 session"), which names *earlier conversation content* and needs a restart. This refusal
 names a **category** of action, such as "Production Deploy".
 
-*9 lines of evidence for this rule are in `conventions/agent-operations.md`.*
+*10 lines of evidence for this rule are in `conventions/agent-operations.md`.*
 
 ### Hand the user bare commands
 
@@ -538,7 +538,7 @@ granted separately, so probe each. If blocked, do not retry variants: ask for **
 into the repo, with absolute source and destination paths. Full Disk Access for the terminal
 app removes the block.
 
-*12 lines of evidence for this rule are in `conventions/agent-operations.md`.*
+*13 lines of evidence for this rule are in `conventions/agent-operations.md`.*
 
 ### Link every issue and PR you name to the user
 
