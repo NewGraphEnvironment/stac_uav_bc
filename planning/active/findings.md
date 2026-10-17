@@ -346,3 +346,31 @@ Two sets, both walked mechanically on 2026-10-16 (`scratchpad/enum/mutate.sh`):
 | Error | Resolution |
 |-------|------------|
 | titiler `/cog/tilejson.json` and `/stac/tilejson.json` answer 404 | titiler 2.0.0a2 needs the tile matrix set in the path: `/stac/WebMercatorQuad/tilejson.json` |
+
+## Phase 6: the drop (2026-10-17, m4; `evidence/20261017_collection_drop.log`)
+
+**Gate, 00:49–00:53Z.** All thirteen sweep PRs MERGED (merge commits in the log). The GitHub
+code-search index still listed the source files the PRs had just changed (fraser_2023's
+`0400-results.Rmd`, the infrastructure repo's register-all list, stac_dem_bc's README), the known
+index lag, so the search is the net and the clone-and-grep the proof: after `git fetch`, a
+`git grep` of each consumer's `origin/main` names the old id only in rendered output (the reports'
+`docs/*.html` and `search_index.json`, the first talk repo's `_freeze` json, stac_dem_bc's
+`README.html` and `index.html`), the infrastructure repo's logs, and planning archives. The second
+talk repo's feature branch (working tree and origin) no longer names it in the four scripts: Al
+changed them. The template has 25 remote branches besides main; 24 still carry the old id on the
+`0400-results.Rmd` line main changed. A merge takes main's version unless the branch touched that
+line, so they are not a blocker; a branch that did touch it conflicts there and the conflict names
+the id. QGIS: m4 332 projects, m1 141, none naming the id.
+
+**Drop.** Report mode read 245 at 00:52Z; `--yes` at 00:53Z deleted the row and its 245 items and
+read back a 404. The script's own guards passed: the live collection served, and 0 of the old
+item ids lacked an item in it.
+
+**After.** `/collections/stac-imagery-uav-bc`: version 2.0.0, the new title; `/collections` lists
+five ids, the old one gone; `/collections/imagery-uav-bc-prod` 404; a `/search` naming the old id
+200 with 0 features (as NEWS says). `stacs verify` IN SYNC 245/245, collection same. pgstac items
+by collection: airphoto 10100, elevation 102460, floodplains 23, imagery-uav 245, pointcloud
+174282; no collection row but `stac-imagery-uav-bc` names uav; the 320 cached `/search` bodies
+naming the old id are still there, by design. One tile from a new-collection item: 200 `image/png`
+693 bytes. rstac from R against the new id: 245 features. Report mode on the old id now says
+"nothing to do".

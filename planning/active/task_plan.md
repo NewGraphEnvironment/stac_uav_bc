@@ -138,22 +138,29 @@ Decided with Al at the plan gate (2026-10-16): this session runs the cutover, an
       repo configures an R&D cross-reference; public repos get no private pointers
 - [x] Gate: the template's `0400-results.Rmd` query lines run against the new id return 245
       features, equal to the old id's 245 measured before the drop
-- [ ] The thirteen PRs merged (all MERGEABLE/CLEAN at 21:03Z; the auto-mode classifier refused
-      `gh pr merge` as a merge without review, so Al merges them)
-- [ ] QGIS count on each other machine that holds projects (hand Al the one-liner; this machine:
-      332 projects, 0 name the id; m1, 2026-10-16: 141 projects, 0 of the `.qgs` name it, `.qgz`
-      not read by the simple one-liner); each machine's number recorded before the drop
+- [x] The thirteen PRs merged (all MERGEABLE/CLEAN at 21:03Z; the auto-mode classifier refused
+      `gh pr merge` as a merge without review, so Al merged them; the last landed 00:50Z 2026-10-17)
+- [x] QGIS count on each other machine that holds projects (this machine, m4: 332 projects, 0
+      name the id; m1, 2026-10-16: 141 projects, 0 of the `.qgs` name it, `.qgz` not read by the
+      simple one-liner); both recorded before the drop
 
 ## Phase 6: Drop the old collection, release
 
-- [ ] Every sweep PR merged; every machine's QGIS count recorded (non-zero → the infrastructure
+- [x] Every sweep PR merged; every machine's QGIS count recorded (non-zero → the infrastructure
       repo's project surgeries, before the drop); `gh api search/code` for the old id returns only
       archives, logs and the evidence repo's dumps plus the by-design carve-out (NEWS, the config README recipe,
       planning), and a clone-and-grep of each consumer repo, open template branches included, agrees
-- [ ] `scripts/config/collection_unregister.sh imagery-uav-bc-prod` reports **245** (anything else
+      (2026-10-17 00:49–00:53Z: thirteen MERGED; the code-search index still listed the source files
+      the PRs had just changed, so the clone-and-grep is the proof: each consumer's fetched
+      `origin/main` names the old id only in rendered output, logs and planning archives; 24 of the
+      template's 25 other remote branches still carry it on the line main changed, which a merge
+      takes from main unless the branch touched that line)
+- [x] `scripts/config/collection_unregister.sh imagery-uav-bc-prod` reports **245** (anything else
       means something still writes to it); then `--yes`, which prints items 0, row 0, API 404
-- [ ] New id serves 245; `stacs verify` IN SYNC; `collection_unregister.sh imagery-uav-bc-prod`
-      says "nothing to do"; drop date into NEWS and the issue body
+      (00:52Z: 245; `--yes` 00:53Z: deleted 245 items, API 404; `evidence/20261017_collection_drop.log`)
+- [x] New id serves 245; `stacs verify` IN SYNC; `collection_unregister.sh imagery-uav-bc-prod`
+      says "nothing to do"; drop date into NEWS and the issue body (IN SYNC: 245; nothing to do;
+      pgstac 245 under the new id and no old row; tile 200 `image/png`; rstac 245; dates filled)
 - [ ] `/planning-archive` (README with Measurement and Evidence); merge; release commit on main:
       NEWS heading `## v2.0.0 (<date>)`, `git tag v2.0.0`, then `curl $API | jq .version` reads
       2.0.0 and `stacs verify` IN SYNC; close #38, #41, #48
@@ -162,5 +169,5 @@ Decided with Al at the plan gate (2026-10-16): this session runs the cutover, an
 
 - [x] Selftests pass (`item_create.py`, `collection_unregister.sh`, `dataset_align-lidarbc.py`)
 - [x] `/code-check` clean (once over the branch: three rounds, ended by enumeration)
-- [ ] PWF checkboxes match landed work
+- [x] PWF checkboxes match landed work
 - [ ] `/planning-archive` on completion

@@ -20,7 +20,7 @@ ids, the S3 bucket, every asset href and download link, and the asset key `image
   layer holds the asset href.
 - **When:** the static catalogue on S3 (`collection.json` and every item JSON) names the new id
   from this release. The API serves both collections from this release until the old one is
-  dropped (date to follow here), the old one frozen at 1.0.4 with no new flights. After the drop
+  dropped, 2026-10-17 (00:53 UTC), the old one frozen at 1.0.4 with no new flights. After the drop
   `/collections/imagery-uav-bc-prod` answers 404, but a `/search` that still names the old id in
   `collections` answers 200 with **no features**, not an error: an `rstac` query or a report chapter
   left on the old id renders an empty table. Change the id, do not wait for a failure.

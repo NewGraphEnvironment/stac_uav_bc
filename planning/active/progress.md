@@ -28,3 +28,9 @@
 - Round 3 (mechanism: guards keyed on a surrogate; 2 findings + 1 wording, fixed): item_unregister.sh option loop and -* refusal (ssh-shim measured); row-count numeric case under --yes; NEWS: /search on the old id answers 200 with no features. Loop ended by enumeration: 19 guard mutants red, every $(...) guarded
 - Phase 4: cutover RELEASE COMPLETE v2.0.0 (20:58Z); hand checks 245/245, tile 200; README rendered from the new collection; issue body rewritten; 13 sweep PRs opened (21:00Z)
 - Phase 5: 13 PRs open and MERGEABLE/CLEAN; template gate 245 on the new id; gh pr merge refused by the auto-mode classifier (merge without review): Al merges, then Phase 6
+- Phase 6 (2026-10-17): Al merged the remaining PRs (last at 00:50Z); gate re-measured in the
+  foreground (13 MERGED, clone-and-grep clean outside rendered output/logs/archives, the second
+  talk repo's branch already changed, QGIS m4 332/0 + m1 141/0); drop: report 245 → `--yes`
+  deleted 245, API 404 (00:53Z); after: new id 2.0.0, verify IN SYNC 245, nothing to do, tile 200,
+  rstac 245; drop date into NEWS and the issue body. Next: `/planning-archive`, PR #50 ready,
+  merge, release commit + tag v2.0.0 on main, close #38 #41 #48
