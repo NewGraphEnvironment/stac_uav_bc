@@ -25,7 +25,7 @@ Item metadata lives implicitly in directory names with bbox-only geometries; no 
 - [x] Verify: `rstac` filter `nge:watershed_group == 'morice'` → 12 datasets; API geometry vertex count > 5; viewer spot-check
 - [ ] PR via `/gh-pr-push`, merge, `/planning-archive`
 
-### Phase 4 — CI rebuild (blocked on rtj#200 OIDC role)
+### Phase 4 — CI rebuild (blocked on an internal issue OIDC role)
 
 - [ ] `.github/workflows/update.yml` modeled on stac_dem_bc: push to `data/sites.csv` + `workflow_dispatch`; dataset enumeration **from sites.csv** (`published=true`); COG reads via `/vsicurl/` (headers/overviews only — no local tifs in CI); `item_validate.py` gate; `aws s3 sync`
 - [ ] Registration stays a documented manual step, matching the stac_dem_bc split

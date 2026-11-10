@@ -5,7 +5,7 @@ Build the catalog's retraction path and execute the first retraction (mis-filed 
 
 ### Phase 0 — Hand off the #16 PWF
 
-- [x] `/planning-archive` the completed #16 PWF (issue closed; its open Phase 4 / CI workflow is tracked by rtj#200 and noted in the archived plan + progress hand-off)
+- [x] `/planning-archive` the completed #16 PWF (issue closed; its open Phase 4 / CI workflow is tracked by an internal issue and noted in the archived plan + progress hand-off)
 
 ### Phase 1 — `item_unregister.sh`
 

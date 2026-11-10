@@ -3,7 +3,7 @@
 ## Session 2026-08-05
 
 - Phases approved via plan mode (v1.0.1 patch vehicle; round-trip test gate before deletion)
-- Archived #16 PWF (Phase 4 → rtj#200)
+- Archived #16 PWF (Phase 4 → an internal issue)
 - Created branch `18-retraction-flow-item-unregister-sh-publi`
 - Next: Phase 1 (item_unregister.sh + round-trip)
 - Phase 1: item_unregister.sh built; round-trip test passed (200→404→idempotent warn→200)

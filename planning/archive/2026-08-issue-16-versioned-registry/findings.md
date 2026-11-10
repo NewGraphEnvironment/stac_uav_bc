@@ -24,7 +24,7 @@ Workflow per release: edit sites.csv → PR/commit → rebuild → NEWS entry + 
 Phasing:
 
 - **Phase 1 (now, local):** wire sites.csv + footprints into `scripts/stac_create_item.py`, backfill all items, adopt NEWS.md + version stamp + first tag. Blocked on: sites.csv review, crossing-id verification (tunnel), footprint approval.
-- **Phase 2 (CI):** `update.yml` triggered on push to `data/sites.csv` + `workflow_dispatch`, using a `role_gha_stac_uav_bc` OIDC role (rtj issue to follow, modeled on rtj#184). Registration stays a one-command manual step (`scripts/config/stac_register_item.sh`).
+- **Phase 2 (CI):** `update.yml` triggered on push to `data/sites.csv` + `workflow_dispatch`, using a `role_gha_stac_uav_bc` OIDC role (rtj issue to follow, modeled on an internal issue). Registration stays a one-command manual step (`scripts/config/stac_register_item.sh`).
 - **Phase 3 (optional):** server-side re-registration on change (e.g. geoserv cron checking the collection etag) — infrastructure repo territory; only worth it if manual registration proves a bottleneck.
 
 ## Acceptance

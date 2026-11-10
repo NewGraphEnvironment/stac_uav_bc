@@ -38,7 +38,7 @@ All four gates green and the reference run reproduced. Findings below are relati
 
 Produced by parsing `flight_plan.py` with `ast`, not by reading it — script at
 `scratchpad/enumerate_buckets.py`. Recollection is what left the sixth message unpinned in
-trap#28; these are counts.
+an internal issue; these are counts.
 
 ### 1. Every bucket, in dict / summary / accounting
 
